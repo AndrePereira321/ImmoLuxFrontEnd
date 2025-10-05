@@ -19,6 +19,6 @@
 	</div>
 
 	<div class="flex items-center gap-2">
-		<FontAwesomeIcon icon="{faArrowsToEye}"></FontAwesomeIcon>
+		<FontAwesomeIcon icon={faArrowsToEye}></FontAwesomeIcon>
 	</div>
 </div>

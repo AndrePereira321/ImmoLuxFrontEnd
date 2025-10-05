@@ -1,8 +1,8 @@
 <script lang="ts">
-	import '../styles/app.css';
+	import '@styles/app.css';
 	import '@fortawesome/fontawesome-svg-core/styles.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import { resolve } from '$app/paths';
+	import AppMenu from '@components/AppMenu.svelte';
 
 	const { children } = $props();
 </script>
@@ -11,9 +11,8 @@
 	<link href={favicon} rel="icon" />
 </svelte:head>
 
-<nav>
-	<a data-sveltekit-preload-data="hover" href={resolve('/')}>Home</a>
-	<a data-sveltekit-preload-data="hover" href={resolve('/houses')}>Houses</a>
+<nav class="px-6 py-8">
+	<AppMenu></AppMenu>
 </nav>
 
 <main>
