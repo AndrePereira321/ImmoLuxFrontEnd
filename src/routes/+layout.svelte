@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../styles/app.css';
+	import '@fortawesome/fontawesome-svg-core/styles.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { resolve } from '$app/paths';
 

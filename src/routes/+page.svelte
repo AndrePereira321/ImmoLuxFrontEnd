@@ -1,4 +1,6 @@
 <script>
+	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+	import { faArrowsToEye } from '@fortawesome/free-solid-svg-icons/faArrowsToEye';
 </script>
 
 <div>
@@ -14,5 +16,9 @@
 		<button class="bg-info-500">Info</button>
 		<button class="bg-dark-500">Dark</button>
 		<button class="bg-light-500">Light</button>
+	</div>
+
+	<div class="flex items-center gap-2">
+		<FontAwesomeIcon icon="{faArrowsToEye}"></FontAwesomeIcon>
 	</div>
 </div>
