@@ -4,7 +4,7 @@
 <div>
 	<h1>Home</h1>
 
-	<div class="flex gap-2 items-center">
+	<div class="flex items-center gap-2">
 		<button class="bg-primary-500">Primary</button>
 		<button class="bg-secondary-500">Secondary</button>
 		<button class="bg-tertiary-500">Tertiary</button>

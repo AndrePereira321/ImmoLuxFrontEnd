@@ -17,4 +17,4 @@
 	clicks: {count}
 </button>
 
-<button onclick={ping}> Ping </button>
+<button onclick={ping}> Ping</button>
