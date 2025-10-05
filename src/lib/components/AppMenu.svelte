@@ -13,7 +13,10 @@
 
 <div class="md:flex md:items-center md:justify-between">
 	<div class="flex items-center justify-between">
-		<a class="text-dark-900 hover:text-secondary-500 cursor-pointer text-xl font-bold md:text-2xl" href={resolve('/')}>
+		<a
+			class="text-dark-900 hover:text-secondary-500 focus:text-secondary-500 cursor-pointer text-xl font-bold md:text-2xl"
+			href={resolve('/')}
+		>
 			ImmoLux
 		</a>
 		<button
@@ -31,7 +34,13 @@
 			? 'flex'
 			: 'hidden'}"
 	>
-		<a class="text-dark-900 hover:text-primary-400" href={resolve('/')}>{$_('home')}</a>
-		<a class="text-dark-900 hover:text-primary-400" href={resolve('/houses')}>{$_('houses')}</a>
+		{#snippet menuItem(path, label)}
+			<a
+				class="text-dark-900 hover:text-primary-400 focus:text-primary-400 hover:font-medium hover:underline focus:underline"
+				href={resolve(path)}>{$_(label)}</a
+			>
+		{/snippet}
+		{@render menuItem('/', 'home')}
+		{@render menuItem('/houses', 'houses')}
 	</div>
 </div>
