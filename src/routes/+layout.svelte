@@ -2,7 +2,7 @@
 	import '$lib/styles/app.css';
 	import '@fortawesome/fontawesome-svg-core/styles.css';
 	import '$lib/i18n';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/favicon.png';
 	import AppMenu from '$lib/components/AppMenu.svelte';
 	import { waitLocale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
