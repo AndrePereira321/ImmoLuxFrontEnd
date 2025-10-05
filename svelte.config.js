@@ -7,12 +7,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter(),
-		alias: {
-			'@': './src',
-			'@components': './src/components',
-			'@styles': './src/styles'
-		}
+		adapter: adapter()
 	},
 	compilerOptions: {
 		warningFilter: (warning) => {

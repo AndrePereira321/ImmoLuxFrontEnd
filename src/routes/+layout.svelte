@@ -1,8 +1,8 @@
 <script lang="ts">
-	import '@styles/app.css';
+	import '$lib/styles/app.css';
 	import '@fortawesome/fontawesome-svg-core/styles.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import AppMenu from '@components/AppMenu.svelte';
+	import AppMenu from '$lib/components/AppMenu.svelte';
 
 	const { children } = $props();
 </script>
