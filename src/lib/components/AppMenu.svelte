@@ -12,17 +12,17 @@
 
 <div class="md:flex md:items-center md:justify-between">
 	<div class="flex items-center justify-between">
-		<a class="text-dark-900 hover:text-primary-700 text-xl font-bold md:text-2xl" href={resolve('/')}> Logo </a>
-		<div class="flex md:hidden">
-			<button
-				class="text-dark-900 hover:text-dark-100 cursor-pointer focus:outline-none"
-				on:click={toggleNavbar}
-				title="toggle_menu"
-				type="button"
-			>
-				<FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
-			</button>
-		</div>
+		<a class="text-dark-900 hover:text-secondary-500 text-xl font-bold md:text-2xl cursor-pointer" href={resolve('/')}>
+			ImmoLux
+		</a>
+		<button
+			class="md:hidden text-dark-900 hover:text-dark-100 cursor-pointer focus:outline-none"
+			on:click={toggleNavbar}
+			title="toggle_menu"
+			type="button"
+		>
+			<FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
+		</button>
 	</div>
 
 	<div
@@ -30,7 +30,7 @@
 			? 'flex'
 			: 'hidden'}"
 	>
-		<a class="text-dark-900 hover:text-primary-800" href={resolve('/')}>Home</a>
-		<a class="text-dark-900 hover:text-primary-800" href={resolve('/houses')}>Houses</a>
+		<a class="text-dark-900 hover:text-primary-400" href={resolve('/')}>Home</a>
+		<a class="text-dark-900 hover:text-primary-400" href={resolve('/houses')}>Houses</a>
 	</div>
 </div>

@@ -11,8 +11,10 @@
 	<link href={favicon} rel="icon" />
 </svelte:head>
 
-<nav class="px-6 py-8">
-	<AppMenu></AppMenu>
+<nav class="sticky top-0 z-50 bg-light-300 shadow-md border-b border-primary-100">
+	<div class="px-4 md:px-8 py-3 md:py-4">
+		<AppMenu></AppMenu>
+	</div>
 </nav>
 
 <main>
