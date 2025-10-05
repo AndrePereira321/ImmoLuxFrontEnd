@@ -8,5 +8,15 @@ export default defineConfig({
 		port: 8080
 	},
 	envDir: './env',
-	plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
+	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+	build: {
+		minify: 'terser',
+		cssMinify: true
+		// terserOptions: {
+		// 	compress: {
+		// 		drop_console: true, // Removes console.log from production
+		// 		drop_debugger: true
+		// 	}
+		// }
+	}
 });

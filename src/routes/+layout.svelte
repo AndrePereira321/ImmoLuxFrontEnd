@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.css';
+	import '../styles/app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { resolve } from '$app/paths';
 
@@ -16,6 +16,6 @@
 </nav>
 
 <main>
-	<div>main</div>
+	<div class="text-primary-500">main</div>
 	{@render children?.()}
 </main>
