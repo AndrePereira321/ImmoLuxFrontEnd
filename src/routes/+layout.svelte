@@ -1,23 +1,38 @@
 <script lang="ts">
 	import '$lib/styles/app.css';
 	import '@fortawesome/fontawesome-svg-core/styles.css';
+	import '$lib/i18n';
 	import favicon from '$lib/assets/favicon.svg';
 	import AppMenu from '$lib/components/AppMenu.svelte';
+	import { waitLocale } from 'svelte-i18n';
+	import { onMount } from 'svelte';
 
 	const { children } = $props();
+
+	let loaded = $state(false);
+
+	onMount(async () => {
+		try {
+			await waitLocale();
+		} finally {
+			loaded = true;
+		}
+	});
 </script>
 
 <svelte:head>
 	<link href={favicon} rel="icon" />
 </svelte:head>
 
-<nav class="sticky top-0 z-50 bg-light-300 shadow-md border-b border-primary-100">
-	<div class="px-4 md:px-8 py-3 md:py-4">
-		<AppMenu></AppMenu>
-	</div>
-</nav>
+{#if loaded}
+	<nav class="bg-light-300 border-primary-100 sticky top-0 z-50 border-b shadow-md">
+		<div class="px-4 py-3 md:px-8 md:py-4">
+			<AppMenu></AppMenu>
+		</div>
+	</nav>
 
-<main>
-	<div class="text-primary-500">main</div>
-	{@render children?.()}
-</main>
+	<main>
+		<div class="text-primary-500">main</div>
+		{@render children?.()}
+	</main>
+{/if}

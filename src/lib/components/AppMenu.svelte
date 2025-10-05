@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
+	import { _ } from 'svelte-i18n';
 
 	let showMenu = false;
 
@@ -12,11 +13,11 @@
 
 <div class="md:flex md:items-center md:justify-between">
 	<div class="flex items-center justify-between">
-		<a class="text-dark-900 hover:text-secondary-500 text-xl font-bold md:text-2xl cursor-pointer" href={resolve('/')}>
+		<a class="text-dark-900 hover:text-secondary-500 cursor-pointer text-xl font-bold md:text-2xl" href={resolve('/')}>
 			ImmoLux
 		</a>
 		<button
-			class="md:hidden text-dark-900 hover:text-dark-100 cursor-pointer focus:outline-none"
+			class="text-dark-900 hover:text-dark-100 cursor-pointer focus:outline-none md:hidden"
 			on:click={toggleNavbar}
 			title="toggle_menu"
 			type="button"
@@ -30,7 +31,7 @@
 			? 'flex'
 			: 'hidden'}"
 	>
-		<a class="text-dark-900 hover:text-primary-400" href={resolve('/')}>Home</a>
-		<a class="text-dark-900 hover:text-primary-400" href={resolve('/houses')}>Houses</a>
+		<a class="text-dark-900 hover:text-primary-400" href={resolve('/')}>{$_('home')}</a>
+		<a class="text-dark-900 hover:text-primary-400" href={resolve('/houses')}>{$_('houses')}</a>
 	</div>
 </div>

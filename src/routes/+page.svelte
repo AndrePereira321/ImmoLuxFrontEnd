@@ -1,6 +1,7 @@
 <script>
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faArrowsToEye } from '@fortawesome/free-solid-svg-icons/faArrowsToEye';
+	import { locale, locales } from 'svelte-i18n';
 </script>
 
 <div>
@@ -21,4 +22,10 @@
 	<div class="flex items-center gap-2">
 		<FontAwesomeIcon icon={faArrowsToEye}></FontAwesomeIcon>
 	</div>
+
+	<select bind:value={$locale}>
+		{#each $locales as locale (locale)}
+			<option value={locale}>{locale}</option>
+		{/each}
+	</select>
 </div>
