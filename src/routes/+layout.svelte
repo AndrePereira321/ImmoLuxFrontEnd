@@ -25,7 +25,7 @@
 </svelte:head>
 
 {#if loaded}
-	<nav class="bg-light-300 border-primary-100 sticky top-0 z-50 border-b shadow-md">
+	<nav class="sticky top-0 z-50 border-b border-primary-100 bg-light-300 shadow-md">
 		<div class="px-4 py-3 md:px-8 md:py-4">
 			<AppMenu></AppMenu>
 		</div>
