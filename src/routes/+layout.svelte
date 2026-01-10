@@ -25,14 +25,11 @@
 </svelte:head>
 
 {#if loaded}
-	<nav class="sticky top-0 z-50 border-b border-primary-100 bg-light-300 shadow-md">
-		<div class="px-4 py-3 md:px-8 md:py-4">
-			<AppMenu></AppMenu>
-		</div>
-	</nav>
+	<div class="sticky top-0 z-50 shadow-xl">
+		<AppMenu></AppMenu>
+	</div>
 
-	<main>
-		<div class="text-primary-500">main</div>
+	<main class="container mx-auto min-h-screen bg-light-300 px-4 py-8">
 		{@render children?.()}
 	</main>
 {/if}

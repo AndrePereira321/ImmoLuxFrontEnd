@@ -1,46 +1,73 @@
 <script>
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
+	import { faBars, faHome, faHouse, faTimes } from '@fortawesome/free-solid-svg-icons';
 	import { _ } from 'svelte-i18n';
 
-	let showMenu = false;
+	let mobileMenuOpen = $state(false);
 
-	function toggleNavbar() {
-		showMenu = !showMenu;
+	function toggleMenu() {
+		mobileMenuOpen = !mobileMenuOpen;
 	}
 </script>
 
-<div class="md:flex md:items-center md:justify-between">
-	<div class="flex items-center justify-between">
-		<a
-			class="cursor-pointer text-xl font-bold text-dark-900 hover:text-secondary-500 focus:text-secondary-500 md:text-2xl"
-			href={resolve('/')}
-		>
-			ImmoLux
-		</a>
-		<button
-			class="cursor-pointer text-dark-900 hover:text-dark-100 focus:outline-none md:hidden"
-			on:click={toggleNavbar}
-			title="toggle_menu"
-			type="button"
-		>
-			<FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
-		</button>
-	</div>
+<nav class="bg-primary-600 shadow-xl">
+	<div class="container mx-auto px-4">
+		<div class="flex h-16 items-center justify-between">
+			<!-- Logo/Brand -->
+			<a href={resolve('/')} class="flex items-center gap-3 transition-opacity hover:opacity-90">
+				<FontAwesomeIcon icon={faHouse} class="text-2xl text-light-50" />
+				<span class="text-2xl font-bold tracking-tight text-light-50">ImmoLux</span>
+			</a>
 
-	<div
-		class="mt-8 flex-col space-y-4 md:mt-0 md:flex md:flex-row md:items-center md:space-y-0 md:space-x-10 {showMenu
-			? 'flex'
-			: 'hidden'}"
-	>
-		{#snippet menuItem(path, label)}
-			<a
-				class="text-dark-900 hover:font-medium hover:text-primary-400 focus:text-primary-400 focus:underline"
-				href={resolve(path)}>{$_(label)}</a
+			<!-- Desktop Menu -->
+			<div class="hidden items-center gap-1 md:flex">
+				<a
+					href={resolve('/')}
+					class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+				>
+					<FontAwesomeIcon icon={faHome} />
+					<span>{$_('home')}</span>
+				</a>
+				<a
+					href={resolve('/houses')}
+					class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+				>
+					<FontAwesomeIcon icon={faHouse} />
+					<span>{$_('houses')}</span>
+				</a>
+			</div>
+
+			<!-- Mobile Menu Button -->
+			<button
+				class="rounded-lg p-2 text-light-50 transition-all hover:bg-primary-700 md:hidden"
+				onclick={toggleMenu}
+				aria-label="Toggle menu"
 			>
-		{/snippet}
-		{@render menuItem('/', 'home')}
-		{@render menuItem('/houses', 'houses')}
+				<FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} size="lg" />
+			</button>
+		</div>
+
+		<!-- Mobile Menu -->
+		{#if mobileMenuOpen}
+			<div class="space-y-2 pb-4 md:hidden">
+				<a
+					href={resolve('/')}
+					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+					onclick={toggleMenu}
+				>
+					<FontAwesomeIcon icon={faHome} />
+					<span>{$_('home')}</span>
+				</a>
+				<a
+					href={resolve('/houses')}
+					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+					onclick={toggleMenu}
+				>
+					<FontAwesomeIcon icon={faHouse} />
+					<span>{$_('houses')}</span>
+				</a>
+			</div>
+		{/if}
 	</div>
-</div>
+</nav>
