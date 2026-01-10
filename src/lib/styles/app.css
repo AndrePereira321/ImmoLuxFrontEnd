@@ -19,6 +19,12 @@
 	h6 {
 		font-family: 'Playfair Display', Georgia, serif;
 	}
+
+	* {
+		transition-property: background-color, border-color, color, fill, stroke;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 300ms;
+	}
 }
 
 @theme {
@@ -136,6 +142,7 @@
 	--color-dark-600: oklch(0.318 0.032 247.11);
 	--color-dark-700: oklch(0.345 0.035 248.87);
 	--color-dark-800: oklch(0.36 0.037 248.88);
+	--color-dark-850: oklch(0.374 0.039 249.5);
 	--color-dark-900: oklch(0.387 0.04 250.23);
 	--color-dark-950: oklch(0.404 0.041 247.56);
 }

@@ -3,7 +3,24 @@
 	"houses": "Houses",
 	"menu": {
 		"toggleTheme": "Toggle theme",
-		"selectLanguage": "Select language"
+		"selectLanguage": "Select language",
+		"login": "Login",
+		"logout": "Logout"
+	},
+	"auth": {
+		"login": "Login",
+		"email": "Email",
+		"password": "Password",
+		"rememberMe": "Remember me",
+		"loginButton": "Login",
+		"loggingIn": "Logging in...",
+		"loggingOut": "Logging out...",
+		"invalidCredentials": "Invalid email or password",
+		"accountLocked": "Account locked due to too many failed login attempts",
+		"loginError": "An error occurred during login",
+		"loginSuccess": "Successfully logged in",
+		"logoutSuccess": "Successfully logged out",
+		"logoutError": "An error occurred during logout"
 	},
 	"footer": {
 		"author": "André Pereira",

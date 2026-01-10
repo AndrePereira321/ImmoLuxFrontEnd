@@ -5,7 +5,10 @@
 	import favicon from '$lib/assets/favicon.png';
 	import AppMenu from '$lib/components/AppMenu.svelte';
 	import AppFooter from '$lib/components/AppFooter.svelte';
+	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
+	import AppNotification from '$lib/components/AppNotification.svelte';
 	import { waitLocale } from 'svelte-i18n';
+	import { authStore } from '$lib/stores/auth';
 	import { onMount } from 'svelte';
 
 	const { children } = $props();
@@ -14,7 +17,7 @@
 
 	onMount(async () => {
 		try {
-			await waitLocale();
+			await Promise.all([waitLocale(), authStore.checkAuth()]);
 		} finally {
 			loaded = true;
 		}
@@ -37,4 +40,9 @@
 
 		<AppFooter />
 	</div>
+
+	<!-- Notifications -->
+	<AppNotification />
+{:else}
+	<AppLoadingSpinner />
 {/if}

@@ -11,13 +11,13 @@
 	<!-- Block 1: Hero Section - Available Houses -->
 	<AppSection
 		variant="primary"
-		class="dark:to-dark-850 relative overflow-hidden bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900"
+		class="relative overflow-hidden bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900 dark:to-dark-850"
 	>
 		<!-- Decorative background -->
-		<div class="absolute inset-0 -z-10 opacity-30">
-			<div class="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary-200 blur-3xl dark:bg-primary-900"></div>
+		<div class="absolute inset-0 -z-10 opacity-20 dark:opacity-10">
+			<div class="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary-200 blur-3xl dark:bg-primary-950"></div>
 			<div
-				class="absolute right-1/4 bottom-20 h-96 w-96 rounded-full bg-secondary-200 blur-3xl dark:bg-secondary-900"
+				class="absolute right-1/4 bottom-20 h-96 w-96 rounded-full bg-secondary-200 blur-3xl dark:bg-secondary-950"
 			></div>
 		</div>
 
@@ -53,7 +53,7 @@
 
 			<!-- Coming Soon Placeholder -->
 			<div
-				class="group dark:to-dark-850 mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-primary-800 dark:from-dark-800 dark:hover:border-primary-700"
+				class="group mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-primary-900 dark:from-dark-800 dark:to-dark-850 dark:hover:border-primary-800"
 			>
 				<div class="mb-4">
 					<FontAwesomeIcon
@@ -78,7 +78,7 @@
 	<AppSectionDivider variant="decorative" />
 
 	<!-- Block 2: About ImmoLux -->
-	<AppSection variant="secondary" class="dark:bg-dark-850 bg-light-100">
+	<AppSection variant="secondary" class="bg-light-100 dark:bg-dark-850">
 		<div class="mx-auto max-w-6xl">
 			<!-- Section Header -->
 			<div class="mb-12 text-center">
@@ -155,7 +155,7 @@
 	<!-- Block 3: Contact Information -->
 	<AppSection
 		variant="tertiary"
-		class="dark:to-dark-850 bg-gradient-to-b from-light-200 to-light-100 dark:from-dark-800"
+		class="bg-gradient-to-b from-light-200 to-light-100 dark:from-dark-800 dark:to-dark-850"
 	>
 		<div class="mx-auto max-w-4xl text-center">
 			<!-- Icon -->
@@ -190,7 +190,7 @@
 			<div class="space-y-6">
 				<!-- Main Contact Card -->
 				<div
-					class="dark:to-dark-650 overflow-hidden rounded-3xl border-2 border-light-300 bg-gradient-to-br from-light-50 to-light-100 p-10 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-12 dark:border-dark-600 dark:from-dark-700 dark:hover:border-primary-700"
+					class="overflow-hidden rounded-3xl border-2 border-light-300 bg-gradient-to-br from-light-50 to-light-100 p-10 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-12 dark:border-dark-700 dark:from-dark-800 dark:to-dark-900 dark:hover:border-primary-800"
 				>
 					<p class="mb-8 text-base leading-relaxed text-dark-700 dark:text-light-300">
 						{$t('homepage.contact.interested')}

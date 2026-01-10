@@ -1,16 +1,34 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faBars, faBuilding, faGlobe, faHome, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faBars,
+		faBuilding,
+		faGlobe,
+		faHome,
+		faRightFromBracket,
+		faRightToBracket,
+		faSearch,
+		faTimes
+	} from '@fortawesome/free-solid-svg-icons';
 	import { _, locale } from 'svelte-i18n';
 	import { LANGUAGES } from '$lib/constants/languages';
 	import { changeLanguage as setLanguage } from '$lib/utils/language';
 	import { themeStore } from '$lib/stores/theme';
+	import { authStore } from '$lib/stores/auth';
+	import { notificationStore } from '$lib/stores/notification';
 	import AppTooltip from '$lib/components/AppTooltip.svelte';
 	import AppThemeToggler from '$lib/components/AppThemeToggler.svelte';
+	import AppModal from '$lib/components/AppModal.svelte';
+	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
 
 	let mobileMenuOpen = $state(false);
 	let languageDropdownOpen = $state(false);
+	let loginModalOpen = $state(false);
+	let isLoggingOut = $state(false);
+	let AppLoginForm: any = $state(null);
+
+	const authState = $derived($authStore);
 
 	const toggleMenu = () => {
 		mobileMenuOpen = !mobileMenuOpen;
@@ -27,6 +45,34 @@
 
 	const toggleTheme = () => {
 		themeStore.toggle();
+	};
+
+	const openLoginModal = async () => {
+		if (!AppLoginForm) {
+			const module = await import('$lib/components/AppLoginForm.svelte');
+			AppLoginForm = module.default;
+		}
+		loginModalOpen = true;
+	};
+
+	const closeLoginModal = () => {
+		loginModalOpen = false;
+	};
+
+	const handleLoginSuccess = () => {
+		closeLoginModal();
+	};
+
+	const handleLogout = async () => {
+		isLoggingOut = true;
+		const result = await authStore.logout();
+		isLoggingOut = false;
+
+		if (result.success) {
+			notificationStore.success($_('auth.logoutSuccess'));
+		} else {
+			notificationStore.error($_('auth.logoutError'));
+		}
 	};
 </script>
 
@@ -65,6 +111,32 @@
 
 			<!-- Right Side Controls (Desktop) -->
 			<div class="hidden items-center gap-1 md:flex">
+				<!-- Login/Logout Button -->
+				{#if !authState.isLoading}
+					{#if authState.isAuthenticated}
+						<button
+							onclick={handleLogout}
+							class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+							aria-label={$_('menu.logout')}
+						>
+							<FontAwesomeIcon icon={faRightFromBracket} />
+							<span>{$_('menu.logout')}</span>
+						</button>
+					{:else}
+						<button
+							onclick={openLoginModal}
+							class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+							aria-label={$_('menu.login')}
+						>
+							<FontAwesomeIcon icon={faRightToBracket} />
+							<span>{$_('menu.login')}</span>
+						</button>
+					{/if}
+
+					<!-- Vertical Divider -->
+					<div class="h-8 w-px bg-primary-400 dark:bg-dark-700"></div>
+				{/if}
+
 				<!-- Language Dropdown -->
 				<button
 					id="language-button"
@@ -138,6 +210,35 @@
 					<span>{$_('houses')}</span>
 				</a>
 
+				<!-- Login/Logout Button Mobile -->
+				{#if !authState.isLoading}
+					<div class="border-t border-primary-700 pt-2">
+						{#if authState.isAuthenticated}
+							<button
+								onclick={() => {
+									handleLogout();
+									toggleMenu();
+								}}
+								class="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+							>
+								<FontAwesomeIcon icon={faRightFromBracket} />
+								<span>{$_('menu.logout')}</span>
+							</button>
+						{:else}
+							<button
+								onclick={() => {
+									openLoginModal();
+									toggleMenu();
+								}}
+								class="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+							>
+								<FontAwesomeIcon icon={faRightToBracket} />
+								<span>{$_('menu.login')}</span>
+							</button>
+						{/if}
+					</div>
+				{/if}
+
 				<!-- Theme Toggle Mobile -->
 				<div class="border-t border-primary-700 pt-2">
 					<div class="flex w-full items-center justify-between px-4 py-3">
@@ -169,3 +270,15 @@
 		{/if}
 	</div>
 </nav>
+
+<!-- Login Modal -->
+<AppModal bind:open={loginModalOpen} title={$_('auth.login')} size="md" onClose={closeLoginModal}>
+	{#if AppLoginForm}
+		<AppLoginForm onSuccess={handleLoginSuccess} />
+	{/if}
+</AppModal>
+
+<!-- Logout Loading -->
+{#if isLoggingOut}
+	<AppLoadingSpinner message={$_('auth.loggingOut')} overlay={true} />
+{/if}

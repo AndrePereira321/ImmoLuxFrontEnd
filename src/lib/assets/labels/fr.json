@@ -3,7 +3,24 @@
 	"houses": "Maisons",
 	"menu": {
 		"toggleTheme": "Basculer le thème",
-		"selectLanguage": "Sélectionner la langue"
+		"selectLanguage": "Sélectionner la langue",
+		"login": "Connexion",
+		"logout": "Déconnexion"
+	},
+	"auth": {
+		"login": "Login",
+		"email": "Email",
+		"password": "Mot de passe",
+		"rememberMe": "Se souvenir de moi",
+		"loginButton": "Login",
+		"loggingIn": "Connexion...",
+		"loggingOut": "Déconnexion...",
+		"invalidCredentials": "Email ou mot de passe invalide",
+		"accountLocked": "Compte verrouillé en raison de trop nombreuses tentatives échouées",
+		"loginError": "Une erreur s'est produite lors de la connexion",
+		"loginSuccess": "Connexion réussie",
+		"logoutSuccess": "Déconnexion réussie",
+		"logoutError": "Une erreur s'est produite lors de la déconnexion"
 	},
 	"footer": {
 		"author": "André Pereira",

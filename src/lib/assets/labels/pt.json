@@ -3,7 +3,24 @@
 	"houses": "Casas",
 	"menu": {
 		"toggleTheme": "Alternar tema",
-		"selectLanguage": "Selecionar idioma"
+		"selectLanguage": "Selecionar idioma",
+		"login": "Entrar",
+		"logout": "Sair"
+	},
+	"auth": {
+		"login": "Login",
+		"email": "Email",
+		"password": "Senha",
+		"rememberMe": "Lembrar-me",
+		"loginButton": "Login",
+		"loggingIn": "Entrando...",
+		"loggingOut": "Saindo...",
+		"invalidCredentials": "Email ou senha inválidos",
+		"accountLocked": "Conta bloqueada devido a muitas tentativas falhadas",
+		"loginError": "Ocorreu um erro durante o login",
+		"loginSuccess": "Login realizado com sucesso",
+		"logoutSuccess": "Logout realizado com sucesso",
+		"logoutError": "Ocorreu um erro durante o logout"
 	},
 	"footer": {
 		"author": "André Pereira",
