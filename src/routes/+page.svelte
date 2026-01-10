@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faGlobe, faHouse, faMapLocationDot, faSearch } from '@fortawesome/free-solid-svg-icons';
 	import { locale, locales } from 'svelte-i18n';

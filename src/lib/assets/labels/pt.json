@@ -1,4 +1,8 @@
 {
 	"home": "Início",
-	"houses": "Casas"
+	"houses": "Casas",
+	"footer": {
+		"author": "André Pereira",
+		"language": "Idioma"
+	}
 }

@@ -4,6 +4,7 @@
 	import '$lib/i18n';
 	import favicon from '$lib/assets/favicon.png';
 	import AppMenu from '$lib/components/AppMenu.svelte';
+	import AppFooter from '$lib/components/AppFooter.svelte';
 	import { waitLocale } from 'svelte-i18n';
 	import { onMount } from 'svelte';
 
@@ -25,11 +26,15 @@
 </svelte:head>
 
 {#if loaded}
-	<div class="sticky top-0 z-50 shadow-xl">
-		<AppMenu></AppMenu>
-	</div>
+	<div class="flex min-h-screen flex-col">
+		<div class="sticky top-0 z-50 shadow-xl">
+			<AppMenu></AppMenu>
+		</div>
 
-	<main class="container mx-auto min-h-screen bg-light-300 px-4 py-8">
-		{@render children?.()}
-	</main>
+		<main class="flex-grow bg-light-300 px-4 py-8">
+			{@render children?.()}
+		</main>
+
+		<AppFooter />
+	</div>
 {/if}
