@@ -31,7 +31,7 @@
 			<AppMenu></AppMenu>
 		</div>
 
-		<main class="flex-grow bg-light-300 px-4 py-8">
+		<main class="flex-grow bg-light-300 px-4 py-8 dark:bg-dark-800">
 			{@render children?.()}
 		</main>
 

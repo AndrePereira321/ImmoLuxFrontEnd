@@ -1,6 +1,10 @@
 {
 	"home": "Accueil",
 	"houses": "Maisons",
+	"menu": {
+		"toggleTheme": "Basculer le thème",
+		"selectLanguage": "Sélectionner la langue"
+	},
 	"footer": {
 		"author": "André Pereira",
 		"language": "Langue"

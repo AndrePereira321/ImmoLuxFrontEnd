@@ -7,8 +7,8 @@
 
 <div class="min-h-screen">
 	<!-- Hero Section -->
-	<section class="relative mb-12 rounded-3xl bg-primary-600 px-4 py-20 text-light-50 shadow-2xl">
-		<div class="absolute inset-0 rounded-3xl bg-dark-950 opacity-10"></div>
+	<section class="relative mb-12 rounded-3xl bg-primary-600 px-4 py-20 text-light-50 shadow-2xl dark:bg-primary-700">
+		<div class="absolute inset-0 rounded-3xl bg-dark-950 opacity-10 dark:opacity-20"></div>
 		<div class="relative z-10 mx-auto max-w-4xl text-center">
 			<div class="mb-6">
 				<FontAwesomeIcon icon={faHouse} size="4x" class="text-light-50 opacity-90" />
@@ -23,7 +23,7 @@
 				<Button
 					size="xl"
 					color="light"
-					class="border-0 bg-secondary-500 font-semibold text-light-50 shadow-lg transition-shadow hover:bg-secondary-600 hover:shadow-xl"
+					class="border-0 bg-secondary-500 font-semibold text-light-50 shadow-lg transition-shadow hover:bg-secondary-600 hover:shadow-xl dark:bg-secondary-600 dark:hover:bg-secondary-700"
 					href="/houses"
 				>
 					<FontAwesomeIcon icon={faSearch} class="mr-2" />
@@ -31,7 +31,7 @@
 				</Button>
 				<Button
 					size="xl"
-					class="border-0 bg-light-50 font-semibold text-primary-600 shadow-lg transition-shadow hover:bg-light-100 hover:shadow-xl"
+					class="border-0 bg-light-50 font-semibold text-primary-600 shadow-lg transition-shadow hover:bg-light-100 hover:shadow-xl dark:bg-light-100 dark:hover:bg-light-200"
 				>
 					<FontAwesomeIcon icon={faMapLocationDot} class="mr-2" />
 					View Map
@@ -42,40 +42,54 @@
 
 	<!-- Features Section -->
 	<section class="mb-16">
-		<Heading tag="h2" class="mb-12 text-center text-4xl font-bold text-dark-900">Why Choose ImmoLux?</Heading>
+		<Heading tag="h2" class="mb-12 text-center text-4xl font-bold text-dark-900 dark:text-light-50"
+			>Why Choose ImmoLux?</Heading
+		>
 		<div class="grid gap-8 md:grid-cols-3">
-			<Card class="border-t-4 border-primary-500 transition-shadow duration-300 hover:shadow-2xl">
+			<Card
+				class="border-t-4 border-primary-500 transition-shadow duration-300 hover:shadow-2xl dark:border-primary-400 dark:bg-dark-700"
+			>
 				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-primary-100 p-6">
-						<FontAwesomeIcon icon={faHouse} size="3x" class="text-primary-600" />
+					<div class="rounded-full bg-primary-100 p-6 dark:bg-primary-900">
+						<FontAwesomeIcon icon={faHouse} size="3x" class="text-primary-600 dark:text-primary-300" />
 					</div>
 				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900">Wide Selection</Heading>
-				<P class="text-center text-lg leading-relaxed text-dark-300">
+				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
+					>Wide Selection</Heading
+				>
+				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
 					Browse through hundreds of premium properties across Luxembourg
 				</P>
 			</Card>
 
-			<Card class="border-t-4 border-secondary-500 transition-shadow duration-300 hover:shadow-2xl">
+			<Card
+				class="border-t-4 border-secondary-500 transition-shadow duration-300 hover:shadow-2xl dark:border-secondary-400 dark:bg-dark-700"
+			>
 				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-secondary-100 p-6">
-						<FontAwesomeIcon icon={faSearch} size="3x" class="text-secondary-600" />
+					<div class="rounded-full bg-secondary-100 p-6 dark:bg-secondary-900">
+						<FontAwesomeIcon icon={faSearch} size="3x" class="text-secondary-600 dark:text-secondary-300" />
 					</div>
 				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900">Smart Search</Heading>
-				<P class="text-center text-lg leading-relaxed text-dark-300">
+				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
+					>Smart Search</Heading
+				>
+				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
 					Find exactly what you're looking for with powerful advanced filters
 				</P>
 			</Card>
 
-			<Card class="border-t-4 border-success-500 transition-shadow duration-300 hover:shadow-2xl">
+			<Card
+				class="border-t-4 border-success-500 transition-shadow duration-300 hover:shadow-2xl dark:border-success-400 dark:bg-dark-700"
+			>
 				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-success-100 p-6">
-						<FontAwesomeIcon icon={faMapLocationDot} size="3x" class="text-success-600" />
+					<div class="rounded-full bg-success-100 p-6 dark:bg-success-900">
+						<FontAwesomeIcon icon={faMapLocationDot} size="3x" class="text-success-600 dark:text-success-300" />
 					</div>
 				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900">Location Based</Heading>
-				<P class="text-center text-lg leading-relaxed text-dark-300">
+				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
+					>Location Based</Heading
+				>
+				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
 					Explore properties by location on an interactive map
 				</P>
 			</Card>
@@ -84,13 +98,19 @@
 
 	<!-- Language Selector -->
 	<section class="flex justify-center py-8">
-		<Card class="w-full max-w-md shadow-lg">
+		<Card class="w-full max-w-md shadow-lg dark:bg-dark-700">
 			<div class="mb-4 flex items-center justify-center">
-				<FontAwesomeIcon icon={faGlobe} size="2x" class="mr-3 text-primary-600" />
-				<Heading tag="h3" class="text-2xl font-bold text-dark-900">Language / Langue</Heading>
+				<FontAwesomeIcon icon={faGlobe} size="2x" class="mr-3 text-primary-600 dark:text-primary-400" />
+				<Heading tag="h3" class="text-2xl font-bold text-dark-900 dark:text-light-50">Language / Langue</Heading>
 			</div>
-			<Label for="locale-select" class="mb-2 font-medium text-dark-700">Choose your preferred language:</Label>
-			<Select id="locale-select" bind:value={$locale} class="text-lg">
+			<Label for="locale-select" class="mb-2 font-medium text-dark-700 dark:text-light-200"
+				>Choose your preferred language:</Label
+			>
+			<Select
+				id="locale-select"
+				bind:value={$locale}
+				class="text-lg dark:border-dark-500 dark:bg-dark-600 dark:text-light-50"
+			>
 				{#each $locales as localeOption (localeOption)}
 					<option value={localeOption}>{localeOption.toUpperCase()}</option>
 				{/each}

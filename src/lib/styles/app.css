@@ -3,6 +3,8 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+@variant dark (&:is(.dark *));
+
 @theme {
 	/* Primary */
 	--color-primary-50: oklch(0.967 0.013 266.74);
