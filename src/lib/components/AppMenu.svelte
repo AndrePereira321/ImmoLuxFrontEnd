@@ -36,7 +36,7 @@
 	>
 		{#snippet menuItem(path, label)}
 			<a
-				class="text-dark-900 hover:font-medium hover:text-primary-400 hover:underline focus:text-primary-400 focus:underline"
+				class="text-dark-900 hover:font-medium hover:text-primary-400 focus:text-primary-400 focus:underline"
 				href={resolve(path)}>{$_(label)}</a
 			>
 		{/snippet}
