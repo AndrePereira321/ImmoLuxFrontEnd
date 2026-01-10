@@ -136,7 +136,7 @@
 						})}
 					</p>
 					<a
-						href="https://www.pacaconstruct.be"
+						href="http://www.pacaconstruct.be"
 						target="_blank"
 						rel="noopener noreferrer"
 						class="inline-flex items-center gap-2 font-medium text-primary-600 underline decoration-primary-300 underline-offset-4 transition-all hover:text-primary-700 hover:decoration-primary-500 dark:text-primary-400 dark:decoration-primary-700 dark:hover:text-primary-300"
