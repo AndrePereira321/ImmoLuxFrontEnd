@@ -24,7 +24,7 @@
 	});
 </script>
 
-<section class={`px-6 py-20 md:px-8 md:py-28 ${variantClasses()} ${className}`}>
+<section class={`px-6 py-12 md:px-8 md:py-16 ${variantClasses()} ${className}`}>
 	<div class={fullWidth ? 'mx-auto max-w-full' : 'mx-auto max-w-7xl'}>
 		{@render children?.()}
 	</div>

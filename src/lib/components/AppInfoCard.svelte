@@ -56,30 +56,30 @@
 </script>
 
 <div
-	class={`group relative overflow-hidden rounded-2xl bg-light-50 p-10 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl md:p-12 dark:bg-dark-700 ${className}`}
+	class={`group relative overflow-hidden rounded-2xl bg-light-50 p-8 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl md:p-10 dark:bg-dark-700 ${className}`}
 >
 	<!-- Glow Effect -->
 	<div
-		class={`absolute top-0 right-0 h-40 w-40 translate-x-20 -translate-y-20 rounded-full opacity-30 blur-3xl transition-transform duration-500 group-hover:scale-150 ${colorClasses().glow}`}
+		class={`absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full opacity-30 blur-3xl transition-transform duration-500 group-hover:scale-150 ${colorClasses().glow}`}
 	></div>
 
 	<div class="relative text-center">
 		<!-- Icon -->
-		<div class="mb-6 flex justify-center">
-			<div class={`inline-block rounded-full p-5 ${colorClasses().bg}`}>
-				<FontAwesomeIcon {icon} size="3x" class={colorClasses().icon} />
+		<div class="mb-5 flex justify-center">
+			<div class={`inline-block rounded-full p-4 ${colorClasses().bg}`}>
+				<FontAwesomeIcon {icon} size="2x" class={colorClasses().icon} />
 			</div>
 		</div>
 
 		<!-- Title (optional) -->
 		{#if title}
-			<h3 class="mb-4 text-2xl font-light text-dark-900 dark:text-light-50">
+			<h3 class="mb-4 text-xl font-light text-dark-900 dark:text-light-50">
 				{title}
 			</h3>
 		{/if}
 
 		<!-- Content -->
-		<div class="text-lg leading-relaxed font-light text-dark-700 dark:text-light-200">
+		<div class="text-base leading-relaxed font-light text-dark-700 dark:text-light-200">
 			{@render children?.()}
 		</div>
 	</div>

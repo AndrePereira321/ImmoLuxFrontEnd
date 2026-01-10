@@ -23,51 +23,51 @@
 
 		<div class="mx-auto max-w-5xl text-center">
 			<!-- Icon -->
-			<div class="mb-10 inline-block">
+			<div class="mb-8 inline-block">
 				<div class="relative">
 					<div
 						class="absolute inset-0 animate-pulse rounded-full bg-primary-400 opacity-20 blur-2xl dark:bg-primary-600"
 					></div>
 					<div
-						class="relative rounded-full bg-gradient-to-br from-primary-500 to-primary-700 p-12 shadow-2xl dark:from-primary-600 dark:to-primary-800"
+						class="relative rounded-full bg-gradient-to-br from-primary-500 to-primary-700 p-10 shadow-2xl dark:from-primary-600 dark:to-primary-800"
 					>
-						<FontAwesomeIcon icon={faHouse} size="4x" class="text-light-50" />
+						<FontAwesomeIcon icon={faHouse} size="3x" class="text-light-50" />
 					</div>
 				</div>
 			</div>
 
 			<!-- Subtitle -->
-			<p class="mb-4 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
+			<p class="mb-3 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
 				{$t('homepage.availableHouses.subtitle')}
 			</p>
 
 			<!-- Main Title -->
-			<h1 class="mb-8 text-5xl font-normal tracking-tight text-dark-900 md:text-6xl lg:text-7xl dark:text-light-50">
+			<h1 class="mb-6 text-4xl font-normal tracking-tight text-dark-900 md:text-5xl lg:text-6xl dark:text-light-50">
 				{$t('homepage.availableHouses.title')}
 			</h1>
 
 			<!-- Description -->
-			<p class="mx-auto mb-16 max-w-3xl text-xl leading-relaxed text-dark-600 dark:text-light-400">
+			<p class="mx-auto mb-10 max-w-3xl text-lg leading-relaxed text-dark-600 dark:text-light-400">
 				{$t('homepage.availableHouses.description')}
 			</p>
 
 			<!-- Coming Soon Placeholder -->
 			<div
-				class="group dark:to-dark-850 mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-20 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-24 dark:border-primary-800 dark:from-dark-800 dark:hover:border-primary-700"
+				class="group dark:to-dark-850 mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-primary-800 dark:from-dark-800 dark:hover:border-primary-700"
 			>
-				<div class="mb-6">
+				<div class="mb-4">
 					<FontAwesomeIcon
 						icon={faHouse}
-						size="3x"
+						size="2x"
 						class="text-primary-400 opacity-40 transition-all duration-500 group-hover:scale-110 group-hover:opacity-60 dark:text-primary-600"
 					/>
 				</div>
 				<h3
-					class="mb-4 text-2xl font-normal tracking-wider text-primary-700 uppercase md:text-3xl dark:text-primary-400"
+					class="mb-3 text-xl font-normal tracking-wider text-primary-700 uppercase md:text-2xl dark:text-primary-400"
 				>
 					{$t('homepage.availableHouses.comingSoon')}
 				</h3>
-				<p class="text-lg text-dark-600 dark:text-light-400">
+				<p class="text-base text-dark-600 dark:text-light-400">
 					{$t('homepage.availableHouses.comingSoonDesc')}
 				</p>
 			</div>
@@ -81,11 +81,11 @@
 	<AppSection variant="secondary" class="dark:bg-dark-850 bg-light-100">
 		<div class="mx-auto max-w-6xl">
 			<!-- Section Header -->
-			<div class="mb-20 text-center">
-				<p class="mb-4 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
+			<div class="mb-12 text-center">
+				<p class="mb-3 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
 					{$t('homepage.aboutUs.subtitle')}
 				</p>
-				<h2 class="mb-6 text-4xl font-normal tracking-tight text-dark-900 md:text-5xl lg:text-6xl dark:text-light-50">
+				<h2 class="mb-4 text-3xl font-normal tracking-tight text-dark-900 md:text-4xl lg:text-5xl dark:text-light-50">
 					{$t('homepage.aboutUs.title')}
 				</h2>
 				<div
@@ -159,46 +159,46 @@
 	>
 		<div class="mx-auto max-w-4xl text-center">
 			<!-- Icon -->
-			<div class="mb-10 inline-block">
+			<div class="mb-8 inline-block">
 				<div class="relative">
 					<div
 						class="absolute inset-0 animate-pulse rounded-full bg-secondary-400 opacity-20 blur-2xl dark:bg-secondary-600"
 					></div>
 					<div
-						class="relative rounded-full bg-gradient-to-br from-secondary-500 to-secondary-700 p-12 shadow-2xl dark:from-secondary-600 dark:to-secondary-800"
+						class="relative rounded-full bg-gradient-to-br from-secondary-500 to-secondary-700 p-10 shadow-2xl dark:from-secondary-600 dark:to-secondary-800"
 					>
-						<FontAwesomeIcon icon={faEnvelope} size="4x" class="text-light-50" />
+						<FontAwesomeIcon icon={faEnvelope} size="3x" class="text-light-50" />
 					</div>
 				</div>
 			</div>
 
 			<!-- Subtitle -->
-			<p class="mb-4 text-sm font-medium tracking-widest text-secondary-600 uppercase dark:text-secondary-400">
+			<p class="mb-3 text-sm font-medium tracking-widest text-secondary-600 uppercase dark:text-secondary-400">
 				{$t('homepage.contact.subtitle')}
 			</p>
 
 			<!-- Title -->
-			<h2 class="mb-8 text-4xl font-normal tracking-tight text-dark-900 md:text-5xl lg:text-6xl dark:text-light-50">
+			<h2 class="mb-4 text-3xl font-normal tracking-tight text-dark-900 md:text-4xl lg:text-5xl dark:text-light-50">
 				{$t('homepage.contact.title')}
 			</h2>
 
 			<div
-				class="mx-auto mb-12 h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-secondary-500 to-transparent"
+				class="mx-auto mb-10 h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-secondary-500 to-transparent"
 			></div>
 
 			<!-- Contact Cards -->
-			<div class="space-y-8">
+			<div class="space-y-6">
 				<!-- Main Contact Card -->
 				<div
-					class="dark:to-dark-650 overflow-hidden rounded-3xl border-2 border-light-300 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-dark-600 dark:from-dark-700 dark:hover:border-primary-700"
+					class="dark:to-dark-650 overflow-hidden rounded-3xl border-2 border-light-300 bg-gradient-to-br from-light-50 to-light-100 p-10 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-12 dark:border-dark-600 dark:from-dark-700 dark:hover:border-primary-700"
 				>
-					<p class="mb-10 text-lg leading-relaxed text-dark-700 dark:text-light-300">
+					<p class="mb-8 text-base leading-relaxed text-dark-700 dark:text-light-300">
 						{$t('homepage.contact.interested')}
 					</p>
 
 					<a
 						href="mailto:info@immolux.pt"
-						class="group inline-flex items-center gap-4 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 px-12 py-6 text-xl font-normal text-light-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-2xl md:px-14 md:py-7 md:text-2xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
+						class="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 px-10 py-5 text-lg font-normal text-light-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-2xl md:px-12 md:py-6 md:text-xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
 					>
 						<FontAwesomeIcon icon={faEnvelope} class="transition-transform duration-300 group-hover:rotate-12" />
 						<span class="tracking-wide">info@immolux.pt</span>
@@ -207,9 +207,9 @@
 
 				<!-- Secondary Info Card -->
 				<div
-					class="rounded-3xl border-2 border-primary-200 bg-light-50 p-10 shadow-md md:p-12 dark:border-primary-800 dark:bg-dark-800"
+					class="rounded-3xl border-2 border-primary-200 bg-light-50 p-8 shadow-md md:p-10 dark:border-primary-800 dark:bg-dark-800"
 				>
-					<p class="text-lg leading-relaxed text-dark-700 dark:text-light-300">
+					<p class="text-base leading-relaxed text-dark-700 dark:text-light-300">
 						{$t('homepage.contact.publishAnnouncement')}
 					</p>
 				</div>
