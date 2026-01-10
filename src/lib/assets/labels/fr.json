@@ -8,5 +8,41 @@
 	"footer": {
 		"author": "André Pereira",
 		"language": "Langue"
+	},
+	"homepage": {
+		"availableHouses": {
+			"title": "Découvrez Votre Propriété de Rêve",
+			"subtitle": "Immobilier Exclusif au Portugal",
+			"description": "Explorez notre portfolio soigneusement sélectionné de propriétés premium dans les emplacements les plus recherchés du Portugal. Des villas contemporaines aux domaines traditionnels, chaque propriété représente une qualité exceptionnelle et un design intemporel.",
+			"comingSoon": "Propriétés Premium Bientôt Disponibles",
+			"comingSoonDesc": "Notre collection exclusive de propriétés triées sur le volet sera bientôt disponible"
+		},
+		"aboutUs": {
+			"title": "La Différence ImmoLux",
+			"subtitle": "Excellence dans le Développement Immobilier",
+			"location": {
+				"title": "Emplacement Stratégique",
+				"description": "Situé à Lousada, Portugal, nous opérons au cœur du marché immobilier le plus dynamique du pays, offrant une expertise locale inégalée et une connaissance approfondie du marché."
+			},
+			"dedication": {
+				"title": "Qualité Sans Compromis",
+				"description": "Notre équipe dédiée d'experts en construction et d'architectes s'engage à livrer des propriétés qui dépassent les normes de l'industrie, combinant design innovant et savoir-faire supérieur."
+			},
+			"experience": {
+				"title": "Expertise Européenne",
+				"description": "Avec une vaste expérience sur plusieurs marchés européens, nous apportons les meilleures pratiques internationales et des techniques de construction sophistiquées à chaque projet que nous entreprenons."
+			},
+			"partner": {
+				"title": "Partenariat de Confiance",
+				"description": "Nous collaborons avec {partner}, leader de la construction reconnu avec des décennies d'excellence prouvée, garantissant que chaque propriété répond aux plus hauts standards de qualité et de durabilité.",
+				"partnerName": "PacaGroup"
+			}
+		},
+		"contact": {
+			"title": "Commencez Votre Voyage",
+			"subtitle": "Trouvons Votre Propriété Parfaite",
+			"interested": "Que vous cherchiez à acheter la maison de vos rêves ou à investir dans l'immobilier premium, notre équipe d'experts est prête à vous guider à chaque étape du processus.",
+			"publishAnnouncement": "Les propriétaires et promoteurs immobiliers sont invités à présenter leurs annonces exclusives via notre plateforme. Contactez-nous pour discuter des opportunités de partenariat et atteindre des acheteurs exigeants."
+		}
 	}
 }

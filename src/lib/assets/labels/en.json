@@ -8,5 +8,41 @@
 	"footer": {
 		"author": "André Pereira",
 		"language": "Language"
+	},
+	"homepage": {
+		"availableHouses": {
+			"title": "Discover Your Dream Property",
+			"subtitle": "Exclusive Real Estate in Portugal",
+			"description": "Explore our carefully curated portfolio of premium properties across Portugal's most sought-after locations. From contemporary villas to traditional estates, each property represents exceptional quality and timeless design.",
+			"comingSoon": "Premium Properties Coming Soon",
+			"comingSoonDesc": "Our exclusive collection of handpicked properties will be available shortly"
+		},
+		"aboutUs": {
+			"title": "The ImmoLux Difference",
+			"subtitle": "Excellence in Real Estate Development",
+			"location": {
+				"title": "Strategic Location",
+				"description": "Headquartered in Lousada, Portugal, we operate at the heart of the country's most dynamic real estate market, offering unparalleled local expertise and market knowledge."
+			},
+			"dedication": {
+				"title": "Uncompromising Quality",
+				"description": "Our dedicated team of construction experts and architects is committed to delivering properties that exceed industry standards, combining innovative design with superior craftsmanship."
+			},
+			"experience": {
+				"title": "European Expertise",
+				"description": "With extensive experience across multiple European markets, we bring international best practices and sophisticated construction techniques to every project we undertake."
+			},
+			"partner": {
+				"title": "Trusted Partnership",
+				"description": "We collaborate with {partner}, a renowned construction leader with decades of proven excellence, ensuring every property meets the highest standards of quality and durability.",
+				"partnerName": "PacaGroup"
+			}
+		},
+		"contact": {
+			"title": "Begin Your Journey",
+			"subtitle": "Let's Find Your Perfect Property",
+			"interested": "Whether you're looking to purchase your dream home or invest in premium real estate, our expert team is ready to guide you through every step of the process.",
+			"publishAnnouncement": "Property owners and developers are invited to showcase their exclusive listings through our platform. Contact us to discuss partnership opportunities and reach discerning buyers."
+		}
 	}
 }

@@ -1,9 +1,25 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
 @variant dark (&:is(.dark *));
+
+@layer base {
+	body {
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: 'Playfair Display', Georgia, serif;
+	}
+}
 
 @theme {
 	/* Primary */

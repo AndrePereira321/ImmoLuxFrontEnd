@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { Tooltip } from 'flowbite-svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		triggeredBy: string;
 		placement?: 'top' | 'right' | 'bottom' | 'left';
-		children?: any;
+		children?: Snippet;
 	}
 
 	let { triggeredBy, placement = 'bottom', children }: Props = $props();

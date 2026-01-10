@@ -8,5 +8,41 @@
 	"footer": {
 		"author": "André Pereira",
 		"language": "Idioma"
+	},
+	"homepage": {
+		"availableHouses": {
+			"title": "Descubra a Sua Propriedade de Sonho",
+			"subtitle": "Imobiliário Exclusivo em Portugal",
+			"description": "Explore o nosso portfólio cuidadosamente selecionado de propriedades premium nas localizações mais procuradas de Portugal. De moradias contemporâneas a propriedades tradicionais, cada imóvel representa qualidade excecional e design intemporal.",
+			"comingSoon": "Propriedades Premium Brevemente",
+			"comingSoonDesc": "A nossa coleção exclusiva de propriedades selecionadas estará disponível em breve"
+		},
+		"aboutUs": {
+			"title": "A Diferença ImmoLux",
+			"subtitle": "Excelência no Desenvolvimento Imobiliário",
+			"location": {
+				"title": "Localização Estratégica",
+				"description": "Com sede em Lousada, Portugal, operamos no coração do mercado imobiliário mais dinâmico do país, oferecendo conhecimento local incomparável e expertise de mercado."
+			},
+			"dedication": {
+				"title": "Qualidade Sem Compromissos",
+				"description": "A nossa equipa dedicada de especialistas em construção e arquitetos está comprometida em entregar propriedades que excedem os padrões da indústria, combinando design inovador com artesanato superior."
+			},
+			"experience": {
+				"title": "Expertise Europeia",
+				"description": "Com vasta experiência em múltiplos mercados europeus, trazemos as melhores práticas internacionais e técnicas de construção sofisticadas para cada projeto que empreendemos."
+			},
+			"partner": {
+				"title": "Parceria de Confiança",
+				"description": "Colaboramos com a {partner}, líder de construção reconhecido com décadas de excelência comprovada, garantindo que cada propriedade atende aos mais altos padrões de qualidade e durabilidade.",
+				"partnerName": "PacaGroup"
+			}
+		},
+		"contact": {
+			"title": "Inicie a Sua Jornada",
+			"subtitle": "Vamos Encontrar a Sua Propriedade Perfeita",
+			"interested": "Quer esteja à procura de comprar a casa dos seus sonhos ou investir em imobiliário premium, a nossa equipa especializada está pronta para guiá-lo em cada passo do processo.",
+			"publishAnnouncement": "Proprietários e promotores imobiliários são convidados a apresentar os seus anúncios exclusivos através da nossa plataforma. Contacte-nos para discutir oportunidades de parceria e alcançar compradores exigentes."
+		}
 	}
 }

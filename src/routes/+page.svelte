@@ -1,120 +1,219 @@
 <script lang="ts">
+	import { t } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faGlobe, faHouse, faMapLocationDot, faSearch } from '@fortawesome/free-solid-svg-icons';
-	import { locale, locales } from 'svelte-i18n';
-	import { Button, Card, Heading, Label, P, Select } from 'flowbite-svelte';
+	import { faEnvelope, faGlobe, faHandshake, faHouse, faMapMarkerAlt, faStar } from '@fortawesome/free-solid-svg-icons';
+	import AppSection from '$lib/components/AppSection.svelte';
+	import AppInfoCard from '$lib/components/AppInfoCard.svelte';
+	import AppSectionDivider from '$lib/components/AppSectionDivider.svelte';
 </script>
 
 <div class="min-h-screen">
-	<!-- Hero Section -->
-	<section class="relative mb-12 rounded-3xl bg-primary-600 px-4 py-20 text-light-50 shadow-2xl dark:bg-primary-700">
-		<div class="absolute inset-0 rounded-3xl bg-dark-950 opacity-10 dark:opacity-20"></div>
-		<div class="relative z-10 mx-auto max-w-4xl text-center">
-			<div class="mb-6">
-				<FontAwesomeIcon icon={faHouse} size="4x" class="text-light-50 opacity-90" />
+	<!-- Block 1: Hero Section - Available Houses -->
+	<AppSection
+		variant="primary"
+		class="dark:to-dark-850 relative overflow-hidden bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900"
+	>
+		<!-- Decorative background -->
+		<div class="absolute inset-0 -z-10 opacity-30">
+			<div class="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary-200 blur-3xl dark:bg-primary-900"></div>
+			<div
+				class="absolute right-1/4 bottom-20 h-96 w-96 rounded-full bg-secondary-200 blur-3xl dark:bg-secondary-900"
+			></div>
+		</div>
+
+		<div class="mx-auto max-w-5xl text-center">
+			<!-- Icon -->
+			<div class="mb-10 inline-block">
+				<div class="relative">
+					<div
+						class="absolute inset-0 animate-pulse rounded-full bg-primary-400 opacity-20 blur-2xl dark:bg-primary-600"
+					></div>
+					<div
+						class="relative rounded-full bg-gradient-to-br from-primary-500 to-primary-700 p-12 shadow-2xl dark:from-primary-600 dark:to-primary-800"
+					>
+						<FontAwesomeIcon icon={faHouse} size="4x" class="text-light-50" />
+					</div>
+				</div>
 			</div>
-			<Heading tag="h1" class="mb-6 text-light-50" customSize="text-5xl font-extrabold md:text-6xl lg:text-7xl">
-				Welcome to ImmoLux
-			</Heading>
-			<P class="mb-8 text-xl font-light text-light-200 md:text-2xl">
-				Discover your perfect home in the heart of Luxembourg
-			</P>
-			<div class="flex flex-col justify-center gap-4 sm:flex-row">
-				<Button
-					size="xl"
-					color="light"
-					class="border-0 bg-secondary-500 font-semibold text-light-50 shadow-lg transition-shadow hover:bg-secondary-600 hover:shadow-xl dark:bg-secondary-600 dark:hover:bg-secondary-700"
-					href="/houses"
+
+			<!-- Subtitle -->
+			<p class="mb-4 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
+				{$t('homepage.availableHouses.subtitle')}
+			</p>
+
+			<!-- Main Title -->
+			<h1 class="mb-8 text-5xl font-normal tracking-tight text-dark-900 md:text-6xl lg:text-7xl dark:text-light-50">
+				{$t('homepage.availableHouses.title')}
+			</h1>
+
+			<!-- Description -->
+			<p class="mx-auto mb-16 max-w-3xl text-xl leading-relaxed text-dark-600 dark:text-light-400">
+				{$t('homepage.availableHouses.description')}
+			</p>
+
+			<!-- Coming Soon Placeholder -->
+			<div
+				class="group dark:to-dark-850 mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-20 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-24 dark:border-primary-800 dark:from-dark-800 dark:hover:border-primary-700"
+			>
+				<div class="mb-6">
+					<FontAwesomeIcon
+						icon={faHouse}
+						size="3x"
+						class="text-primary-400 opacity-40 transition-all duration-500 group-hover:scale-110 group-hover:opacity-60 dark:text-primary-600"
+					/>
+				</div>
+				<h3
+					class="mb-4 text-2xl font-normal tracking-wider text-primary-700 uppercase md:text-3xl dark:text-primary-400"
 				>
-					<FontAwesomeIcon icon={faSearch} class="mr-2" />
-					Browse Properties
-				</Button>
-				<Button
-					size="xl"
-					class="border-0 bg-light-50 font-semibold text-primary-600 shadow-lg transition-shadow hover:bg-light-100 hover:shadow-xl dark:bg-light-100 dark:hover:bg-light-200"
-				>
-					<FontAwesomeIcon icon={faMapLocationDot} class="mr-2" />
-					View Map
-				</Button>
+					{$t('homepage.availableHouses.comingSoon')}
+				</h3>
+				<p class="text-lg text-dark-600 dark:text-light-400">
+					{$t('homepage.availableHouses.comingSoonDesc')}
+				</p>
 			</div>
 		</div>
-	</section>
+	</AppSection>
 
-	<!-- Features Section -->
-	<section class="mb-16">
-		<Heading tag="h2" class="mb-12 text-center text-4xl font-bold text-dark-900 dark:text-light-50"
-			>Why Choose ImmoLux?</Heading
-		>
-		<div class="grid gap-8 md:grid-cols-3">
-			<Card
-				class="border-t-4 border-primary-500 transition-shadow duration-300 hover:shadow-2xl dark:border-primary-400 dark:bg-dark-700"
-			>
-				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-primary-100 p-6 dark:bg-primary-900">
-						<FontAwesomeIcon icon={faHouse} size="3x" class="text-primary-600 dark:text-primary-300" />
-					</div>
-				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
-					>Wide Selection</Heading
-				>
-				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
-					Browse through hundreds of premium properties across Luxembourg
-				</P>
-			</Card>
+	<!-- Divider 1 -->
+	<AppSectionDivider variant="decorative" />
 
-			<Card
-				class="border-t-4 border-secondary-500 transition-shadow duration-300 hover:shadow-2xl dark:border-secondary-400 dark:bg-dark-700"
-			>
-				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-secondary-100 p-6 dark:bg-secondary-900">
-						<FontAwesomeIcon icon={faSearch} size="3x" class="text-secondary-600 dark:text-secondary-300" />
-					</div>
-				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
-					>Smart Search</Heading
-				>
-				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
-					Find exactly what you're looking for with powerful advanced filters
-				</P>
-			</Card>
-
-			<Card
-				class="border-t-4 border-success-500 transition-shadow duration-300 hover:shadow-2xl dark:border-success-400 dark:bg-dark-700"
-			>
-				<div class="mb-6 flex justify-center">
-					<div class="rounded-full bg-success-100 p-6 dark:bg-success-900">
-						<FontAwesomeIcon icon={faMapLocationDot} size="3x" class="text-success-600 dark:text-success-300" />
-					</div>
-				</div>
-				<Heading tag="h3" class="mb-3 text-center text-2xl font-bold text-dark-900 dark:text-light-50"
-					>Location Based</Heading
-				>
-				<P class="text-center text-lg leading-relaxed text-dark-300 dark:text-light-300">
-					Explore properties by location on an interactive map
-				</P>
-			</Card>
-		</div>
-	</section>
-
-	<!-- Language Selector -->
-	<section class="flex justify-center py-8">
-		<Card class="w-full max-w-md shadow-lg dark:bg-dark-700">
-			<div class="mb-4 flex items-center justify-center">
-				<FontAwesomeIcon icon={faGlobe} size="2x" class="mr-3 text-primary-600 dark:text-primary-400" />
-				<Heading tag="h3" class="text-2xl font-bold text-dark-900 dark:text-light-50">Language / Langue</Heading>
+	<!-- Block 2: About ImmoLux -->
+	<AppSection variant="secondary" class="dark:bg-dark-850 bg-light-100">
+		<div class="mx-auto max-w-6xl">
+			<!-- Section Header -->
+			<div class="mb-20 text-center">
+				<p class="mb-4 text-sm font-medium tracking-widest text-primary-600 uppercase dark:text-primary-400">
+					{$t('homepage.aboutUs.subtitle')}
+				</p>
+				<h2 class="mb-6 text-4xl font-normal tracking-tight text-dark-900 md:text-5xl lg:text-6xl dark:text-light-50">
+					{$t('homepage.aboutUs.title')}
+				</h2>
+				<div
+					class="mx-auto h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-primary-500 to-transparent"
+				></div>
 			</div>
-			<Label for="locale-select" class="mb-2 font-medium text-dark-700 dark:text-light-200"
-				>Choose your preferred language:</Label
-			>
-			<Select
-				id="locale-select"
-				bind:value={$locale}
-				class="text-lg dark:border-dark-500 dark:bg-dark-600 dark:text-light-50"
-			>
-				{#each $locales as localeOption (localeOption)}
-					<option value={localeOption}>{localeOption.toUpperCase()}</option>
-				{/each}
-			</Select>
-		</Card>
-	</section>
+
+			<!-- Info Cards Grid -->
+			<div class="grid gap-8 md:grid-cols-2 lg:gap-10">
+				<!-- Location Card -->
+				<AppInfoCard icon={faMapMarkerAlt} iconColor="primary">
+					<h3 class="mb-3 text-xl font-medium text-dark-900 dark:text-light-50">
+						{$t('homepage.aboutUs.location.title')}
+					</h3>
+					<p class="text-base">
+						{$t('homepage.aboutUs.location.description')}
+					</p>
+				</AppInfoCard>
+
+				<!-- Quality Card -->
+				<AppInfoCard icon={faStar} iconColor="secondary">
+					<h3 class="mb-3 text-xl font-medium text-dark-900 dark:text-light-50">
+						{$t('homepage.aboutUs.dedication.title')}
+					</h3>
+					<p class="text-base">
+						{$t('homepage.aboutUs.dedication.description')}
+					</p>
+				</AppInfoCard>
+
+				<!-- Experience Card -->
+				<AppInfoCard icon={faGlobe} iconColor="success">
+					<h3 class="mb-3 text-xl font-medium text-dark-900 dark:text-light-50">
+						{$t('homepage.aboutUs.experience.title')}
+					</h3>
+					<p class="text-base">
+						{$t('homepage.aboutUs.experience.description')}
+					</p>
+				</AppInfoCard>
+
+				<!-- Partner Card -->
+				<AppInfoCard icon={faHandshake} iconColor="info">
+					<h3 class="mb-3 text-xl font-medium text-dark-900 dark:text-light-50">
+						{$t('homepage.aboutUs.partner.title')}
+					</h3>
+					<p class="mb-4 text-base">
+						{$t('homepage.aboutUs.partner.description', {
+							values: { partner: $t('homepage.aboutUs.partner.partnerName') }
+						})}
+					</p>
+					<a
+						href="https://www.pacaconstruct.be"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="inline-flex items-center gap-2 font-medium text-primary-600 underline decoration-primary-300 underline-offset-4 transition-all hover:text-primary-700 hover:decoration-primary-500 dark:text-primary-400 dark:decoration-primary-700 dark:hover:text-primary-300"
+					>
+						www.pacaconstruct.be
+						<span class="text-sm">→</span>
+					</a>
+				</AppInfoCard>
+			</div>
+		</div>
+	</AppSection>
+
+	<!-- Divider 2 -->
+	<AppSectionDivider variant="gradient" />
+
+	<!-- Block 3: Contact Information -->
+	<AppSection
+		variant="tertiary"
+		class="dark:to-dark-850 bg-gradient-to-b from-light-200 to-light-100 dark:from-dark-800"
+	>
+		<div class="mx-auto max-w-4xl text-center">
+			<!-- Icon -->
+			<div class="mb-10 inline-block">
+				<div class="relative">
+					<div
+						class="absolute inset-0 animate-pulse rounded-full bg-secondary-400 opacity-20 blur-2xl dark:bg-secondary-600"
+					></div>
+					<div
+						class="relative rounded-full bg-gradient-to-br from-secondary-500 to-secondary-700 p-12 shadow-2xl dark:from-secondary-600 dark:to-secondary-800"
+					>
+						<FontAwesomeIcon icon={faEnvelope} size="4x" class="text-light-50" />
+					</div>
+				</div>
+			</div>
+
+			<!-- Subtitle -->
+			<p class="mb-4 text-sm font-medium tracking-widest text-secondary-600 uppercase dark:text-secondary-400">
+				{$t('homepage.contact.subtitle')}
+			</p>
+
+			<!-- Title -->
+			<h2 class="mb-8 text-4xl font-normal tracking-tight text-dark-900 md:text-5xl lg:text-6xl dark:text-light-50">
+				{$t('homepage.contact.title')}
+			</h2>
+
+			<div
+				class="mx-auto mb-12 h-0.5 w-32 rounded-full bg-gradient-to-r from-transparent via-secondary-500 to-transparent"
+			></div>
+
+			<!-- Contact Cards -->
+			<div class="space-y-8">
+				<!-- Main Contact Card -->
+				<div
+					class="dark:to-dark-650 overflow-hidden rounded-3xl border-2 border-light-300 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-dark-600 dark:from-dark-700 dark:hover:border-primary-700"
+				>
+					<p class="mb-10 text-lg leading-relaxed text-dark-700 dark:text-light-300">
+						{$t('homepage.contact.interested')}
+					</p>
+
+					<a
+						href="mailto:info@immolux.pt"
+						class="group inline-flex items-center gap-4 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 px-12 py-6 text-xl font-normal text-light-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-2xl md:px-14 md:py-7 md:text-2xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
+					>
+						<FontAwesomeIcon icon={faEnvelope} class="transition-transform duration-300 group-hover:rotate-12" />
+						<span class="tracking-wide">info@immolux.pt</span>
+					</a>
+				</div>
+
+				<!-- Secondary Info Card -->
+				<div
+					class="rounded-3xl border-2 border-primary-200 bg-light-50 p-10 shadow-md md:p-12 dark:border-primary-800 dark:bg-dark-800"
+				>
+					<p class="text-lg leading-relaxed text-dark-700 dark:text-light-300">
+						{$t('homepage.contact.publishAnnouncement')}
+					</p>
+				</div>
+			</div>
+		</div>
+	</AppSection>
 </div>
