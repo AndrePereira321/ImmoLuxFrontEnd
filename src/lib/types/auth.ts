@@ -3,8 +3,10 @@ export interface User {
 	email: string;
 	firstName: string;
 	lastName: string;
-	phone: string;
-	role: string;
+	isActive?: boolean;
+	isSuperUser?: boolean;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface LoginRequest {
@@ -14,12 +16,13 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-	user: User;
+	isConnected: boolean;
+	userData: User;
 }
 
 export interface IsConnectedResponse {
 	isConnected: boolean;
-	user?: User;
+	userData?: User;
 }
 
 export interface LogoutResponse {

@@ -38,9 +38,9 @@
 			const errorMessage = result.error || '';
 			let errorMsg = '';
 
-			if (errorMessage.includes('Invalid email or password') || errorMessage.includes('INVALID_CREDENTIALS')) {
+			if (errorMessage === 'INVALID_CREDENTIALS') {
 				errorMsg = $_('auth.invalidCredentials');
-			} else if (errorMessage.includes('Account locked') || errorMessage.includes('ACCOUNT_LOCKED')) {
+			} else if (errorMessage === 'RATE_LIMIT_EXCEEDED') {
 				errorMsg = $_('auth.accountLocked');
 			} else {
 				errorMsg = $_('auth.loginError');

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { HTMLInputAttributes } from 'svelte/elements';
+
 	interface Props {
 		id: string;
 		type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number';
@@ -8,7 +10,7 @@
 		required?: boolean;
 		disabled?: boolean;
 		error?: string;
-		autocomplete?: string;
+		autocomplete?: HTMLInputAttributes['autocomplete'];
 	}
 
 	let {

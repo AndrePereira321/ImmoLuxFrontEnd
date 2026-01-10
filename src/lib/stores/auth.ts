@@ -23,7 +23,7 @@ const createAuthStore = () => {
 
 			if (response.data.success && response.data.data.isConnected) {
 				set({
-					user: response.data.data.user || null,
+					user: response.data.data.userData || null,
 					isAuthenticated: true,
 					isLoading: false
 				});
@@ -57,7 +57,7 @@ const createAuthStore = () => {
 
 			if (response.data.success) {
 				set({
-					user: response.data.data.user,
+					user: response.data.data.userData,
 					isAuthenticated: true,
 					isLoading: false
 				});
@@ -65,7 +65,7 @@ const createAuthStore = () => {
 			} else {
 				return {
 					success: false,
-					error: response.data.error?.message || 'Login failed'
+					error: response.data.error?.code || 'Login failed'
 				};
 			}
 		} catch (error) {
