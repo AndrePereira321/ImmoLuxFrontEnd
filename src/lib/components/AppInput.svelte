@@ -2,27 +2,33 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	interface Props {
-		id: string;
+		id?: string;
 		type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number';
-		label: string;
-		value?: string;
+		label?: string;
+		value?: string | number | undefined;
 		placeholder?: string;
 		required?: boolean;
 		disabled?: boolean;
 		error?: string;
 		autocomplete?: HTMLInputAttributes['autocomplete'];
+		step?: string | number;
+		min?: string | number;
+		max?: string | number;
 	}
 
 	let {
 		id,
 		type = 'text',
 		label,
-		value = $bindable(''),
+		value = $bindable(undefined),
 		placeholder = ' ',
 		required = false,
 		disabled = false,
 		error,
-		autocomplete
+		autocomplete,
+		step,
+		min,
+		max
 	}: Props = $props();
 
 	let isFocused = $state(false);
@@ -36,7 +42,7 @@
 			? 'text-error-600 dark:text-error-400'
 			: shouldFloat
 				? 'text-primary-600 dark:text-primary-400'
-				: 'text-dark-600 dark:text-light-400';
+				: 'text-dark-500 dark:text-light-500';
 		return `${base} ${position} ${color}`;
 	});
 
@@ -58,24 +64,33 @@
 		{required}
 		{disabled}
 		{autocomplete}
+		{step}
+		{min}
+		{max}
 		onfocus={handleFocus}
 		onblur={handleBlur}
-		class="peer block w-full appearance-none rounded-lg border-2 border-light-600 bg-light-50 px-4 pt-7 pb-3 text-base text-dark-900 transition-all duration-200 placeholder:text-transparent focus:border-primary-600 focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50 dark:focus:border-primary-500"
+		class="peer block w-full appearance-none rounded-lg border-2 bg-white px-4 pt-6 pb-2.5 text-base text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-700 dark:text-light-50"
+		class:border-light-300={!error && !isFocused}
+		class:dark:border-dark-600={!error && !isFocused}
+		class:border-primary-500={!error && isFocused}
+		class:dark:border-primary-400={!error && isFocused}
 		class:border-error-600={error}
 		class:dark:border-error-500={error}
 		class:focus:border-error-600={error}
 		class:dark:focus:border-error-500={error}
 	/>
 
-	<label for={id} class={labelClasses()}>
-		{label}
-		{#if required}
-			<span class="text-error-600 dark:text-error-400">*</span>
-		{/if}
-	</label>
+	{#if label}
+		<label for={id} class={labelClasses()}>
+			{label}
+			{#if required}
+				<span class="text-error-600 dark:text-error-400">*</span>
+			{/if}
+		</label>
+	{/if}
 
 	{#if error}
-		<p class="mt-2 text-sm text-error-600 dark:text-error-400">
+		<p class="mt-1 text-sm text-error-600 dark:text-error-400">
 			{error}
 		</p>
 	{/if}

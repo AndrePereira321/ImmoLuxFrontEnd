@@ -1,7 +1,7 @@
 <script lang="ts">
 	interface Props {
-		id: string;
-		label: string;
+		id?: string;
+		label?: string;
 		value?: string;
 		placeholder?: string;
 		required?: boolean;
@@ -20,6 +20,29 @@
 		error = '',
 		rows = 3
 	}: Props = $props();
+
+	let isFocused = $state(false);
+	let hasValue = $derived(value !== '' && value !== null && value !== undefined);
+	let shouldFloat = $derived(isFocused || hasValue);
+
+	const labelClasses = $derived(() => {
+		const base = 'pointer-events-none absolute left-4 origin-left text-base transition-all duration-200';
+		const position = shouldFloat ? 'top-2 translate-y-0 scale-75' : 'top-4';
+		const color = error
+			? 'text-error-600 dark:text-error-400'
+			: shouldFloat
+				? 'text-primary-600 dark:text-primary-400'
+				: 'text-dark-500 dark:text-light-500';
+		return `${base} ${position} ${color}`;
+	});
+
+	const handleFocus = () => {
+		isFocused = true;
+	};
+
+	const handleBlur = () => {
+		isFocused = false;
+	};
 </script>
 
 <div class="relative">
@@ -30,19 +53,31 @@
 		{required}
 		{disabled}
 		{rows}
-		class="peer w-full rounded-lg border-2 px-4 pt-7 pb-3 transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 {error
-			? 'border-error-600 bg-error-50 text-error-900 focus:border-error-600 dark:border-error-500 dark:bg-error-900/20 dark:text-error-50 dark:focus:border-error-500'
-			: 'border-light-600 bg-light-50 text-dark-900 focus:border-primary-600 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50 dark:focus:border-primary-500'}"
+		onfocus={handleFocus}
+		onblur={handleBlur}
+		class="peer block w-full appearance-none rounded-lg border-2 bg-white px-4 pt-6 pb-2.5 text-base text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-700 dark:text-light-50"
+		class:border-light-300={!error && !isFocused}
+		class:dark:border-dark-600={!error && !isFocused}
+		class:border-primary-500={!error && isFocused}
+		class:dark:border-primary-400={!error && isFocused}
+		class:border-error-600={error}
+		class:dark:border-error-500={error}
+		class:focus:border-error-600={error}
+		class:dark:focus:border-error-500={error}
 	></textarea>
-	<label
-		for={id}
-		class="pointer-events-none absolute top-2 left-4 text-xs transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs {error
-			? 'text-error-600 dark:text-error-500'
-			: 'text-dark-300 dark:text-light-300'}"
-	>
-		{label}{#if required}<span class="text-error-600 dark:text-error-500">*</span>{/if}
-	</label>
+
+	{#if label}
+		<label for={id} class={labelClasses()}>
+			{label}
+			{#if required}
+				<span class="text-error-600 dark:text-error-400">*</span>
+			{/if}
+		</label>
+	{/if}
+
 	{#if error}
-		<p class="mt-1 text-xs text-error-600 dark:text-error-500">{error}</p>
+		<p class="mt-1 text-sm text-error-600 dark:text-error-400">
+			{error}
+		</p>
 	{/if}
 </div>
