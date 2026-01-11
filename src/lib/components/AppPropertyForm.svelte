@@ -40,7 +40,11 @@
 	let property = $state<PropertyDTO | null>(null);
 	let contacts = $state<ContactDTO[]>([]);
 	let loadingProperty = $state(false);
-	let images = $state<{ file: File; url: string; displayOrder: number; id?: number }[]>([]);
+
+	// Track existing images (from server) and new images (to upload) separately
+	let existingImages = $state<PropertyImageDTO[]>([]);
+	let newImages = $state<{ file: File; url: string; displayOrder: number }[]>([]);
+	let deletedImageIds = $state<number[]>([]);
 
 	const locations = $derived($locationsStore);
 
@@ -86,24 +90,26 @@
 
 	const loadPropertyImages = async (propId: number) => {
 		try {
-			const response = await apiClient.get<{ images: PropertyImageDTO[] }>(`/properties/${propId}/images`);
-			const serverResponse: ServerAPIResponse<{ images: PropertyImageDTO[] }> = response.data;
+			const response = await apiClient.get(`/properties/${propId}/images`);
+			const serverResponse: ServerAPIResponse<PropertyImageDTO[]> = response.data;
 
-			if (serverResponse.success && serverResponse.data && serverResponse.data.images) {
-				const serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
+			if (serverResponse.success && serverResponse.data) {
+				// Handle if data is wrapped in an object or is directly an array
+				let imagesData = serverResponse.data;
 
-				// Convert PropertyImageDTO to the format expected by AppImageUpload
-				// Note: Existing images don't have File objects, so we create placeholder objects
-				// that will be used only for display
-				images = serverResponse.data.images.map((img) => ({
-					file: null as unknown as File, // No actual file for existing images
-					url: `${serverUrl}/v1/api/images/${img.id}`, // URL to fetch the image from backend
-					displayOrder: img.displayOrder || 0,
-					id: img.id // Store the image ID for potential deletion
-				}));
+				// Check if it's wrapped in an object with an 'images' property
+				if (typeof imagesData === 'object' && !Array.isArray(imagesData) && 'images' in imagesData) {
+					imagesData = (imagesData as any).images;
+				}
+
+				// Ensure data is an array
+				existingImages = Array.isArray(imagesData) ? imagesData : [];
+			} else {
+				existingImages = [];
 			}
 		} catch (error) {
 			console.error('Error loading property images:', error);
+			existingImages = [];
 		}
 	};
 
@@ -124,6 +130,8 @@
 		if (!error) return '';
 		return $_(`${error}`);
 	};
+
+	let isSaving = $state(false);
 
 	const { form, errors, enhance, submitting, allErrors } = superForm(
 		{
@@ -165,6 +173,7 @@
 			invalidateAll: false,
 			onSubmit: async ({ cancel }) => {
 				cancel();
+				isSaving = true;
 
 				try {
 					const payload = {
@@ -204,9 +213,13 @@
 						const serverResponse: ServerAPIResponse<PropertyDTO> = response.data;
 
 						if (serverResponse.success && serverResponse.data) {
-							if (images.length > 0) {
-								await uploadImages(Number(propertyId));
+							// Handle image changes
+							await deleteRemovedImages();
+							await updateImageOrders();
+							if (newImages.length > 0) {
+								await uploadNewImages(Number(propertyId));
 							}
+
 							notificationStore.success($_('properties.updateSuccess'));
 							goto(resolve('/panel/properties'));
 						} else {
@@ -219,8 +232,8 @@
 
 						if (serverResponse.success && serverResponse.data) {
 							const createdPropertyId = serverResponse.data.id;
-							if (createdPropertyId && images.length > 0) {
-								await uploadImages(createdPropertyId);
+							if (createdPropertyId && newImages.length > 0) {
+								await uploadNewImages(createdPropertyId);
 							}
 							notificationStore.success($_('properties.createSuccess'));
 							goto(resolve('/panel/properties'));
@@ -231,6 +244,8 @@
 				} catch (error) {
 					notificationStore.error(isEditMode ? $_('properties.updateError') : $_('properties.createError'));
 					console.error('Property submission error:', error);
+				} finally {
+					isSaving = false;
 				}
 			}
 		}
@@ -267,11 +282,70 @@
 		$form.contactId = propertyData.contactId;
 	};
 
-	const uploadImages = async (propertyId: number) => {
-		for (let i = 0; i < images.length; i++) {
+	// Combined images for display in AppImageUpload
+	const displayImages = $derived.by(() => {
+		const serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
+
+		// Map existing images to display format
+		const existing = existingImages.map((img) => ({
+			file: null as unknown as File,
+			url: `${serverUrl}/v1/api/images/${img.id}`,
+			displayOrder: img.displayOrder || 0,
+			id: img.id
+		}));
+
+		// Map new images
+		const newImgs = newImages.map((img) => ({
+			file: img.file,
+			url: img.url,
+			displayOrder: img.displayOrder,
+			id: undefined
+		}));
+
+		// Combine and sort by display order
+		return [...existing, ...newImgs].sort((a, b) => a.displayOrder - b.displayOrder);
+	});
+
+	const handleImagesChange = (changedImages: { file: File; url: string; displayOrder: number; id?: number }[]) => {
+		const existingImagesUpdated: PropertyImageDTO[] = [];
+		const newImagesUpdated: { file: File; url: string; displayOrder: number }[] = [];
+		const currentExistingIds = new Set(changedImages.filter((img) => img.id).map((img) => img.id!));
+
+		// Find deleted images
+		const newDeletedIds = existingImages.filter((img) => !currentExistingIds.has(img.id!)).map((img) => img.id!);
+
+		deletedImageIds = [...deletedImageIds, ...newDeletedIds];
+
+		// Process changed images
+		changedImages.forEach((img, index) => {
+			if (img.id) {
+				// Existing image - find original and update display order
+				const original = existingImages.find((e) => e.id === img.id);
+				if (original) {
+					existingImagesUpdated.push({
+						...original,
+						displayOrder: index
+					});
+				}
+			} else {
+				// New image
+				newImagesUpdated.push({
+					file: img.file,
+					url: img.url,
+					displayOrder: index
+				});
+			}
+		});
+
+		existingImages = existingImagesUpdated;
+		newImages = newImagesUpdated;
+	};
+
+	const uploadNewImages = async (propertyId: number) => {
+		for (const img of newImages) {
 			const formData = new FormData();
-			formData.append('image', images[i].file);
-			formData.append('displayOrder', images[i].displayOrder.toString());
+			formData.append('image', img.file);
+			formData.append('displayOrder', img.displayOrder.toString());
 
 			try {
 				await apiClient.post(`/properties/${propertyId}/images`, formData, {
@@ -284,12 +358,32 @@
 		}
 	};
 
-	const handleCancel = () => {
-		goto(resolve('/panel/properties'));
+	const deleteRemovedImages = async () => {
+		for (const imageId of deletedImageIds) {
+			try {
+				await apiClient.delete(`/images/${imageId}`);
+			} catch (error) {
+				console.error('Error deleting image:', error);
+				notificationStore.error($_('properties.imageUpload.deleteError'));
+			}
+		}
+		deletedImageIds = [];
 	};
 
-	const handleImagesChange = (newImages: { file: File; url: string; displayOrder: number }[]) => {
-		images = newImages;
+	const updateImageOrders = async () => {
+		for (const img of existingImages) {
+			try {
+				await apiClient.put(`/images/${img.id}/order`, {
+					displayOrder: img.displayOrder
+				});
+			} catch (error) {
+				console.error('Error updating image order:', error);
+			}
+		}
+	};
+
+	const handleCancel = () => {
+		goto(resolve('/panel/properties'));
 	};
 
 	const handlePublish = async () => {
@@ -474,7 +568,7 @@
 						{$_('properties.sections.images')}
 					</h2>
 				</div>
-				<AppImageUpload {images} onImagesChange={handleImagesChange} />
+				<AppImageUpload images={displayImages} onImagesChange={handleImagesChange} />
 			</div>
 
 			<!-- Basic Information -->
@@ -827,3 +921,7 @@
 		</form>
 	{/if}
 </div>
+
+{#if isSaving}
+	<AppLoadingSpinner message={$_('common.saving')} overlay={true} />
+{/if}
