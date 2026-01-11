@@ -14,18 +14,19 @@
 	import { _, locale } from 'svelte-i18n';
 	import { LANGUAGES } from '$lib/constants/languages';
 	import { changeLanguage as setLanguage } from '$lib/utils/language';
-	import { themeStore } from '$lib/stores/theme';
 	import { authStore } from '$lib/stores/auth';
 	import { notificationStore } from '$lib/stores/notification';
 	import AppTooltip from '$lib/components/AppTooltip.svelte';
 	import AppThemeToggler from '$lib/components/AppThemeToggler.svelte';
 	import AppModal from '$lib/components/AppModal.svelte';
 	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
+	import AppUserDropdown from '$lib/components/AppUserDropdown.svelte';
 
 	let mobileMenuOpen = $state(false);
 	let languageDropdownOpen = $state(false);
 	let loginModalOpen = $state(false);
 	let isLoggingOut = $state(false);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let AppLoginForm: any = $state(null);
 
 	const authState = $derived($authStore);
@@ -41,10 +42,6 @@
 	const changeLanguage = (lang: string) => {
 		setLanguage(lang);
 		languageDropdownOpen = false;
-	};
-
-	const toggleTheme = () => {
-		themeStore.toggle();
 	};
 
 	const openLoginModal = async () => {
@@ -111,32 +108,6 @@
 
 			<!-- Right Side Controls (Desktop) -->
 			<div class="hidden items-center gap-1 md:flex">
-				<!-- Login/Logout Button -->
-				{#if !authState.isLoading}
-					{#if authState.isAuthenticated}
-						<button
-							onclick={handleLogout}
-							class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
-							aria-label={$_('menu.logout')}
-						>
-							<FontAwesomeIcon icon={faRightFromBracket} />
-							<span>{$_('menu.logout')}</span>
-						</button>
-					{:else}
-						<button
-							onclick={openLoginModal}
-							class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
-							aria-label={$_('menu.login')}
-						>
-							<FontAwesomeIcon icon={faRightToBracket} />
-							<span>{$_('menu.login')}</span>
-						</button>
-					{/if}
-
-					<!-- Vertical Divider -->
-					<div class="h-8 w-px bg-primary-400 dark:bg-dark-700"></div>
-				{/if}
-
 				<!-- Language Dropdown -->
 				<button
 					id="language-button"
@@ -176,6 +147,27 @@
 				<AppTooltip triggeredBy="#theme-toggler-wrapper" placement="bottom">
 					{$_('menu.toggleTheme')}
 				</AppTooltip>
+
+				<!-- Login/User Dropdown Button -->
+				{#if !authState.isLoading}
+					{#if authState.isAuthenticated && authState.user}
+						<!-- User Dropdown -->
+						<AppUserDropdown user={authState.user} onLogout={handleLogout} />
+					{:else}
+						<!-- Login Button (icon only) -->
+						<button
+							id="login-button"
+							onclick={openLoginModal}
+							class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700 dark:hover:bg-dark-800"
+							aria-label={$_('menu.login')}
+						>
+							<FontAwesomeIcon icon={faRightToBracket} />
+						</button>
+						<AppTooltip triggeredBy="#login-button" placement="bottom">
+							{$_('menu.login')}
+						</AppTooltip>
+					{/if}
+				{/if}
 			</div>
 
 			<!-- Mobile Menu Button -->

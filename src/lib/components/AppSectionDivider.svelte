@@ -8,11 +8,17 @@
 </script>
 
 {#if variant === 'default'}
-	<div class={`relative h-px w-full bg-gradient-to-r from-transparent via-dark-300 to-transparent dark:via-light-700 ${className}`}></div>
+	<div
+		class={`relative h-px w-full bg-gradient-to-r from-transparent via-dark-300 to-transparent dark:via-light-700 ${className}`}
+	></div>
 {:else if variant === 'gradient'}
 	<div class={`relative py-8 ${className}`}>
-		<div class="absolute inset-0 bg-gradient-to-b from-transparent via-primary-100/30 to-transparent dark:via-primary-900/20"></div>
-		<div class="relative mx-auto h-px w-full max-w-7xl bg-gradient-to-r from-transparent via-primary-500 to-transparent"></div>
+		<div
+			class="absolute inset-0 bg-gradient-to-b from-transparent via-primary-100/30 to-transparent dark:via-primary-900/20"
+		></div>
+		<div
+			class="relative mx-auto h-px w-full max-w-7xl bg-gradient-to-r from-transparent via-primary-500 to-transparent"
+		></div>
 	</div>
 {:else if variant === 'decorative'}
 	<div class={`relative py-8 ${className}`}>

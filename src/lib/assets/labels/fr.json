@@ -5,7 +5,8 @@
 		"toggleTheme": "Basculer le thème",
 		"selectLanguage": "Sélectionner la langue",
 		"login": "Connexion",
-		"logout": "Déconnexion"
+		"logout": "Déconnexion",
+		"userMenu": "Menu utilisateur"
 	},
 	"auth": {
 		"login": "Login",

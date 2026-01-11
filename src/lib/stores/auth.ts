@@ -9,7 +9,7 @@ interface AuthState {
 }
 
 const createAuthStore = () => {
-	const { subscribe, set, update } = writable<AuthState>({
+	const { subscribe, set } = writable<AuthState>({
 		user: null,
 		isAuthenticated: false,
 		isLoading: true
