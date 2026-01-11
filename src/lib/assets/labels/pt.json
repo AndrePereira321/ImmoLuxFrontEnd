@@ -6,7 +6,8 @@
 		"selectLanguage": "Selecionar idioma",
 		"login": "Entrar",
 		"logout": "Sair",
-		"userMenu": "Menu de utilizador"
+		"userMenu": "Menu de utilizador",
+		"myProperties": "As Minhas Propriedades"
 	},
 	"auth": {
 		"login": "Login",
@@ -62,5 +63,45 @@
 			"interested": "Quer esteja à procura de comprar a casa dos seus sonhos ou investir em imobiliário premium, a nossa equipa especializada está pronta para guiá-lo em cada passo do processo.",
 			"publishAnnouncement": "Proprietários e promotores imobiliários são convidados a apresentar os seus anúncios exclusivos através da nossa plataforma. Contacte-nos para discutir oportunidades de parceria e alcançar compradores exigentes."
 		}
+	},
+	"properties": {
+		"myProperties": "As Minhas Propriedades",
+		"manageDescription": "Gerir os seus anúncios e pessoas de contacto",
+		"propertiesList": "Propriedades",
+		"addProperty": "Adicionar Propriedade",
+		"noProperties": "Ainda não tem propriedades",
+		"noPropertiesDescription": "Comece por adicionar a sua primeira propriedade",
+		"contactPersons": "Pessoas de Contacto",
+		"addContact": "Adicionar Contacto",
+		"noContacts": "Ainda não tem contactos",
+		"noContactsDescription": "Comece por adicionar a sua primeira pessoa de contacto",
+		"loadingContacts": "A carregar contactos...",
+		"contactCount": "{count, plural, =1 {Existe 1 contacto} other {Existem # contactos}}"
+	},
+	"contacts": {
+		"addContact": "Adicionar Pessoa de Contacto",
+		"editContact": "Editar Pessoa de Contacto",
+		"name": "Nome",
+		"email": "Email",
+		"phone": "Telefone",
+		"notes": "Notas (opcional)",
+		"create": "Adicionar Contacto",
+		"creating": "Adicionando...",
+		"update": "Atualizar Contacto",
+		"updating": "Atualizando...",
+		"cancel": "Cancelar",
+		"edit": "Editar",
+		"nameMinLength": "O nome deve ter pelo menos 3 caracteres",
+		"nameMaxLength": "O nome deve ter menos de 150 caracteres",
+		"emailRequired": "O email é obrigatório",
+		"emailInvalid": "Por favor insira um endereço de email válido",
+		"emailMaxLength": "O email deve ter menos de 255 caracteres",
+		"phoneRequired": "O telefone é obrigatório",
+		"phoneMaxLength": "O telefone deve ter menos de 20 caracteres",
+		"notesMaxLength": "As notas devem ter menos de 1000 caracteres",
+		"createSuccess": "Contacto criado com sucesso",
+		"createError": "Falha ao criar contacto",
+		"updateSuccess": "Contacto atualizado com sucesso",
+		"updateError": "Falha ao atualizar contacto"
 	}
 }

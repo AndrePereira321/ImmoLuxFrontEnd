@@ -6,7 +6,8 @@
 		"selectLanguage": "Sélectionner la langue",
 		"login": "Connexion",
 		"logout": "Déconnexion",
-		"userMenu": "Menu utilisateur"
+		"userMenu": "Menu utilisateur",
+		"myProperties": "Mes Propriétés"
 	},
 	"auth": {
 		"login": "Login",
@@ -62,5 +63,45 @@
 			"interested": "Que vous cherchiez à acheter la maison de vos rêves ou à investir dans l'immobilier premium, notre équipe d'experts est prête à vous guider à chaque étape du processus.",
 			"publishAnnouncement": "Les propriétaires et promoteurs immobiliers sont invités à présenter leurs annonces exclusives via notre plateforme. Contactez-nous pour discuter des opportunités de partenariat et atteindre des acheteurs exigeants."
 		}
+	},
+	"properties": {
+		"myProperties": "Mes Propriétés",
+		"manageDescription": "Gérer vos annonces et personnes de contact",
+		"propertiesList": "Propriétés",
+		"addProperty": "Ajouter une Propriété",
+		"noProperties": "Pas encore de propriétés",
+		"noPropertiesDescription": "Commencez par ajouter votre première propriété",
+		"contactPersons": "Personnes de Contact",
+		"addContact": "Ajouter un Contact",
+		"noContacts": "Pas encore de contacts",
+		"noContactsDescription": "Commencez par ajouter votre première personne de contact",
+		"loadingContacts": "Chargement des contacts...",
+		"contactCount": "Il y a {count, plural, =1 {1 contact} other {# contacts}}"
+	},
+	"contacts": {
+		"addContact": "Ajouter une Personne de Contact",
+		"editContact": "Modifier la Personne de Contact",
+		"name": "Nom",
+		"email": "Email",
+		"phone": "Téléphone",
+		"notes": "Notes (optionnel)",
+		"create": "Ajouter le Contact",
+		"creating": "Ajout en cours...",
+		"update": "Mettre à jour le Contact",
+		"updating": "Mise à jour...",
+		"cancel": "Annuler",
+		"edit": "Modifier",
+		"nameMinLength": "Le nom doit contenir au moins 3 caractères",
+		"nameMaxLength": "Le nom doit contenir moins de 150 caractères",
+		"emailRequired": "L'email est obligatoire",
+		"emailInvalid": "Veuillez saisir une adresse email valide",
+		"emailMaxLength": "L'email doit contenir moins de 255 caractères",
+		"phoneRequired": "Le téléphone est obligatoire",
+		"phoneMaxLength": "Le téléphone doit contenir moins de 20 caractères",
+		"notesMaxLength": "Les notes doivent contenir moins de 1000 caractères",
+		"createSuccess": "Contact créé avec succès",
+		"createError": "Échec de la création du contact",
+		"updateSuccess": "Contact mis à jour avec succès",
+		"updateError": "Échec de la mise à jour du contact"
 	}
 }

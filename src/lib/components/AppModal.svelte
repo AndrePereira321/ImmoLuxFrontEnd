@@ -7,11 +7,12 @@
 		open: boolean;
 		title?: string;
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+		closeOnBackdrop?: boolean;
 		onClose?: () => void;
 		children?: Snippet;
 	}
 
-	let { open = $bindable(false), title, size = 'md', onClose, children }: Props = $props();
+	let { open = $bindable(false), title, size = 'md', closeOnBackdrop = true, onClose, children }: Props = $props();
 
 	const handleClose = () => {
 		open = false;
@@ -21,10 +22,28 @@
 	};
 
 	const handleBackdropClick = (e: MouseEvent) => {
-		if (e.target === e.currentTarget) {
+		if (closeOnBackdrop && e.target === e.currentTarget) {
 			handleClose();
 		}
 	};
+
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key === 'Escape') {
+			handleClose();
+		}
+	};
+
+	$effect(() => {
+		if (open) {
+			document.addEventListener('keydown', handleKeyDown);
+		} else {
+			document.removeEventListener('keydown', handleKeyDown);
+		}
+
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	});
 
 	const sizeClasses = {
 		xs: 'max-w-xs',

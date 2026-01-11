@@ -10,6 +10,7 @@ export class ApiClient {
 			headers: {
 				'Content-Type': 'application/json'
 			},
+			withCredentials: true,
 			validateStatus: () => true,
 			...config
 		});

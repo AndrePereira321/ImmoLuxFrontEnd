@@ -150,7 +150,7 @@
 	</AppSection>
 
 	<!-- Divider 2 -->
-	<AppSectionDivider variant="gradient" />
+	<AppSectionDivider variant="decorative" />
 
 	<!-- Block 3: Contact Information -->
 	<AppSection

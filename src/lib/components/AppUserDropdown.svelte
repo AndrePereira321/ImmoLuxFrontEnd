@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faChevronDown, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+	import { faBuilding, faChevronDown, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 	import { _ } from 'svelte-i18n';
 	import type { User } from '$lib/types/auth';
 	import AppTooltip from '$lib/components/AppTooltip.svelte';
@@ -13,6 +14,7 @@
 	let { user, onLogout }: Props = $props();
 
 	let dropdownOpen = $state(false);
+	let dropdownRef: HTMLDivElement;
 
 	const toggleDropdown = () => {
 		dropdownOpen = !dropdownOpen;
@@ -22,9 +24,27 @@
 		dropdownOpen = false;
 		onLogout();
 	};
+
+	const handleClickOutside = (event: MouseEvent) => {
+		if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+			dropdownOpen = false;
+		}
+	};
+
+	$effect(() => {
+		if (dropdownOpen) {
+			document.addEventListener('click', handleClickOutside);
+		} else {
+			document.removeEventListener('click', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
-<div class="relative">
+<div class="relative" bind:this={dropdownRef}>
 	<button
 		id="user-dropdown-button"
 		onclick={toggleDropdown}
@@ -55,6 +75,15 @@
 					{user.email}
 				</p>
 			</div>
+
+			<!-- Property Management Option -->
+			<a
+				href={resolve('/panel/properties')}
+				class="flex w-full items-center gap-3 px-4 py-3 text-sm text-dark-900 transition-colors hover:bg-primary-100 dark:text-light-50 dark:hover:bg-dark-700"
+			>
+				<FontAwesomeIcon icon={faBuilding} />
+				<span>{$_('menu.myProperties')}</span>
+			</a>
 
 			<!-- Logout Option -->
 			<button

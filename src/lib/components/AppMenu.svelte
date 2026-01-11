@@ -6,7 +6,6 @@
 		faBuilding,
 		faGlobe,
 		faHome,
-		faRightFromBracket,
 		faRightToBracket,
 		faSearch,
 		faTimes
@@ -28,6 +27,7 @@
 	let isLoggingOut = $state(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let AppLoginForm: any = $state(null);
+	let languageDropdownRef: HTMLDivElement;
 
 	const authState = $derived($authStore);
 
@@ -43,6 +43,24 @@
 		setLanguage(lang);
 		languageDropdownOpen = false;
 	};
+
+	const handleClickOutsideLanguage = (event: MouseEvent) => {
+		if (languageDropdownRef && !languageDropdownRef.contains(event.target as Node)) {
+			languageDropdownOpen = false;
+		}
+	};
+
+	$effect(() => {
+		if (languageDropdownOpen) {
+			document.addEventListener('click', handleClickOutsideLanguage);
+		} else {
+			document.removeEventListener('click', handleClickOutsideLanguage);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleClickOutsideLanguage);
+		};
+	});
 
 	const openLoginModal = async () => {
 		if (!AppLoginForm) {
@@ -109,36 +127,38 @@
 			<!-- Right Side Controls (Desktop) -->
 			<div class="hidden items-center gap-1 md:flex">
 				<!-- Language Dropdown -->
-				<button
-					id="language-button"
-					onclick={toggleLanguageDropdown}
-					class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
-					aria-label={$_('menu.selectLanguage')}
-				>
-					<FontAwesomeIcon icon={faGlobe} />
-				</button>
-				<AppTooltip triggeredBy="#language-button" placement="bottom">
-					{$_('menu.selectLanguage')}
-				</AppTooltip>
-
-				<!-- Language Dropdown Menu -->
-				{#if languageDropdownOpen}
-					<div
-						class="ring-opacity-5 absolute top-16 right-0 w-40 rounded-lg bg-light-50 py-2 shadow-lg ring-1 ring-dark-900 dark:bg-dark-800 dark:ring-light-300"
+				<div class="relative" bind:this={languageDropdownRef}>
+					<button
+						id="language-button"
+						onclick={toggleLanguageDropdown}
+						class="flex h-10 items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+						aria-label={$_('menu.selectLanguage')}
 					>
-						{#each LANGUAGES as lang (lang.code)}
-							<button
-								onclick={() => changeLanguage(lang.code)}
-								class="flex w-full items-center gap-3 px-4 py-2 text-sm text-dark-900 transition-colors hover:bg-primary-100 dark:text-light-50 dark:hover:bg-dark-700"
-								class:bg-primary-200={$locale === lang.code}
-								class:dark:bg-dark-700={$locale === lang.code}
-							>
-								<img src={lang.flag} alt={lang.name} class="h-4 w-6 object-cover" />
-								<span>{lang.name}</span>
-							</button>
-						{/each}
-					</div>
-				{/if}
+						<FontAwesomeIcon icon={faGlobe} />
+					</button>
+					<AppTooltip triggeredBy="#language-button" placement="bottom">
+						{$_('menu.selectLanguage')}
+					</AppTooltip>
+
+					<!-- Language Dropdown Menu -->
+					{#if languageDropdownOpen}
+						<div
+							class="ring-opacity-5 absolute top-12 right-0 z-50 w-40 rounded-lg bg-light-50 py-2 shadow-lg ring-1 ring-dark-900 dark:bg-dark-800 dark:ring-light-300"
+						>
+							{#each LANGUAGES as lang (lang.code)}
+								<button
+									onclick={() => changeLanguage(lang.code)}
+									class="flex w-full items-center gap-3 px-4 py-2 text-sm text-dark-900 transition-colors hover:bg-primary-100 dark:text-light-50 dark:hover:bg-dark-700"
+									class:bg-primary-200={$locale === lang.code}
+									class:dark:bg-dark-700={$locale === lang.code}
+								>
+									<img src={lang.flag} alt={lang.name} class="h-4 w-6 object-cover" />
+									<span>{lang.name}</span>
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 
 				<!-- Theme Toggle -->
 				<div id="theme-toggler-wrapper" class="flex h-10 items-center">
@@ -170,14 +190,34 @@
 				{/if}
 			</div>
 
-			<!-- Mobile Menu Button -->
-			<button
-				class="rounded-lg p-2 text-light-50 transition-all hover:bg-primary-700 md:hidden"
-				onclick={toggleMenu}
-				aria-label="Toggle menu"
-			>
-				<FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} size="lg" />
-			</button>
+			<!-- Mobile Right Side Controls -->
+			<div class="flex items-center gap-2 md:hidden">
+				<!-- Login/User Dropdown Button (Mobile) -->
+				{#if !authState.isLoading}
+					{#if authState.isAuthenticated && authState.user}
+						<!-- User Dropdown (Mobile) -->
+						<AppUserDropdown user={authState.user} onLogout={handleLogout} />
+					{:else}
+						<!-- Login Button (Mobile) -->
+						<button
+							onclick={openLoginModal}
+							class="flex h-10 items-center gap-2 rounded-lg px-3 py-2 font-medium text-light-50 transition-all hover:bg-primary-700 dark:hover:bg-dark-800"
+							aria-label={$_('menu.login')}
+						>
+							<FontAwesomeIcon icon={faRightToBracket} />
+						</button>
+					{/if}
+				{/if}
+
+				<!-- Mobile Menu Button -->
+				<button
+					class="rounded-lg p-2 text-light-50 transition-all hover:bg-primary-700"
+					onclick={toggleMenu}
+					aria-label="Toggle menu"
+				>
+					<FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} size="lg" />
+				</button>
+			</div>
 		</div>
 
 		<!-- Mobile Menu -->
@@ -201,35 +241,6 @@
 					<FontAwesomeIcon icon={faSearch} />
 					<span>{$_('houses')}</span>
 				</a>
-
-				<!-- Login/Logout Button Mobile -->
-				{#if !authState.isLoading}
-					<div class="border-t border-primary-700 pt-2">
-						{#if authState.isAuthenticated}
-							<button
-								onclick={() => {
-									handleLogout();
-									toggleMenu();
-								}}
-								class="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
-							>
-								<FontAwesomeIcon icon={faRightFromBracket} />
-								<span>{$_('menu.logout')}</span>
-							</button>
-						{:else}
-							<button
-								onclick={() => {
-									openLoginModal();
-									toggleMenu();
-								}}
-								class="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
-							>
-								<FontAwesomeIcon icon={faRightToBracket} />
-								<span>{$_('menu.login')}</span>
-							</button>
-						{/if}
-					</div>
-				{/if}
 
 				<!-- Theme Toggle Mobile -->
 				<div class="border-t border-primary-700 pt-2">
@@ -264,7 +275,13 @@
 </nav>
 
 <!-- Login Modal -->
-<AppModal bind:open={loginModalOpen} title={$_('auth.login')} size="md" onClose={closeLoginModal}>
+<AppModal
+	bind:open={loginModalOpen}
+	title={$_('auth.login')}
+	size="md"
+	closeOnBackdrop={false}
+	onClose={closeLoginModal}
+>
 	{#if AppLoginForm}
 		<AppLoginForm onSuccess={handleLoginSuccess} />
 	{/if}

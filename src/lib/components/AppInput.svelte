@@ -29,6 +29,17 @@
 	let hasValue = $derived(value !== '' && value !== null && value !== undefined);
 	let shouldFloat = $derived(isFocused || hasValue);
 
+	const labelClasses = $derived(() => {
+		const base = 'pointer-events-none absolute left-4 origin-left text-base transition-all duration-200';
+		const position = shouldFloat ? 'top-2 translate-y-0 scale-75' : 'top-1/2 -translate-y-1/2';
+		const color = error
+			? 'text-error-600 dark:text-error-400'
+			: shouldFloat
+				? 'text-primary-600 dark:text-primary-400'
+				: 'text-dark-600 dark:text-light-400';
+		return `${base} ${position} ${color}`;
+	});
+
 	const handleFocus = () => {
 		isFocused = true;
 	};
@@ -56,17 +67,7 @@
 		class:dark:focus:border-error-500={error}
 	/>
 
-	<label
-		for={id}
-		class="pointer-events-none absolute top-1/2 left-4 origin-left -translate-y-1/2 text-base text-dark-600 transition-all duration-200 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:scale-75 peer-focus:text-primary-600 dark:text-light-400 dark:peer-focus:text-primary-400"
-		class:top-2={shouldFloat}
-		class:translate-y-0={shouldFloat}
-		class:scale-75={shouldFloat}
-		class:text-primary-600={shouldFloat && !error}
-		class:dark:text-primary-400={shouldFloat && !error}
-		class:text-error-600={error}
-		class:dark:text-error-400={error}
-	>
+	<label for={id} class={labelClasses()}>
 		{label}
 		{#if required}
 			<span class="text-error-600 dark:text-error-400">*</span>

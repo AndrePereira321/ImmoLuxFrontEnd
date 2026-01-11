@@ -6,7 +6,8 @@
 		"selectLanguage": "Select language",
 		"login": "Login",
 		"logout": "Logout",
-		"userMenu": "User menu"
+		"userMenu": "User menu",
+		"myProperties": "My Properties"
 	},
 	"auth": {
 		"login": "Login",
@@ -62,5 +63,45 @@
 			"interested": "Whether you're looking to purchase your dream home or invest in premium real estate, our expert team is ready to guide you through every step of the process.",
 			"publishAnnouncement": "Property owners and developers are invited to showcase their exclusive listings through our platform. Contact us to discuss partnership opportunities and reach discerning buyers."
 		}
+	},
+	"properties": {
+		"myProperties": "My Properties",
+		"manageDescription": "Manage your property listings and contact persons",
+		"propertiesList": "Properties",
+		"addProperty": "Add Property",
+		"noProperties": "No properties yet",
+		"noPropertiesDescription": "Start by adding your first property",
+		"contactPersons": "Contact Persons",
+		"addContact": "Add Contact",
+		"noContacts": "No contacts yet",
+		"noContactsDescription": "Start by adding your first contact person",
+		"loadingContacts": "Loading contacts...",
+		"contactCount": "There {count, plural, =1 {is 1 contact} other {are # contacts}}"
+	},
+	"contacts": {
+		"addContact": "Add Contact Person",
+		"editContact": "Edit Contact Person",
+		"name": "Name",
+		"email": "Email",
+		"phone": "Phone",
+		"notes": "Notes (optional)",
+		"create": "Add Contact",
+		"creating": "Adding...",
+		"update": "Update Contact",
+		"updating": "Updating...",
+		"cancel": "Cancel",
+		"edit": "Edit",
+		"nameMinLength": "Name must be at least 3 characters",
+		"nameMaxLength": "Name must be less than 150 characters",
+		"emailRequired": "Email is required",
+		"emailInvalid": "Please enter a valid email address",
+		"emailMaxLength": "Email must be less than 255 characters",
+		"phoneRequired": "Phone is required",
+		"phoneMaxLength": "Phone must be less than 20 characters",
+		"notesMaxLength": "Notes must be less than 1000 characters",
+		"createSuccess": "Contact created successfully",
+		"createError": "Failed to create contact",
+		"updateSuccess": "Contact updated successfully",
+		"updateError": "Failed to update contact"
 	}
 }
