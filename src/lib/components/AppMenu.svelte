@@ -1,15 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import {
-		faBars,
-		faBuilding,
-		faGlobe,
-		faHome,
-		faRightToBracket,
-		faSearch,
-		faTimes
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faBars, faGlobe, faHome, faRightToBracket, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+	import logoTransparentWhite from '$lib/assets/images/logo_transparent_white.png';
+	import logoTransparentDark from '$lib/assets/images/logo_transparent_dark.png';
 	import { _, locale } from 'svelte-i18n';
 	import { LANGUAGES } from '$lib/constants/languages';
 	import { changeLanguage as setLanguage } from '$lib/utils/language';
@@ -98,7 +92,8 @@
 			<div class="flex items-center gap-8">
 				<!-- Logo/Brand -->
 				<a href={resolve('/')} class="flex items-center gap-3 transition-opacity hover:opacity-90">
-					<FontAwesomeIcon icon={faBuilding} class="text-2xl text-light-50" />
+					<img src={logoTransparentWhite} alt="ImmoLux" class="h-8 w-auto dark:hidden" />
+					<img src={logoTransparentDark} alt="ImmoLux" class="hidden h-8 w-auto dark:block" />
 					<span class="text-2xl font-bold tracking-tight text-light-50">ImmoLux</span>
 				</a>
 
