@@ -14,6 +14,11 @@
 		"noProperties": "Nenhuma propriedade encontrada",
 		"noPropertiesDescription": "Tente ajustar os filtros para ver mais resultados",
 		"pageInfo": "Página {current} de {total}",
+		"quickFilters": {
+			"under200k": "Até 200 mil",
+			"between200k500k": "200 - 500 mil",
+			"luxury500k": "Luxo +500 mil"
+		},
 		"sort": {
 			"newest": "Mais Recentes",
 			"oldest": "Mais Antigas",

@@ -260,7 +260,7 @@
 							}}
 							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
 						>
-							💰 Under 200k
+							💰 {$_('houses.quickFilters.under200k')}
 						</button>
 						<button
 							type="button"
@@ -272,7 +272,7 @@
 							}}
 							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
 						>
-							💎 200k - 500k
+							💎 {$_('houses.quickFilters.between200k500k')}
 						</button>
 						<button
 							type="button"
@@ -284,7 +284,7 @@
 							}}
 							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
 						>
-							👑 Luxury 500k+
+							👑 {$_('houses.quickFilters.luxury500k')}
 						</button>
 					</div>
 
