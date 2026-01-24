@@ -48,7 +48,9 @@
 		"axios": "^1.13.2",
 		"flowbite": "^4.0.1",
 		"flowbite-svelte": "^1.31.0",
+		"leaflet": "^1.9.4",
 		"svelte-i18n": "^4.0.1",
+		"svelte-leafletjs": "^2.0.0",
 		"sveltekit-superforms": "^2.29.1",
 		"valibot": "^1.2.0",
 		"zod": "^4.3.6"

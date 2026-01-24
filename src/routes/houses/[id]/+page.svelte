@@ -27,6 +27,7 @@
 	import { apiClient } from '$lib/api/api-client';
 	import type { PropertyDTO, PropertyImageDTO } from '$lib/types/property';
 	import type { ServerAPIResponse } from '$lib/types/api';
+	import { browser } from '$app/environment';
 
 	const propertyId = $derived($page.params.id);
 
@@ -34,8 +35,19 @@
 	let images = $state<PropertyImageDTO[]>([]);
 	let loading = $state(true);
 	let currentImageIndex = $state(0);
+	let mapCoordinates = $state<[number, number] | null>(null);
+	let LeafletMap = $state<any>(null);
+	let TileLayer = $state<any>(null);
+	let Marker = $state<any>(null);
+	let Popup = $state<any>(null);
+	let mapReady = $state(false);
+	let serverUrl = $state('');
 
-	const serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
+	$effect(() => {
+		if (browser) {
+			serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
+		}
+	});
 
 	const formatPrice = (price?: number): string => {
 		if (!price) return '—';
@@ -97,6 +109,7 @@
 			if (serverResponse.success && serverResponse.data) {
 				property = serverResponse.data;
 				await loadImages();
+				await geocodeAddress();
 			} else {
 				goto('/houses');
 			}
@@ -121,10 +134,64 @@
 		}
 	};
 
-	onMount(() => {
+	const geocodeAddress = async () => {
+		if (!property) return;
+
+		// Use property's latitude and longitude if defined
+		if (
+			property.latitude !== null &&
+			property.latitude !== undefined &&
+			property.longitude !== null &&
+			property.longitude !== undefined
+		) {
+			mapCoordinates = [property.latitude, property.longitude];
+			return;
+		}
+
+		// Otherwise, geocode the address
+		const addressParts = [
+			property.address,
+			property.parish,
+			property.municipality,
+			property.district,
+			property.postalCode
+		]
+			.filter(Boolean)
+			.join(', ');
+
+		if (!addressParts) return;
+
+		try {
+			const response = await fetch(
+				`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`
+			);
+			const data = await response.json();
+
+			if (data && data.length > 0) {
+				mapCoordinates = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+			}
+		} catch (error) {
+			console.error('Failed to geocode address:', error);
+		}
+	};
+
+	onMount(async () => {
+		// Load Leaflet components only on client side
+		if (browser) {
+			const leaflet = await import('svelte-leafletjs');
+			LeafletMap = leaflet.LeafletMap;
+			TileLayer = leaflet.TileLayer;
+			Marker = leaflet.Marker;
+			Popup = leaflet.Popup;
+			mapReady = true;
+		}
 		loadProperty();
 	});
 </script>
+
+<svelte:head>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</svelte:head>
 
 {#if loading}
 	<div
@@ -300,6 +367,31 @@
 								{/if}
 							</div>
 						</a>
+
+						<!-- Map -->
+						{#if mapCoordinates && mapReady && LeafletMap}
+							<div class="mb-8">
+								<h2 class="mb-4 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
+									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
+									{$_('properties.sections.location')}
+								</h2>
+								<div class="overflow-hidden rounded-xl border-2 border-light-300 shadow-lg dark:border-dark-600">
+									<div class="h-96">
+										<LeafletMap options={{ center: mapCoordinates, zoom: 15 }}>
+											<TileLayer url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'} />
+											<Marker latLng={mapCoordinates}>
+												<Popup>
+													<div class="p-2">
+														<p class="font-bold">{property.title || $_('properties.untitled')}</p>
+														<p class="text-sm">{property.address}</p>
+													</div>
+												</Popup>
+											</Marker>
+										</LeafletMap>
+									</div>
+								</div>
+							</div>
+						{/if}
 
 						<!-- Description -->
 						{#if property.description}
