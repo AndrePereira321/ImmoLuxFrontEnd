@@ -28,6 +28,9 @@
 	import type { PropertyDTO, PropertyImageDTO } from '$lib/types/property';
 	import type { ServerAPIResponse } from '$lib/types/api';
 	import { browser } from '$app/environment';
+	import { resolve } from '$app/paths';
+
+	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 	const propertyId = $derived($page.params.id);
 
@@ -36,10 +39,10 @@
 	let loading = $state(true);
 	let currentImageIndex = $state(0);
 	let mapCoordinates = $state<[number, number] | null>(null);
-	let LeafletMap = $state<any>(null);
-	let TileLayer = $state<any>(null);
-	let Marker = $state<any>(null);
-	let Popup = $state<any>(null);
+	let LeafletMap = $state<LeafletComponent>(null);
+	let TileLayer = $state<LeafletComponent>(null);
+	let Marker = $state<LeafletComponent>(null);
+	let Popup = $state<LeafletComponent>(null);
 	let mapReady = $state(false);
 	let serverUrl = $state('');
 
@@ -111,11 +114,11 @@
 				await loadImages();
 				await geocodeAddress();
 			} else {
-				goto('/houses');
+				goto(resolve('/houses'));
 			}
 		} catch (error) {
 			console.error('Failed to load property:', error);
-			goto('/houses');
+			goto(resolve('/houses'));
 		} finally {
 			loading = false;
 		}
@@ -208,7 +211,7 @@
 		<div class="border-b border-light-300 bg-white shadow-sm dark:border-dark-700 dark:bg-dark-800">
 			<div class="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
 				<button
-					onclick={() => goto('/houses')}
+					onclick={() => goto(resolve('/houses'))}
 					class="group flex items-center gap-2 font-medium text-dark-600 transition-all hover:gap-3 hover:text-primary-600 dark:text-light-400 dark:hover:text-primary-400"
 				>
 					<FontAwesomeIcon icon={faArrowLeft} class="transition-transform group-hover:-translate-x-1" />

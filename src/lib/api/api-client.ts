@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import type { ServerAPIResponse } from '$lib/types/api';
+import { browser } from '$app/environment';
 
 export class ApiClient {
 	private instance: AxiosInstance;
@@ -61,4 +62,4 @@ export class ApiClient {
 	}
 }
 
-export const apiClient = new ApiClient(import.meta.env.VITE_SERVER_URL || window.location.origin);
+export const apiClient = new ApiClient(import.meta.env.VITE_SERVER_URL || (browser ? window.location.origin : ''));

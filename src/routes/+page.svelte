@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { t } from 'svelte-i18n';
+	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faEnvelope, faGlobe, faHandshake, faHouse, faMapMarkerAlt, faStar } from '@fortawesome/free-solid-svg-icons';
 	import AppSection from '$lib/components/AppSection.svelte';
@@ -148,7 +149,7 @@
 				<!-- View All Button -->
 				<div class="mt-10 text-center">
 					<a
-						href="/houses"
+						href={resolve('/houses')}
 						class="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 px-10 py-5 text-lg font-normal text-light-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-2xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
 					>
 						<FontAwesomeIcon icon={faHouse} class="transition-transform duration-300 group-hover:rotate-12" />

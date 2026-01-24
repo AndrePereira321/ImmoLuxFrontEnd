@@ -207,7 +207,6 @@
 	<div
 		class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 dark:from-primary-800 dark:via-primary-900 dark:to-dark-950"
 	>
-		<div class="absolute inset-0 bg-[url('/pattern.svg')] opacity-10"></div>
 		<div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
 			<div class="text-center">
 				<div class="mb-4 flex justify-center">

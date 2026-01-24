@@ -72,11 +72,6 @@
 		}
 	};
 
-	const getEnergyRatingLabel = (rating?: string): string | null => {
-		if (!rating) return null;
-		return $_(`properties.energyRatings.${rating}`);
-	};
-
 	const hasFeatures = $derived(
 		!!property.bedrooms ||
 			!!property.bathrooms ||
