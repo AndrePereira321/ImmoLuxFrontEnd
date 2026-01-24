@@ -28,10 +28,10 @@
 		[propertyId: number]: number[];
 	}
 
-	// State
+	// Mutable state for client-side updates
 	let properties = $state<PropertyDTO[]>([]);
 	let total = $state(0);
-	let loading = $state(false);
+	let loading = $state(true);
 	let showFilters = $state(false);
 
 	// Locations data
@@ -54,8 +54,14 @@
 		offset: 0
 	});
 
-	// Image IDs map (propertyId -> imageIds[])
+	// Image IDs map
 	let propertyImageMap = $state<PropertyImageMap>({});
+
+	// Initialize on mount
+	onMount(() => {
+		loadLocations();
+		loadProperties();
+	});
 
 	// Pagination
 	const currentPage = $derived(Math.floor(filters.offset / filters.limit) + 1);
@@ -77,6 +83,7 @@
 	);
 
 	const loadLocations = async () => {
+		// Already loaded from server
 		if (districts.length > 0) return;
 
 		loadingLocations = true;
@@ -196,11 +203,16 @@
 			loadLocations();
 		}
 	};
-
-	onMount(() => {
-		loadProperties();
-	});
 </script>
+
+<svelte:head>
+	<title>{$_('houses.title')} - ImmoLux</title>
+	<meta name="description" content={$_('houses.meta.description')} />
+	<meta property="og:title" content="{$_('houses.title')} - ImmoLux" />
+	<meta property="og:description" content={$_('houses.meta.description')} />
+	<meta property="og:type" content="website" />
+	<link rel="canonical" href="https://immolux.pt/houses" />
+</svelte:head>
 
 <div class="min-h-screen bg-light-50 dark:bg-dark-900">
 	<!-- Hero Section -->

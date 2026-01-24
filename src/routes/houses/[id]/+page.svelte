@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
@@ -24,16 +24,13 @@
 		faUser,
 		faWarehouse
 	} from '@fortawesome/free-solid-svg-icons';
-	import { apiClient } from '$lib/api/api-client';
 	import type { PropertyDTO, PropertyImageDTO } from '$lib/types/property';
-	import type { ServerAPIResponse } from '$lib/types/api';
 	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 
 	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-	const propertyId = $derived($page.params.id);
-
+	// Mutable state
 	let property = $state<PropertyDTO | null>(null);
 	let images = $state<PropertyImageDTO[]>([]);
 	let loading = $state(true);
@@ -103,96 +100,172 @@
 		currentImageIndex = index;
 	};
 
-	const loadProperty = async () => {
-		loading = true;
-		try {
-			const response = await apiClient.get<PropertyDTO>(`/properties/${propertyId}`);
-			const serverResponse: ServerAPIResponse<PropertyDTO> = response.data;
+	// Generate JSON-LD structured data
+	const jsonLd = $derived(
+		property
+			? `<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "RealEstateListing",
+	"name": "${property.title || 'Propriedade ImmoLux'}",
+	"description": "${(property.description || '').replace(/"/g, '\\"')}",
+	"url": "https://immolux.pt/houses/${property.id}",
+	${images.length > 0 ? `"image": "${serverUrl || 'https://immolux.pt'}/v1/api/images/${images[0].id}",` : ''}
+	"offers": {
+		"@type": "Offer",
+		"price": "${property.price || 0}",
+		"priceCurrency": "EUR",
+		"availability": "${property.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
+	},
+	"address": {
+		"@type": "PostalAddress",
+		"streetAddress": "${(property.address || '').replace(/"/g, '\\"')}",
+		"addressLocality": "${property.municipality || ''}",
+		"addressRegion": "${property.district || ''}",
+		"postalCode": "${property.postalCode || ''}",
+		"addressCountry": "PT"
+	}${
+		property.areaSqm
+			? `,
+	"floorSize": {
+		"@type": "QuantitativeValue",
+		"value": "${property.areaSqm}",
+		"unitCode": "MTK"
+	}`
+			: ''
+	}${
+		property.bedrooms
+			? `,
+	"numberOfBedrooms": "${property.bedrooms}"`
+			: ''
+	}${
+		property.bathrooms
+			? `,
+	"numberOfBathroomsTotal": "${property.bathrooms}"`
+			: ''
+	}
+}
+</` + `script>`
+			: ''
+	);
 
-			if (serverResponse.success && serverResponse.data) {
-				property = serverResponse.data;
-				await loadImages();
-				await geocodeAddress();
-			} else {
-				goto(resolve('/houses'));
-			}
-		} catch (error) {
-			console.error('Failed to load property:', error);
-			goto(resolve('/houses'));
-		} finally {
-			loading = false;
-		}
-	};
-
-	const loadImages = async () => {
-		try {
-			const response = await apiClient.get<{ images: PropertyImageDTO[] }>(`/properties/${propertyId}/images`);
-			const serverResponse: ServerAPIResponse<{ images: PropertyImageDTO[] }> = response.data;
-
-			if (serverResponse.success && serverResponse.data) {
-				images = serverResponse.data.images ?? [];
-			}
-		} catch (error) {
-			console.error('Failed to load images:', error);
-		}
-	};
-
-	const geocodeAddress = async () => {
-		if (!property) return;
-
-		// Use property's latitude and longitude if defined
-		if (
-			property.latitude !== null &&
-			property.latitude !== undefined &&
-			property.longitude !== null &&
-			property.longitude !== undefined
-		) {
-			mapCoordinates = [property.latitude, property.longitude];
-			return;
-		}
-
-		// Otherwise, geocode the address
-		const addressParts = [
-			property.address,
-			property.parish,
-			property.municipality,
-			property.district,
-			property.postalCode
-		]
-			.filter(Boolean)
-			.join(', ');
-
-		if (!addressParts) return;
-
-		try {
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`
-			);
-			const data = await response.json();
-
-			if (data && data.length > 0) {
-				mapCoordinates = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-			}
-		} catch (error) {
-			console.error('Failed to geocode address:', error);
-		}
-	};
-
+	// Load property data client-side
 	onMount(async () => {
-		// Load Leaflet components only on client side
-		if (browser) {
+		if (!browser) return;
+
+		try {
+			loading = true;
+			const propertyId = $page.params.id;
+
+			// Fetch property details
+			const propertyResponse = await fetch(`${serverUrl}/v1/api/properties/${propertyId}`);
+
+			if (!propertyResponse.ok) {
+				goto('/houses');
+				return;
+			}
+
+			const propertyData = await propertyResponse.json();
+
+			if (!propertyData.success || !propertyData.data) {
+				goto('/houses');
+				return;
+			}
+
+			property = propertyData.data;
+
+			// Fetch property images
+			try {
+				const imagesResponse = await fetch(`${serverUrl}/v1/api/properties/${propertyId}/images`);
+				if (imagesResponse.ok) {
+					const imagesData = await imagesResponse.json();
+					if (imagesData.success && imagesData.data) {
+						images = imagesData.data.images || [];
+					}
+				}
+			} catch (err) {
+				console.error('Failed to load images:', err);
+			}
+
+			// Geocode address if needed
+			if (
+				property &&
+				property.latitude !== null &&
+				property.latitude !== undefined &&
+				property.longitude !== null &&
+				property.longitude !== undefined
+			) {
+				mapCoordinates = [property.latitude, property.longitude];
+			} else if (property) {
+				// Try to geocode the address
+				const addressParts = [
+					property.address,
+					property.parish,
+					property.municipality,
+					property.district,
+					property.postalCode
+				]
+					.filter(Boolean)
+					.join(', ');
+
+				if (addressParts) {
+					try {
+						const geocodeResponse = await fetch(
+							`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`
+						);
+						const geocodeData = await geocodeResponse.json();
+
+						if (geocodeData && geocodeData.length > 0) {
+							mapCoordinates = [parseFloat(geocodeData[0].lat), parseFloat(geocodeData[0].lon)];
+						}
+					} catch (err) {
+						console.error('Failed to geocode address:', err);
+					}
+				}
+			}
+
+			// Load Leaflet components
 			const leaflet = await import('svelte-leafletjs');
 			LeafletMap = leaflet.LeafletMap;
 			TileLayer = leaflet.TileLayer;
 			Marker = leaflet.Marker;
 			Popup = leaflet.Popup;
 			mapReady = true;
+		} catch (err) {
+			console.error('Failed to load property:', err);
+			goto('/houses');
+		} finally {
+			loading = false;
 		}
-		loadProperty();
 	});
 </script>
 
 <svelte:head>
+	{#if property}
+		<title>{property.title || 'Propriedade'} - ImmoLux</title>
+		<meta
+			name="description"
+			content={property.description
+				? property.description.substring(0, 160)
+				: `${getPropertyTypeLabel(property.propertyType)} em ${property.municipality}, ${property.district}. ${formatPrice(property.price)}`}
+		/>
+		<meta property="og:title" content="{property.title || 'Propriedade'} - ImmoLux" />
+		<meta
+			property="og:description"
+			content={property.description
+				? property.description.substring(0, 160)
+				: `${getPropertyTypeLabel(property.propertyType)} em ${property.municipality}, ${property.district}`}
+		/>
+		<meta property="og:type" content="website" />
+		{#if images.length > 0}
+			<meta property="og:image" content="{serverUrl || 'https://immolux.pt'}/v1/api/images/{images[0].id}" />
+		{/if}
+		<link rel="canonical" href="https://immolux.pt/houses/{property.id}" />
+
+		<!-- Structured Data (JSON-LD) for Rich Snippets -->
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		{@html jsonLd}
+	{/if}
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </svelte:head>
 
@@ -569,8 +642,10 @@
 									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
 									{$_('properties.virtualTourUrl')}
 								</h2>
+								<!-- External link - data-sveltekit-reload bypasses SvelteKit routing -->
 								<a
 									href={property.virtualTourUrl}
+									data-sveltekit-reload
 									target="_blank"
 									rel="noopener noreferrer"
 									class="group inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-8 py-4 text-lg font-semibold text-light-50 shadow-lg transition-all hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"

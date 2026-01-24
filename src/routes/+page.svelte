@@ -8,13 +8,7 @@
 	import AppInfoCard from '$lib/components/AppInfoCard.svelte';
 	import AppSectionDivider from '$lib/components/AppSectionDivider.svelte';
 	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
-	import { apiClient } from '$lib/api/api-client';
 	import type { PropertyDTO } from '$lib/types/property';
-
-	interface PropertyListResponse {
-		properties: PropertyDTO[];
-		total: number;
-	}
 
 	interface PropertyImageMap {
 		[propertyId: number]: number[];
@@ -22,70 +16,63 @@
 
 	let properties = $state<PropertyDTO[]>([]);
 	let propertyImageMap = $state<PropertyImageMap>({});
-	let loading = $state(true);
 	let hasProperties = $state(false);
+	let loading = $state(true);
 
-	const loadPropertyImages = async (propertyId: number) => {
+	onMount(async () => {
 		try {
-			const response = await apiClient.get<{ images: { id: number; displayOrder: number }[] }>(
-				`/properties/${propertyId}/images`
+			const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+			const response = await fetch(
+				`${serverUrl}/v1/api/properties?status=available&page=1&limit=3&orderBy=created_desc`
 			);
 
-			if (response.data.success && response.data.data) {
-				const images = response.data.data.images;
-				if (Array.isArray(images)) {
-					const sortedImageIds = images
-						.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-						.map((img) => img.id!);
-					propertyImageMap[propertyId] = sortedImageIds;
-				} else {
-					propertyImageMap[propertyId] = [];
-				}
-			} else {
-				propertyImageMap[propertyId] = [];
-			}
-		} catch (error) {
-			console.error(`Failed to load images for property ${propertyId}:`, error);
-			propertyImageMap[propertyId] = [];
-		}
-	};
+			if (response.ok) {
+				const data = await response.json();
+				if (data.success && data.data) {
+					properties = data.data.properties;
+					hasProperties = properties.length > 0;
 
-	const loadRecentProperties = async () => {
-		loading = true;
-		try {
-			const response = await apiClient.get<PropertyListResponse>('/properties', {
-				params: {
-					status: 'available',
-					page: 1,
-					limit: 3,
-					orderBy: 'created_desc'
-				}
-			});
-
-			if (response.data.success && response.data.data) {
-				properties = response.data.data.properties;
-				hasProperties = properties.length > 0;
-
-				// Load images for each property
-				for (const property of properties) {
-					if (property.id) {
-						await loadPropertyImages(property.id);
+					// Load images for each property
+					for (const property of properties) {
+						if (property.id) {
+							try {
+								const imgResponse = await fetch(`${serverUrl}/v1/api/properties/${property.id}/images`);
+								if (imgResponse.ok) {
+									const imgData = await imgResponse.json();
+									if (imgData.success && imgData.data && imgData.data.images) {
+										const images = imgData.data.images;
+										const sortedImageIds = images
+											.sort(
+												(a: { displayOrder?: number }, b: { displayOrder?: number }) =>
+													(a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+											)
+											.map((img: { id: number }) => img.id);
+										propertyImageMap[property.id] = sortedImageIds;
+									}
+								}
+							} catch (err) {
+								console.error(`Failed to load images for property ${property.id}:`, err);
+							}
+						}
 					}
 				}
 			}
 		} catch (error) {
 			console.error('Failed to load properties:', error);
-			properties = [];
-			hasProperties = false;
 		} finally {
 			loading = false;
 		}
-	};
-
-	onMount(() => {
-		loadRecentProperties();
 	});
 </script>
+
+<svelte:head>
+	<title>ImmoLux - {$t('homepage.meta.title')}</title>
+	<meta name="description" content={$t('homepage.meta.description')} />
+	<meta property="og:title" content="ImmoLux - {$t('homepage.meta.title')}" />
+	<meta property="og:description" content={$t('homepage.meta.description')} />
+	<meta property="og:type" content="website" />
+	<link rel="canonical" href="https://immolux.pt/" />
+</svelte:head>
 
 <div class="min-h-screen">
 	<!-- Block 1: Hero Section - Available Houses -->

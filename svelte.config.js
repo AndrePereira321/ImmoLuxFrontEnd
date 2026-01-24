@@ -8,7 +8,12 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			fallback: 'index.html'
+			// SPA mode - single index.html fallback for all routes
+			fallback: 'index.html',
+			pages: 'build',
+			assets: 'build',
+			precompress: false,
+			strict: false
 		})
 	},
 	compilerOptions: {

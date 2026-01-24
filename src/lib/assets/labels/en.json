@@ -2,6 +2,9 @@
 	"home": "Home",
 	"houses": {
 		"title": "Browse Houses",
+		"meta": {
+			"description": "Explore available properties in Portugal. Filter by location, price and type. Find your ideal home in premium villas, apartments and land."
+		},
 		"filters": "Filters",
 		"allTypes": "All Types",
 		"allStatuses": "All Statuses",
@@ -68,6 +71,10 @@
 		"language": "Language"
 	},
 	"homepage": {
+		"meta": {
+			"title": "Luxury Properties in Portugal",
+			"description": "Discover dream properties in Portugal. Premium villas, apartments and land in the best locations. Exceptional quality real estate."
+		},
 		"availableHouses": {
 			"title": "Discover Your Dream Property",
 			"subtitle": "Exclusive Real Estate in Portugal",

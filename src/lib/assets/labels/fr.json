@@ -2,6 +2,9 @@
 	"home": "Accueil",
 	"houses": {
 		"title": "Parcourir les Propriétés",
+		"meta": {
+			"description": "Explorez les propriétés disponibles au Portugal. Filtrez par emplacement, prix et type. Trouvez votre maison idéale parmi les villas, appartements et terrains premium."
+		},
 		"filters": "Filtres",
 		"allTypes": "Tous les Types",
 		"allStatuses": "Tous les États",
@@ -68,6 +71,10 @@
 		"language": "Langue"
 	},
 	"homepage": {
+		"meta": {
+			"title": "Propriétés de Luxe au Portugal",
+			"description": "Découvrez des propriétés de rêve au Portugal. Villas, appartements et terrains premium dans les meilleurs emplacements. Immobilier de qualité exceptionnelle."
+		},
 		"availableHouses": {
 			"title": "Découvrez Votre Propriété de Rêve",
 			"subtitle": "Immobilier Exclusif au Portugal",

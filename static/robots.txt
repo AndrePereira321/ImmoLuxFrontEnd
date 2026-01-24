@@ -1,3 +1,9 @@
-# allow crawling everything by default
+# Allow all crawlers
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap location
+Sitemap: https://immolux.pt/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1
