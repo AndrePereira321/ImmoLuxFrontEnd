@@ -1,10 +1,89 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { t } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faEnvelope, faGlobe, faHandshake, faHouse, faMapMarkerAlt, faStar } from '@fortawesome/free-solid-svg-icons';
 	import AppSection from '$lib/components/AppSection.svelte';
 	import AppInfoCard from '$lib/components/AppInfoCard.svelte';
 	import AppSectionDivider from '$lib/components/AppSectionDivider.svelte';
+	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
+	import { apiClient } from '$lib/api/api-client';
+	import type { PropertyDTO } from '$lib/types/property';
+
+	interface PropertyListResponse {
+		properties: PropertyDTO[];
+		total: number;
+	}
+
+	interface PropertyImageMap {
+		[propertyId: number]: number[];
+	}
+
+	let properties = $state<PropertyDTO[]>([]);
+	let propertyImageMap = $state<PropertyImageMap>({});
+	let loading = $state(true);
+	let hasProperties = $state(false);
+
+	const loadPropertyImages = async (propertyId: number) => {
+		try {
+			const response = await apiClient.get<{ images: { id: number; displayOrder: number }[] }>(
+				`/properties/${propertyId}/images`
+			);
+
+			if (response.data.success && response.data.data) {
+				const images = response.data.data.images;
+				if (Array.isArray(images)) {
+					const sortedImageIds = images
+						.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+						.map((img) => img.id!);
+					propertyImageMap[propertyId] = sortedImageIds;
+				} else {
+					propertyImageMap[propertyId] = [];
+				}
+			} else {
+				propertyImageMap[propertyId] = [];
+			}
+		} catch (error) {
+			console.error(`Failed to load images for property ${propertyId}:`, error);
+			propertyImageMap[propertyId] = [];
+		}
+	};
+
+	const loadRecentProperties = async () => {
+		loading = true;
+		try {
+			const response = await apiClient.get<PropertyListResponse>('/properties', {
+				params: {
+					status: 'available',
+					page: 1,
+					limit: 3,
+					orderBy: 'created_desc'
+				}
+			});
+
+			if (response.data.success && response.data.data) {
+				properties = response.data.data.properties;
+				hasProperties = properties.length > 0;
+
+				// Load images for each property
+				for (const property of properties) {
+					if (property.id) {
+						await loadPropertyImages(property.id);
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Failed to load properties:', error);
+			properties = [];
+			hasProperties = false;
+		} finally {
+			loading = false;
+		}
+	};
+
+	onMount(() => {
+		loadRecentProperties();
+	});
 </script>
 
 <div class="min-h-screen">
@@ -51,26 +130,53 @@
 				{$t('homepage.availableHouses.description')}
 			</p>
 
-			<!-- Coming Soon Placeholder -->
-			<div
-				class="group mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-primary-900 dark:from-dark-800 dark:to-dark-850 dark:hover:border-primary-800"
-			>
-				<div class="mb-4">
-					<FontAwesomeIcon
-						icon={faHouse}
-						size="2x"
-						class="text-primary-400 opacity-40 transition-all duration-500 group-hover:scale-110 group-hover:opacity-60 dark:text-primary-600"
-					/>
+			<!-- Recent Properties -->
+			{#if loading}
+				<div class="flex justify-center py-16">
+					<FontAwesomeIcon icon={faHouse} class="animate-spin text-6xl text-primary-600 dark:text-primary-400" />
 				</div>
-				<h3
-					class="mb-3 text-xl font-normal tracking-wider text-primary-700 uppercase md:text-2xl dark:text-primary-400"
+			{:else if hasProperties}
+				<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+					{#each properties as property (property.id)}
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+						<a href="/houses/{property.id}" class="block transition-transform duration-200 hover:scale-[1.02]">
+							<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id!] || []} compact={true} />
+						</a>
+					{/each}
+				</div>
+
+				<!-- View All Button -->
+				<div class="mt-10 text-center">
+					<a
+						href="/houses"
+						class="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 px-10 py-5 text-lg font-normal text-light-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-2xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
+					>
+						<FontAwesomeIcon icon={faHouse} class="transition-transform duration-300 group-hover:rotate-12" />
+						<span class="tracking-wide">{$t('houses.title')}</span>
+					</a>
+				</div>
+			{:else}
+				<!-- Coming Soon Placeholder -->
+				<div
+					class="group mx-auto max-w-4xl overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-light-50 to-light-100 p-12 shadow-xl transition-all duration-500 hover:border-primary-300 hover:shadow-2xl md:p-16 dark:border-primary-900 dark:from-dark-800 dark:to-dark-850 dark:hover:border-primary-800"
 				>
-					{$t('homepage.availableHouses.comingSoon')}
-				</h3>
-				<p class="text-base text-dark-600 dark:text-light-400">
-					{$t('homepage.availableHouses.comingSoonDesc')}
-				</p>
-			</div>
+					<div class="mb-4">
+						<FontAwesomeIcon
+							icon={faHouse}
+							size="2x"
+							class="text-primary-400 opacity-40 transition-all duration-500 group-hover:scale-110 group-hover:opacity-60 dark:text-primary-600"
+						/>
+					</div>
+					<h3
+						class="mb-3 text-xl font-normal tracking-wider text-primary-700 uppercase md:text-2xl dark:text-primary-400"
+					>
+						{$t('homepage.availableHouses.comingSoon')}
+					</h3>
+					<p class="text-base text-dark-600 dark:text-light-400">
+						{$t('homepage.availableHouses.comingSoonDesc')}
+					</p>
+				</div>
+			{/if}
 		</div>
 	</AppSection>
 

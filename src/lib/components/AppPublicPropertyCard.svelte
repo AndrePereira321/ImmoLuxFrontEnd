@@ -3,7 +3,6 @@
 	import {
 		faBath,
 		faBed,
-		faBolt,
 		faCar,
 		faElevator,
 		faMapMarkerAlt,
@@ -18,9 +17,10 @@
 	interface Props {
 		property: PropertyDTO;
 		imageIds?: number[];
+		compact?: boolean;
 	}
 
-	let { property, imageIds = [] }: Props = $props();
+	let { property, imageIds = [], compact = false }: Props = $props();
 
 	let currentImageIndex = $state(0);
 
@@ -179,10 +179,14 @@
 	</div>
 
 	<!-- Content -->
-	<div class="flex flex-1 flex-col p-5">
+	<div class="flex flex-1 flex-col {compact ? 'p-4' : 'p-5'}">
 		<!-- Title and badges row -->
-		<div class="mb-3">
-			<h3 class="mb-2 line-clamp-2 text-xl leading-tight font-bold text-dark-900 xl:text-2xl dark:text-light-50">
+		<div class={compact ? 'mb-2' : 'mb-3'}>
+			<h3
+				class="mb-2 line-clamp-2 {compact
+					? 'text-lg'
+					: 'text-xl xl:text-2xl'} leading-tight font-bold text-dark-900 dark:text-light-50"
+			>
 				{property.title ?? $_('properties.untitled')}
 			</h3>
 			<div class="flex flex-wrap items-center gap-2">
@@ -191,98 +195,95 @@
 				>
 					{getPropertyTypeLabel(property.propertyType)}
 				</span>
-				{#if property.energyRating}
-					<span
-						class="inline-flex items-center gap-1.5 rounded-full bg-success-100 px-3 py-1 text-xs font-semibold text-success-800 dark:bg-success-900 dark:text-success-200"
-					>
-						<FontAwesomeIcon icon={faBolt} class="text-xs" />
-						<span>{getEnergyRatingLabel(property.energyRating)}</span>
-					</span>
-				{/if}
 			</div>
 		</div>
 
 		<!-- Price -->
-		<p class="mb-3 text-3xl leading-none font-extrabold text-primary-600 xl:text-4xl dark:text-primary-400">
+		<p
+			class="{compact
+				? 'mb-2 text-2xl'
+				: 'mb-3 text-3xl xl:text-4xl'} leading-none font-extrabold text-primary-600 dark:text-primary-400"
+		>
 			{formatPrice(property.price)}
 		</p>
 
 		<!-- Location -->
-		<div class="mb-3 flex items-start gap-2 text-sm text-dark-600 dark:text-light-400">
+		<div class="{compact ? 'mb-2' : 'mb-3'} flex items-start gap-2 text-sm text-dark-600 dark:text-light-400">
 			<FontAwesomeIcon icon={faMapMarkerAlt} class="mt-0.5 flex-shrink-0 text-primary-500" />
-			<span class="line-clamp-2 leading-relaxed">
-				{#if property.address}
-					{property.address}
-					{#if property.municipality || property.district}
-						<br />
-						<span class="font-medium text-dark-700 dark:text-light-300">
-							{property.municipality
-								? `${property.municipality}${property.district ? ', ' : ''}`
-								: ''}{property.district ?? ''}
-						</span>
-					{/if}
-				{:else}
-					<span class="font-medium text-dark-700 dark:text-light-300">
-						{property.municipality
-							? `${property.municipality}${property.district ? ', ' : ''}`
-							: ''}{property.district ?? '—'}
-					</span>
-				{/if}
+			<span class="line-clamp-1 leading-relaxed">
+				<span class="font-medium text-dark-700 dark:text-light-300">
+					{property.municipality ? `${property.municipality}${property.district ? ', ' : ''}` : ''}{property.district ??
+						'—'}
+				</span>
 			</span>
 		</div>
 
-		<!-- Main Features Grid -->
+		<!-- Main Features Grid (compact shows only main 3) -->
 		{#if hasFeatures}
-			<div class="mb-4 flex flex-wrap gap-3">
+			<div class="flex flex-wrap gap-2">
 				{#if property.bedrooms}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+					<div
+						class="flex items-center gap-2 rounded-lg bg-light-100 {compact
+							? 'px-2 py-1'
+							: 'px-3 py-2'} dark:bg-dark-600"
+					>
 						<FontAwesomeIcon icon={faBed} class="text-primary-600 dark:text-primary-400" />
 						<span class="text-sm font-semibold text-dark-800 dark:text-light-200">{property.bedrooms}</span>
 					</div>
 				{/if}
 				{#if property.bathrooms}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+					<div
+						class="flex items-center gap-2 rounded-lg bg-light-100 {compact
+							? 'px-2 py-1'
+							: 'px-3 py-2'} dark:bg-dark-600"
+					>
 						<FontAwesomeIcon icon={faBath} class="text-primary-600 dark:text-primary-400" />
 						<span class="text-sm font-semibold text-dark-800 dark:text-light-200">{property.bathrooms}</span>
 					</div>
 				{/if}
 				{#if property.areaSqm}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+					<div
+						class="flex items-center gap-2 rounded-lg bg-light-100 {compact
+							? 'px-2 py-1'
+							: 'px-3 py-2'} dark:bg-dark-600"
+					>
 						<FontAwesomeIcon icon={faRulerCombined} class="text-primary-600 dark:text-primary-400" />
 						<span class="text-sm font-semibold text-dark-800 dark:text-light-200">{property.areaSqm} m²</span>
 					</div>
 				{/if}
-				{#if property.parkingSpaces}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
-						<FontAwesomeIcon icon={faCar} class="text-primary-600 dark:text-primary-400" />
-						<span class="text-sm font-semibold text-dark-800 dark:text-light-200">{property.parkingSpaces}</span>
-					</div>
-				{/if}
-				{#if property.hasGarage}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
-						<FontAwesomeIcon icon={faWarehouse} class="text-primary-600 dark:text-primary-400" />
-					</div>
-				{/if}
-				{#if property.hasGarden}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
-						<FontAwesomeIcon icon={faTree} class="text-primary-600 dark:text-primary-400" />
-					</div>
-				{/if}
-				{#if property.hasPool}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
-						<FontAwesomeIcon icon={faSwimmingPool} class="text-primary-600 dark:text-primary-400" />
-					</div>
-				{/if}
-				{#if property.hasElevator}
-					<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
-						<FontAwesomeIcon icon={faElevator} class="text-primary-600 dark:text-primary-400" />
-					</div>
+				{#if !compact}
+					{#if property.parkingSpaces}
+						<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+							<FontAwesomeIcon icon={faCar} class="text-primary-600 dark:text-primary-400" />
+							<span class="text-sm font-semibold text-dark-800 dark:text-light-200">{property.parkingSpaces}</span>
+						</div>
+					{/if}
+					{#if property.hasGarage}
+						<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+							<FontAwesomeIcon icon={faWarehouse} class="text-primary-600 dark:text-primary-400" />
+						</div>
+					{/if}
+					{#if property.hasGarden}
+						<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+							<FontAwesomeIcon icon={faTree} class="text-primary-600 dark:text-primary-400" />
+						</div>
+					{/if}
+					{#if property.hasPool}
+						<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+							<FontAwesomeIcon icon={faSwimmingPool} class="text-primary-600 dark:text-primary-400" />
+						</div>
+					{/if}
+					{#if property.hasElevator}
+						<div class="flex items-center gap-2 rounded-lg bg-light-100 px-3 py-2 dark:bg-dark-600">
+							<FontAwesomeIcon icon={faElevator} class="text-primary-600 dark:text-primary-400" />
+						</div>
+					{/if}
 				{/if}
 			</div>
 		{/if}
 
-		<!-- Contact info -->
-		{#if property.contact}
+		<!-- Contact info (hidden in compact mode) -->
+		{#if !compact && property.contact}
 			<div
 				class="mt-auto flex flex-col gap-1 rounded-lg border border-light-300 bg-light-50 p-3 text-sm dark:border-dark-600 dark:bg-dark-800"
 			>
