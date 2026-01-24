@@ -90,20 +90,12 @@
 
 	const loadPropertyImages = async (propId: number) => {
 		try {
-			const response = await apiClient.get(`/properties/${propId}/images`);
-			const serverResponse: ServerAPIResponse<PropertyImageDTO[]> = response.data;
+			const response = await apiClient.get<{ images: PropertyImageDTO[] }>(`/properties/${propId}/images`);
+			const serverResponse: ServerAPIResponse<{ images: PropertyImageDTO[] }> = response.data;
 
 			if (serverResponse.success && serverResponse.data) {
-				// Handle if data is wrapped in an object or is directly an array
-				let imagesData = serverResponse.data;
-
-				// Check if it's wrapped in an object with an 'images' property
-				if (typeof imagesData === 'object' && !Array.isArray(imagesData) && 'images' in imagesData) {
-					imagesData = (imagesData as any).images;
-				}
-
-				// Ensure data is an array
-				existingImages = Array.isArray(imagesData) ? imagesData : [];
+				// Data is wrapped in an object with an 'images' property
+				existingImages = serverResponse.data.images ?? [];
 			} else {
 				existingImages = [];
 			}

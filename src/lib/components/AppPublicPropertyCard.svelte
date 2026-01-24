@@ -72,7 +72,7 @@
 		}
 	};
 
-	const getEnergyRatingLabel = (rating?: string): string => {
+	const getEnergyRatingLabel = (rating?: string): string | null => {
 		if (!rating) return null;
 		return $_(`properties.energyRatings.${rating}`);
 	};

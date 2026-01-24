@@ -15,6 +15,7 @@
 		faMapMarkerAlt,
 		faTimes
 	} from '@fortawesome/free-solid-svg-icons';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 	type OrderBy = 'price_asc' | 'price_desc' | 'created_asc' | 'created_desc' | 'popularity' | 'location';
 
@@ -124,7 +125,7 @@
 	const loadProperties = async () => {
 		loading = true;
 		try {
-			const params = new URLSearchParams();
+			const params = new SvelteURLSearchParams();
 
 			if (filters.district) params.append('district', filters.district);
 			if (filters.municipality) params.append('municipality', filters.municipality);
@@ -349,7 +350,7 @@
 									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
 								>
 									<option value="">{$_('properties.selectDistrict')}</option>
-									{#each districts as district}
+									{#each districts as district (district)}
 										<option value={district}>{district}</option>
 									{/each}
 								</select>
@@ -368,7 +369,7 @@
 									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
 								>
 									<option value="">{$_('properties.selectMunicipality')}</option>
-									{#each municipalities as municipality}
+									{#each municipalities as municipality (municipality)}
 										<option value={municipality}>{municipality}</option>
 									{/each}
 								</select>
@@ -387,7 +388,7 @@
 									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
 								>
 									<option value="">{$_('properties.selectParish')}</option>
-									{#each parishes as parish}
+									{#each parishes as parish (parish)}
 										<option value={parish}>{parish}</option>
 									{/each}
 								</select>
@@ -521,6 +522,7 @@
 			<!-- Properties Grid -->
 			<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{#each properties as property (property.id)}
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 					<a href="/houses/{property.id}" class="block transition-transform duration-200 hover:scale-[1.02]">
 						<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id!] || []} />
 					</a>
@@ -542,7 +544,7 @@
 					</button>
 
 					<!-- Page Numbers -->
-					{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page}
+					{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page (page)}
 						{#if page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)}
 							<button
 								type="button"
