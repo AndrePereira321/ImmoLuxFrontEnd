@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faBars, faGlobe, faHome, faRightToBracket, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +15,14 @@
 	import AppModal from '$lib/components/AppModal.svelte';
 	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
 	import AppUserDropdown from '$lib/components/AppUserDropdown.svelte';
+
+	const isActive = (path: string) => {
+		const currentPath = $page.url.pathname;
+		if (path === '/') {
+			return currentPath === '/';
+		}
+		return currentPath.startsWith(path);
+	};
 
 	let mobileMenuOpen = $state(false);
 	let languageDropdownOpen = $state(false);
@@ -104,14 +113,22 @@
 				<div class="hidden items-center gap-1 md:flex">
 					<a
 						href={resolve('/')}
-						class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+						class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700 {isActive(
+							'/'
+						)
+							? 'bg-primary-700 shadow-inner'
+							: ''}"
 					>
 						<FontAwesomeIcon icon={faHome} />
 						<span>{$_('home')}</span>
 					</a>
 					<a
 						href={resolve('/houses')}
-						class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
+						class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700 {isActive(
+							'/houses'
+						)
+							? 'bg-primary-700 shadow-inner'
+							: ''}"
 					>
 						<FontAwesomeIcon icon={faSearch} />
 						<span>{$_('houses.title')}</span>
@@ -222,7 +239,11 @@
 			>
 				<a
 					href={resolve('/')}
-					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700 {isActive(
+						'/'
+					)
+						? 'bg-primary-700 shadow-inner'
+						: ''}"
 					onclick={toggleMenu}
 				>
 					<FontAwesomeIcon icon={faHome} />
@@ -230,7 +251,11 @@
 				</a>
 				<a
 					href={resolve('/houses')}
-					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700"
+					class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-light-50 transition-all hover:bg-primary-700 {isActive(
+						'/houses'
+					)
+						? 'bg-primary-700 shadow-inner'
+						: ''}"
 					onclick={toggleMenu}
 				>
 					<FontAwesomeIcon icon={faSearch} />

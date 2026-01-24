@@ -130,7 +130,16 @@
 </script>
 
 <div
-	class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-light-300 bg-white shadow-sm transition-all duration-300 hover:shadow-xl dark:border-dark-600 dark:bg-dark-700"
+	role="button"
+	tabindex="0"
+	onclick={handleEdit}
+	onkeydown={(e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			handleEdit();
+		}
+	}}
+	class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-light-300 bg-white shadow-sm transition-all duration-300 hover:cursor-pointer hover:shadow-xl dark:border-dark-600 dark:bg-dark-700"
 >
 	<!-- Image carousel or placeholder -->
 	<div

@@ -68,7 +68,12 @@
 	},
 	"footer": {
 		"author": "André Pereira",
-		"language": "Langue"
+		"language": "Langue",
+		"about": "À Propos d'ImmoLux",
+		"aboutDescription": "ImmoLux est spécialisée dans l'immobilier de luxe au Portugal, offrant une sélection soignée de villas, appartements et propriétés exclusives premium.",
+		"quickLinks": "Liens Rapides",
+		"contact": "Contact",
+		"allRightsReserved": "Tous droits réservés"
 	},
 	"homepage": {
 		"meta": {
