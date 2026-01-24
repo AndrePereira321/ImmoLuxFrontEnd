@@ -1,6 +1,28 @@
 {
 	"home": "Início",
-	"houses": "Casas",
+	"houses": {
+		"title": "Explorar Casas",
+		"filters": "Filtros",
+		"allTypes": "Todos os Tipos",
+		"allStatuses": "Todos os Estados",
+		"minPrice": "Preço Mín (€)",
+		"maxPrice": "Preço Máx (€)",
+		"clearFilters": "Limpar Filtros",
+		"loading": "A carregar propriedades...",
+		"property": "propriedade",
+		"properties": "propriedades",
+		"noProperties": "Nenhuma propriedade encontrada",
+		"noPropertiesDescription": "Tente ajustar os filtros para ver mais resultados",
+		"pageInfo": "Página {current} de {total}",
+		"sort": {
+			"newest": "Mais Recentes",
+			"oldest": "Mais Antigas",
+			"popular": "Mais Populares",
+			"priceLowHigh": "Preço: Baixo para Alto",
+			"priceHighLow": "Preço: Alto para Baixo",
+			"location": "Localização (A-Z)"
+		}
+	},
 	"common": {
 		"save": "Guardar",
 		"saving": "A guardar...",

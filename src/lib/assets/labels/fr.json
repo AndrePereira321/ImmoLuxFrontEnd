@@ -1,6 +1,28 @@
 {
 	"home": "Accueil",
-	"houses": "Maisons",
+	"houses": {
+		"title": "Parcourir les Propriétés",
+		"filters": "Filtres",
+		"allTypes": "Tous les Types",
+		"allStatuses": "Tous les États",
+		"minPrice": "Prix Min (€)",
+		"maxPrice": "Prix Max (€)",
+		"clearFilters": "Effacer les Filtres",
+		"loading": "Chargement des propriétés...",
+		"property": "propriété",
+		"properties": "propriétés",
+		"noProperties": "Aucune propriété trouvée",
+		"noPropertiesDescription": "Essayez d'ajuster vos filtres pour voir plus de résultats",
+		"pageInfo": "Page {current} sur {total}",
+		"sort": {
+			"newest": "Plus Récentes",
+			"oldest": "Plus Anciennes",
+			"popular": "Plus Populaires",
+			"priceLowHigh": "Prix: Bas à Élevé",
+			"priceHighLow": "Prix: Élevé à Bas",
+			"location": "Emplacement (A-Z)"
+		}
+	},
 	"common": {
 		"save": "Enregistrer",
 		"saving": "Enregistrement...",

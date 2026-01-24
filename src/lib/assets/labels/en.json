@@ -1,6 +1,28 @@
 {
 	"home": "Home",
-	"houses": "Houses",
+	"houses": {
+		"title": "Browse Houses",
+		"filters": "Filters",
+		"allTypes": "All Types",
+		"allStatuses": "All Statuses",
+		"minPrice": "Min Price (€)",
+		"maxPrice": "Max Price (€)",
+		"clearFilters": "Clear Filters",
+		"loading": "Loading properties...",
+		"property": "property",
+		"properties": "properties",
+		"noProperties": "No properties found",
+		"noPropertiesDescription": "Try adjusting your filters to see more results",
+		"pageInfo": "Page {current} of {total}",
+		"sort": {
+			"newest": "Newest First",
+			"oldest": "Oldest First",
+			"popular": "Most Popular",
+			"priceLowHigh": "Price: Low to High",
+			"priceHighLow": "Price: High to Low",
+			"location": "Location (A-Z)"
+		}
+	},
 	"common": {
 		"save": "Save",
 		"saving": "Saving...",

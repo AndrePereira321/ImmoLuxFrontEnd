@@ -114,7 +114,7 @@
 						class="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-light-50 transition-all hover:bg-primary-700"
 					>
 						<FontAwesomeIcon icon={faSearch} />
-						<span>{$_('houses')}</span>
+						<span>{$_('houses.title')}</span>
 					</a>
 				</div>
 			</div>
@@ -234,7 +234,7 @@
 					onclick={toggleMenu}
 				>
 					<FontAwesomeIcon icon={faSearch} />
-					<span>{$_('houses')}</span>
+					<span>{$_('houses.title')}</span>
 				</a>
 
 				<!-- Theme Toggle Mobile -->
