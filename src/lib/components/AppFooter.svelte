@@ -6,22 +6,43 @@
 	import { LANGUAGES } from '$lib/constants/languages';
 	import { changeLanguage } from '$lib/utils/language';
 	import AppTooltip from '$lib/components/AppTooltip.svelte';
+	import pacaGroupLogo from '$lib/assets/images/paca_group.jpg';
 
 	const currentYear = new Date().getFullYear();
 	const contactEmail = 'info@immolux.pt';
-	const contactPhone = '';
+	const contactPhone = '+351 913 160 232';
 	const contactAddress = 'Lousada, Portugal';
 </script>
 
 <footer class="bg-dark-800 text-light-200 dark:bg-dark-950 dark:text-light-300">
 	<div class="container mx-auto px-4 py-8">
-		<div class="grid gap-8 md:grid-cols-3">
+		<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
 			<!-- Company Info -->
 			<div class="space-y-3">
 				<h3 class="text-lg font-semibold text-light-50">{$_('footer.about')}</h3>
 				<p class="text-sm leading-relaxed">
 					{$_('footer.aboutDescription')}
 				</p>
+			</div>
+
+			<!-- Partners -->
+			<div class="space-y-3">
+				<h3 class="text-lg font-semibold text-light-50">{$_('footer.partners')}</h3>
+				<div class="flex items-start">
+					<a
+						href="https://www.pacaconstruct.be"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group block transition-all hover:scale-105"
+						aria-label="Paca Group - Partner"
+					>
+						<img
+							src={pacaGroupLogo}
+							alt="Paca Group"
+							class="h-16 w-auto rounded-lg bg-white p-2 shadow-md transition-all group-hover:shadow-lg dark:bg-light-100"
+						/>
+					</a>
+				</div>
 			</div>
 
 			<!-- Quick Links -->
