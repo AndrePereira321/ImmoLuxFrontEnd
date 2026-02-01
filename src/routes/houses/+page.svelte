@@ -216,9 +216,16 @@
 
 <div class="min-h-screen bg-light-50 dark:bg-dark-900">
 	<!-- Hero Section -->
-	<div
-		class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 dark:from-primary-800 dark:via-primary-900 dark:to-dark-950"
-	>
+	<div class="relative overflow-hidden">
+		<!-- Background Image -->
+		<div
+			class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+			style="background-image: url('/src/lib/assets/images/home_image.jpeg')"
+		></div>
+
+		<!-- Transparent Overlay -->
+		<div class="absolute inset-0 bg-primary-900/70 dark:bg-dark-950/80"></div>
+
 		<div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
 			<div class="text-center">
 				<div class="mb-4 flex justify-center">
@@ -226,10 +233,10 @@
 						<FontAwesomeIcon icon={faHome} class="text-4xl text-white" />
 					</div>
 				</div>
-				<h1 class="mb-4 text-5xl font-bold tracking-tight text-white sm:text-6xl">
+				<h1 class="mb-4 text-5xl font-bold tracking-tight text-white drop-shadow-lg sm:text-6xl">
 					{$_('homepage.availableHouses.title')}
 				</h1>
-				<p class="mx-auto max-w-2xl text-xl text-primary-100">
+				<p class="mx-auto max-w-2xl text-xl text-white drop-shadow-md">
 					{$_('homepage.availableHouses.subtitle')}
 				</p>
 			</div>
@@ -535,7 +542,7 @@
 				{#each properties as property (property.id)}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 					<a href="/houses/{property.id}" class="block transition-transform duration-200 hover:scale-[1.02]">
-						<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id!] || []} />
+						<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id ?? 0] || []} />
 					</a>
 				{/each}
 			</div>
