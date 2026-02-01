@@ -34,7 +34,7 @@
 				<h3 class="text-lg font-semibold text-light-50">{$_('footer.partners')}</h3>
 				<div class="flex items-start">
 					<a
-						href="https://www.pacaconstruct.be"
+						href="http://www.pacaconstruct.be"
 						target="_blank"
 						rel="noopener noreferrer"
 						class="group block transition-all hover:scale-105"
