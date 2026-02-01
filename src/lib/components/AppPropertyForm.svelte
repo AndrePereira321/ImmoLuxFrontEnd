@@ -887,7 +887,9 @@
 
 					{#if $errors.contactIds?.[0]}
 						<p class="text-sm text-error-600 dark:text-error-400">
-							{translateError($errors.contactIds?.[0])}
+							{translateError(
+								Array.isArray($errors.contactIds[0]) ? $errors.contactIds[0].join(', ') : $errors.contactIds[0]
+							)}
 						</p>
 					{/if}
 				</div>
