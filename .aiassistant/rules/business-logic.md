@@ -64,7 +64,7 @@ Property
 **Fields**:
 
 | Field            | Type      | Required | Description                                          |
-| ---------------- | --------- | -------- | ---------------------------------------------------- |
+|------------------|-----------|----------|------------------------------------------------------|
 | id               | int       | Auto     | Primary key                                          |
 | title            | string    | Yes      | Property title (max 200 chars)                       |
 | description      | text      | Yes      | Full description                                     |
@@ -153,7 +153,7 @@ EnergyRatingG     EnergyRating = "G"
 **Fields**:
 
 | Field      | Type      | Required | Description                   |
-| ---------- | --------- | -------- | ----------------------------- |
+|------------|-----------|----------|-------------------------------|
 | id         | int       | Auto     | Primary key                   |
 | user_id    | int       | Yes      | Foreign key to User (owner)   |
 | name       | string    | Yes      | Contact name (max 150 chars)  |
@@ -180,7 +180,7 @@ EnergyRatingG     EnergyRating = "G"
 **Fields**:
 
 | Field         | Type      | Required | Description                         |
-| ------------- | --------- | -------- | ----------------------------------- |
+|---------------|-----------|----------|-------------------------------------|
 | id            | int       | Auto     | Primary key                         |
 | property_id   | int       | Yes      | Foreign key to Property             |
 | image_data    | bytea     | Yes      | Binary image data (JPEG, processed) |
@@ -266,52 +266,52 @@ UpdatedAt      *time.Time `json:"updatedAt"`
 
 ```typescript
 interface PropertyDTO {
-	id?: number;
-	title?: string;
-	description?: string;
-	propertyType?: 'house' | 'apartment' | 'villa' | 'townhouse' | 'land' | 'commercial';
-	price?: number;
-	status?: 'available' | 'pending' | 'sold' | 'rented';
-	isPublished?: boolean;
+    id?: number;
+    title?: string;
+    description?: string;
+    propertyType?: 'house' | 'apartment' | 'villa' | 'townhouse' | 'land' | 'commercial';
+    price?: number;
+    status?: 'available' | 'pending' | 'sold' | 'rented';
+    isPublished?: boolean;
 
-	// Location
-	address?: string;
-	district?: string; // Required on create
-	municipality?: string; // Required on create
-	parish?: string; // Optional
-	postalCode?: string;
-	country?: string;
-	latitude?: number;
-	longitude?: number;
+    // Location
+    address?: string;
+    district?: string;      // Required on create
+    municipality?: string;  // Required on create
+    parish?: string;        // Optional
+    postalCode?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
 
-	// Property details
-	bedrooms?: number;
-	bathrooms?: number;
-	areaSqm?: number;
-	landAreaSqm?: number;
-	yearBuilt?: number;
-	floor?: number;
-	totalFloors?: number;
-	parkingSpaces?: number;
+    // Property details
+    bedrooms?: number;
+    bathrooms?: number;
+    areaSqm?: number;
+    landAreaSqm?: number;
+    yearBuilt?: number;
+    floor?: number;
+    totalFloors?: number;
+    parkingSpaces?: number;
 
-	// Features
-	hasGarage?: boolean;
-	hasGarden?: boolean;
-	hasPool?: boolean;
-	hasElevator?: boolean;
-	energyRating?: 'Aplus' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
-	virtualTourUrl?: string;
+    // Features
+    hasGarage?: boolean;
+    hasGarden?: boolean;
+    hasPool?: boolean;
+    hasElevator?: boolean;
+    energyRating?: 'Aplus' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+    virtualTourUrl?: string;
 
-	// Relationships
-	contactId?: number;
-	contact?: ContactDTO;
-	publisherId?: number;
+    // Relationships
+    contactId?: number;
+    contact?: ContactDTO;
+    publisherId?: number;
 
-	// Metadata
-	viewCount?: number;
-	publishedAt?: string;
-	createdAt?: string;
-	updatedAt?: string;
+    // Metadata
+    viewCount?: number;
+    publishedAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 ```
 
@@ -333,19 +333,19 @@ municipalities, 3000+ parishes).
 ### Portuguese Administrative Levels
 
 1. **Distrito (District)** - 18 total
-   - Top-level administrative division
-   - Examples: Lisboa, Porto, Faro, Braga
-   - **Required** for all properties
+    - Top-level administrative division
+    - Examples: Lisboa, Porto, Faro, Braga
+    - **Required** for all properties
 
 2. **Concelho (Municipality)** - 308 total
-   - Second-level division within districts
-   - Examples: Sintra, Cascais, Oeiras, Vila Nova de Gaia
-   - **Required** for all properties
+    - Second-level division within districts
+    - Examples: Sintra, Cascais, Oeiras, Vila Nova de Gaia
+    - **Required** for all properties
 
 3. **Freguesia (Parish)** - 3000+ total
-   - Third-level division within municipalities
-   - Examples: Queluz, São Domingos de Rana, Agualva-Cacém
-   - **Optional** for properties
+    - Third-level division within municipalities
+    - Examples: Queluz, São Domingos de Rana, Agualva-Cacém
+    - **Optional** for properties
 
 ### Validation Implementation
 
@@ -417,14 +417,14 @@ UpdatedAt *time.Time `json:"updatedAt"`
 
 ```typescript
 interface ContactDTO {
-	id?: number;
-	userId?: number;
-	name?: string;
-	email?: string;
-	phone?: string;
-	notes?: string;
-	createdAt?: string;
-	updatedAt?: string;
+    id?: number;
+    userId?: number;
+    name?: string;
+    email?: string;
+    phone?: string;
+    notes?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 ```
 
@@ -451,10 +451,10 @@ When creating a property, you can either:
 
 ```json
 {
-	"title": "Beautiful Villa",
-	"contact": {
-		"id": 123
-	}
+  "title": "Beautiful Villa",
+  "contact": {
+    "id": 123
+  }
 }
 ```
 
@@ -462,13 +462,13 @@ When creating a property, you can either:
 
 ```json
 {
-	"title": "Beautiful Villa",
-	"contact": {
-		"name": "John Doe",
-		"email": "john@example.com",
-		"phone": "+351 123456789",
-		"notes": "Available weekdays 9-5"
-	}
+  "title": "Beautiful Villa",
+  "contact": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+351 123456789",
+    "notes": "Available weekdays 9-5"
+  }
 }
 ```
 
@@ -535,14 +535,14 @@ CreatedAt    *time.Time `json:"createdAt"`
 
 ```typescript
 interface PropertyImageDTO {
-	id?: number;
-	propertyId?: number;
-	contentType?: string;
-	fileSize?: number;
-	width?: number;
-	height?: number;
-	displayOrder?: number; // 0 = primary/first image
-	createdAt?: string;
+    id?: number;
+    propertyId?: number;
+    contentType?: string;
+    fileSize?: number;
+    width?: number;
+    height?: number;
+    displayOrder?: number;  // 0 = primary/first image
+    createdAt?: string;
 }
 ```
 
@@ -586,13 +586,28 @@ number.
 
 ```json
 {
-	"success": true,
-	"data": {
-		"districts": ["Aveiro", "Beja", "Braga", "...18 total"],
-		"municipalities": ["Águeda", "Albergaria-a-Velha", "Anadia", "...308 total"],
-		"parishes": ["Aguada de Cima", "Fermentelos", "Macinhata do Vouga", "...3000+ total"]
-	},
-	"error": null
+  "success": true,
+  "data": {
+    "districts": [
+      "Aveiro",
+      "Beja",
+      "Braga",
+      "...18 total"
+    ],
+    "municipalities": [
+      "Águeda",
+      "Albergaria-a-Velha",
+      "Anadia",
+      "...308 total"
+    ],
+    "parishes": [
+      "Aguada de Cima",
+      "Fermentelos",
+      "Macinhata do Vouga",
+      "...3000+ total"
+    ]
+  },
+  "error": null
 }
 ```
 
@@ -631,10 +646,10 @@ All contact endpoints require authentication (valid session cookie).
 
 ```json
 {
-	"name": "John Doe",
-	"email": "john@example.com",
-	"phone": "+351 123456789",
-	"notes": "Available weekdays 9-5"
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+351 123456789",
+  "notes": "Available weekdays 9-5"
 }
 ```
 
@@ -642,18 +657,18 @@ All contact endpoints require authentication (valid session cookie).
 
 ```json
 {
-	"success": true,
-	"data": {
-		"id": 123,
-		"userId": 1,
-		"name": "John Doe",
-		"email": "john@example.com",
-		"phone": "+351 123456789",
-		"notes": "Available weekdays 9-5",
-		"createdAt": "2025-01-10T12:00:00Z",
-		"updatedAt": "2025-01-10T12:00:00Z"
-	},
-	"error": null
+  "success": true,
+  "data": {
+    "id": 123,
+    "userId": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+351 123456789",
+    "notes": "Available weekdays 9-5",
+    "createdAt": "2025-01-10T12:00:00Z",
+    "updatedAt": "2025-01-10T12:00:00Z"
+  },
+  "error": null
 }
 ```
 
@@ -674,20 +689,20 @@ All contact endpoints require authentication (valid session cookie).
 
 ```json
 {
-	"success": true,
-	"data": [
-		{
-			"id": 123,
-			"userId": 1,
-			"name": "John Doe",
-			"email": "john@example.com",
-			"phone": "+351 123456789",
-			"notes": "Available weekdays 9-5",
-			"createdAt": "2025-01-10T12:00:00Z",
-			"updatedAt": "2025-01-10T12:00:00Z"
-		}
-	],
-	"error": null
+  "success": true,
+  "data": [
+    {
+      "id": 123,
+      "userId": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+351 123456789",
+      "notes": "Available weekdays 9-5",
+      "createdAt": "2025-01-10T12:00:00Z",
+      "updatedAt": "2025-01-10T12:00:00Z"
+    }
+  ],
+  "error": null
 }
 ```
 
@@ -714,8 +729,8 @@ All contact endpoints require authentication (valid session cookie).
 
 ```json
 {
-	"name": "John Smith",
-	"phone": "+351 987654321"
+  "name": "John Smith",
+  "phone": "+351 987654321"
 }
 ```
 
@@ -736,9 +751,9 @@ All contact endpoints require authentication (valid session cookie).
 
 ```json
 {
-	"success": true,
-	"data": null,
-	"error": null
+  "success": true,
+  "data": null,
+  "error": null
 }
 ```
 
@@ -788,53 +803,52 @@ GET /properties?orderBy=location
 
 ```json
 {
-	"success": true,
-	"data": {
-		"properties": [
-			{
-				"id": 1,
-				"title": "Beautiful Villa in Sintra",
-				"description": "Spacious 4 bedroom villa...",
-				"propertyType": "villa",
-				"price": 450000,
-				"status": "available",
-				"isPublished": true,
-				"address": "Rua da Liberdade, 45",
-				"district": "Lisboa",
-				"municipality": "Sintra",
-				"parish": "Queluz",
-				"postalCode": "2745-001",
-				"country": "PT",
-				"bedrooms": 4,
-				"bathrooms": 3,
-				"areaSqm": 250,
-				"landAreaSqm": 500,
-				"hasGarage": true,
-				"hasGarden": true,
-				"hasPool": true,
-				"contact": {
-					"id": 123,
-					"name": "John Doe",
-					"email": "john@example.com",
-					"phone": "+351 123456789"
-				},
-				"publisherId": 1,
-				"viewCount": 45,
-				"publishedAt": "2025-01-01T10:00:00Z",
-				"createdAt": "2024-12-15T08:30:00Z",
-				"updatedAt": "2025-01-10T12:00:00Z"
-			}
-		],
-		"total": 1
-	},
-	"error": null
+  "success": true,
+  "data": {
+    "properties": [
+      {
+        "id": 1,
+        "title": "Beautiful Villa in Sintra",
+        "description": "Spacious 4 bedroom villa...",
+        "propertyType": "villa",
+        "price": 450000,
+        "status": "available",
+        "isPublished": true,
+        "address": "Rua da Liberdade, 45",
+        "district": "Lisboa",
+        "municipality": "Sintra",
+        "parish": "Queluz",
+        "postalCode": "2745-001",
+        "country": "PT",
+        "bedrooms": 4,
+        "bathrooms": 3,
+        "areaSqm": 250,
+        "landAreaSqm": 500,
+        "hasGarage": true,
+        "hasGarden": true,
+        "hasPool": true,
+        "contact": {
+          "id": 123,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "phone": "+351 123456789"
+        },
+        "publisherId": 1,
+        "viewCount": 45,
+        "publishedAt": "2025-01-01T10:00:00Z",
+        "createdAt": "2024-12-15T08:30:00Z",
+        "updatedAt": "2025-01-10T12:00:00Z"
+      }
+    ],
+    "total": 1
+  },
+  "error": null
 }
 ```
 
 **Sorting Options**:
 
 The `orderBy` parameter supports the following values:
-
 - `price_asc` - Price: Low to High
 - `price_desc` - Price: High to Low
 - `created_asc` - Oldest First
@@ -873,30 +887,30 @@ The `orderBy` parameter supports the following values:
 
 ```json
 {
-	"success": true,
-	"data": [
-		{
-			"id": 1,
-			"propertyId": 1,
-			"contentType": "image/jpeg",
-			"fileSize": 245678,
-			"width": 1920,
-			"height": 1080,
-			"displayOrder": 0,
-			"createdAt": "2025-01-10T12:00:00Z"
-		},
-		{
-			"id": 2,
-			"propertyId": 1,
-			"contentType": "image/jpeg",
-			"fileSize": 198456,
-			"width": 1600,
-			"height": 1200,
-			"displayOrder": 1,
-			"createdAt": "2025-01-10T12:05:00Z"
-		}
-	],
-	"error": null
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "propertyId": 1,
+      "contentType": "image/jpeg",
+      "fileSize": 245678,
+      "width": 1920,
+      "height": 1080,
+      "displayOrder": 0,
+      "createdAt": "2025-01-10T12:00:00Z"
+    },
+    {
+      "id": 2,
+      "propertyId": 1,
+      "contentType": "image/jpeg",
+      "fileSize": 198456,
+      "width": 1600,
+      "height": 1200,
+      "displayOrder": 1,
+      "createdAt": "2025-01-10T12:05:00Z"
+    }
+  ],
+  "error": null
 }
 ```
 
@@ -924,7 +938,7 @@ Cache-Control: public, max-age=31536000
 **Usage**:
 
 ```html
-<img src="/api/images/1" alt="Property" />
+<img src="/api/images/1" alt="Property"/>
 ```
 
 **Errors**:
@@ -940,19 +954,31 @@ Cache-Control: public, max-age=31536000
 **Authentication**: Required
 
 **Query Parameters**: Same as public list, including:
-
 - `limit` - Results per page (default: 20)
 - `offset` - Pagination offset (default: 0)
-- `orderBy` - Sort order (same options as public list)
+- `orderBy` - Sort order (same options as public list, plus `status`)
+
+**Default Sorting**: Properties are **automatically sorted by status** (available → pending → sold → rented) unless `orderBy` is explicitly specified.
 
 **Response**: Same structure as public list
+
+**Sorting Options**:
+- `status` - Status priority: Available → Pending → Sold → Rented (DEFAULT for /my-properties)
+- `price_asc` - Price: Low to High
+- `price_desc` - Price: High to Low
+- `created_asc` - Oldest First
+- `created_desc` - Newest First
+- `popularity` - Most Viewed First
+- `location` - Alphabetically by District → Municipality → Parish
 
 **Notes**:
 
 - Returns ALL user properties (published AND unpublished)
 - Contact information included for each property
 - Only shows properties where `publisher_id` matches authenticated user
-- Supports all sorting options (price_asc, price_desc, created_asc, created_desc, popularity, location)
+- **Default behavior**: Orders by status (available, pending, sold, rented) with newest first within each status group
+- User can override default sorting by providing explicit `orderBy` parameter
+- Supports all sorting options (price_asc, price_desc, created_asc, created_desc, popularity, location, status)
 
 ##### POST /properties
 
@@ -964,34 +990,34 @@ Cache-Control: public, max-age=31536000
 
 ```json
 {
-	"title": "Beautiful Villa in Sintra",
-	"description": "Spacious 4 bedroom villa with stunning views...",
-	"propertyType": "villa",
-	"price": 450000,
-	"status": "available",
-	"address": "Rua da Liberdade, 45",
-	"district": "Lisboa",
-	"municipality": "Sintra",
-	"parish": "Queluz",
-	"postalCode": "2745-001",
-	"country": "PT",
-	"latitude": 38.75,
-	"longitude": -9.25,
-	"bedrooms": 4,
-	"bathrooms": 3,
-	"areaSqm": 250.5,
-	"landAreaSqm": 500.0,
-	"yearBuilt": 2015,
-	"parkingSpaces": 2,
-	"hasGarage": true,
-	"hasGarden": true,
-	"hasPool": true,
-	"hasElevator": false,
-	"energyRating": "A",
-	"virtualTourUrl": "https://example.com/tour",
-	"contact": {
-		"id": 123
-	}
+  "title": "Beautiful Villa in Sintra",
+  "description": "Spacious 4 bedroom villa with stunning views...",
+  "propertyType": "villa",
+  "price": 450000,
+  "status": "available",
+  "address": "Rua da Liberdade, 45",
+  "district": "Lisboa",
+  "municipality": "Sintra",
+  "parish": "Queluz",
+  "postalCode": "2745-001",
+  "country": "PT",
+  "latitude": 38.7500,
+  "longitude": -9.2500,
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "areaSqm": 250.5,
+  "landAreaSqm": 500.0,
+  "yearBuilt": 2015,
+  "parkingSpaces": 2,
+  "hasGarage": true,
+  "hasGarden": true,
+  "hasPool": true,
+  "hasElevator": false,
+  "energyRating": "A",
+  "virtualTourUrl": "https://example.com/tour",
+  "contact": {
+    "id": 123
+  }
 }
 ```
 
@@ -999,14 +1025,14 @@ Cache-Control: public, max-age=31536000
 
 ```json
 {
-	"title": "Beautiful Villa in Sintra",
-	"...": "...",
-	"contact": {
-		"name": "John Doe",
-		"email": "john@example.com",
-		"phone": "+351 123456789",
-		"notes": "Available weekdays"
-	}
+  "title": "Beautiful Villa in Sintra",
+  "...": "...",
+  "contact": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+351 123456789",
+    "notes": "Available weekdays"
+  }
 }
 ```
 
@@ -1052,9 +1078,9 @@ Cache-Control: public, max-age=31536000
 
 ```json
 {
-	"title": "Updated Title",
-	"price": 475000,
-	"bedrooms": 5
+  "title": "Updated Title",
+  "price": 475000,
+  "bedrooms": 5
 }
 ```
 
@@ -1080,9 +1106,9 @@ Cache-Control: public, max-age=31536000
 
 ```json
 {
-	"success": true,
-	"data": null,
-	"error": null
+  "success": true,
+  "data": null,
+  "error": null
 }
 ```
 
@@ -1162,18 +1188,18 @@ displayOrder: 0  // Optional, auto-assigned if not provided
 
 ```json
 {
-	"success": true,
-	"data": {
-		"id": 1,
-		"propertyId": 1,
-		"contentType": "image/jpeg",
-		"fileSize": 245678,
-		"width": 1920,
-		"height": 1080,
-		"displayOrder": 0,
-		"createdAt": "2025-01-10T12:00:00Z"
-	},
-	"error": null
+  "success": true,
+  "data": {
+    "id": 1,
+    "propertyId": 1,
+    "contentType": "image/jpeg",
+    "fileSize": 245678,
+    "width": 1920,
+    "height": 1080,
+    "displayOrder": 0,
+    "createdAt": "2025-01-10T12:00:00Z"
+  },
+  "error": null
 }
 ```
 
@@ -1206,7 +1232,7 @@ displayOrder: 0  // Optional, auto-assigned if not provided
 
 ```json
 {
-	"displayOrder": 2
+  "displayOrder": 2
 }
 ```
 
@@ -1229,9 +1255,9 @@ displayOrder: 0  // Optional, auto-assigned if not provided
 
 ```json
 {
-	"success": true,
-	"data": null,
-	"error": null
+  "success": true,
+  "data": null,
+  "error": null
 }
 ```
 
@@ -1253,12 +1279,12 @@ displayOrder: 0  // Optional, auto-assigned if not provided
 ```typescript
 // On page mount or modal open
 const loadLocations = async () => {
-	const response = await apiClient.get<LocationsResponse>('/locations');
-	if (response.data.success) {
-		districts = response.data.data.districts;
-		municipalities = response.data.data.municipalities;
-		parishes = response.data.data.parishes;
-	}
+    const response = await apiClient.get<LocationsResponse>('/locations');
+    if (response.data.success) {
+        districts = response.data.data.districts;
+        municipalities = response.data.data.municipalities;
+        parishes = response.data.data.parishes;
+    }
 };
 ```
 
@@ -1266,10 +1292,10 @@ const loadLocations = async () => {
 
 ```typescript
 const loadContacts = async () => {
-	const response = await apiClient.get<ContactDTO[]>('/contacts');
-	if (response.data.success) {
-		contacts = response.data.data;
-	}
+    const response = await apiClient.get<ContactDTO[]>('/contacts');
+    if (response.data.success) {
+        contacts = response.data.data;
+    }
 };
 ```
 
@@ -1277,100 +1303,105 @@ const loadContacts = async () => {
 
 ```svelte
 <script lang="ts">
-	let property = $state({
-		title: '',
-		description: '',
-		propertyType: 'house',
-		price: 0,
-		status: 'available',
-		address: '',
-		district: '',
-		municipality: '',
-		parish: '',
-		postalCode: ''
-		// ... other fields
-	});
+  let property = $state({
+    title: '',
+    description: '',
+    propertyType: 'house',
+    price: 0,
+    status: 'available',
+    address: '',
+    district: '',
+    municipality: '',
+    parish: '',
+    postalCode: '',
+    // ... other fields
+  });
 
-	let useExistingContact = $state(true);
-	let selectedContactId = $state<number | null>(null);
-	let newContact = $state({
-		name: '',
-		email: '',
-		phone: '',
-		notes: ''
-	});
+  let useExistingContact = $state(true);
+  let selectedContactId = $state<number | null>(null);
+  let newContact = $state({
+    name: '',
+    email: '',
+    phone: '',
+    notes: ''
+  });
 </script>
 
 <form onsubmit={handleSubmit}>
-	<!-- Basic Info -->
-	<input type="text" bind:value={property.title} required />
-	<textarea bind:value={property.description} required />
-	<select bind:value={property.propertyType} required>
-		<option value="house">House</option>
-		<option value="apartment">Apartment</option>
-		<option value="villa">Villa</option>
-		<option value="townhouse">Townhouse</option>
-		<option value="land">Land</option>
-		<option value="commercial">Commercial</option>
-	</select>
-	<input type="number" bind:value={property.price} required />
+  <!-- Basic Info -->
+  <input type="text" bind:value={property.title} required />
+  <textarea bind:value={property.description} required />
+  <select bind:value={property.propertyType} required>
+    <option value="house">House</option>
+    <option value="apartment">Apartment</option>
+    <option value="villa">Villa</option>
+    <option value="townhouse">Townhouse</option>
+    <option value="land">Land</option>
+    <option value="commercial">Commercial</option>
+  </select>
+  <input type="number" bind:value={property.price} required />
 
-	<!-- Location (Required) -->
-	<select bind:value={property.district} required>
-		<option value="">Select District...</option>
-		{#each districts as district}
-			<option value={district}>{district}</option>
-		{/each}
-	</select>
+  <!-- Location (Required) -->
+  <select bind:value={property.district} required>
+    <option value="">Select District...</option>
+    {#each districts as district}
+      <option value={district}>{district}</option>
+    {/each}
+  </select>
 
-	<select bind:value={property.municipality} required>
-		<option value="">Select Municipality...</option>
-		{#each municipalities as municipality}
-			<option value={municipality}>{municipality}</option>
-		{/each}
-	</select>
+  <select bind:value={property.municipality} required>
+    <option value="">Select Municipality...</option>
+    {#each municipalities as municipality}
+      <option value={municipality}>{municipality}</option>
+    {/each}
+  </select>
 
-	<select bind:value={property.parish}>
-		<option value="">Select Parish (optional)...</option>
-		{#each parishes as parish}
-			<option value={parish}>{parish}</option>
-		{/each}
-	</select>
+  <select bind:value={property.parish}>
+    <option value="">Select Parish (optional)...</option>
+    {#each parishes as parish}
+      <option value={parish}>{parish}</option>
+    {/each}
+  </select>
 
-	<input type="text" bind:value={property.postalCode} placeholder="1000-001" pattern="\d{4}-\d{3}" />
+  <input
+    type="text"
+    bind:value={property.postalCode}
+    placeholder="1000-001"
+    pattern="\d{4}-\d{3}"
+  />
 
-	<!-- Contact Section -->
-	<div>
-		<label>
-			<input type="radio" bind:group={useExistingContact} value={true} />
-			Use Existing Contact
-		</label>
-		<label>
-			<input type="radio" bind:group={useExistingContact} value={false} />
-			Create New Contact
-		</label>
-	</div>
+  <!-- Contact Section -->
+  <div>
+    <label>
+      <input type="radio" bind:group={useExistingContact} value={true} />
+      Use Existing Contact
+    </label>
+    <label>
+      <input type="radio" bind:group={useExistingContact} value={false} />
+      Create New Contact
+    </label>
+  </div>
 
-	{#if useExistingContact}
-		<select bind:value={selectedContactId} required>
-			<option value="">Select Contact...</option>
-			{#each contacts as contact}
-				<option value={contact.id}>{contact.name} - {contact.email}</option>
-			{/each}
-		</select>
-	{:else}
-		<input type="text" bind:value={newContact.name} required />
-		<input type="email" bind:value={newContact.email} required />
-		<input type="tel" bind:value={newContact.phone} required />
-		<textarea bind:value={newContact.notes} />
-	{/if}
+  {#if useExistingContact}
+    <select bind:value={selectedContactId} required>
+      <option value="">Select Contact...</option>
+      {#each contacts as contact}
+        <option value={contact.id}>{contact.name} - {contact.email}</option>
+      {/each}
+    </select>
+  {:else}
+    <input type="text" bind:value={newContact.name} required />
+    <input type="email" bind:value={newContact.email} required />
+    <input type="tel" bind:value={newContact.phone} required />
+    <textarea bind:value={newContact.notes} />
+  {/if}
 
-	<!-- Optional Fields -->
-	<input type="number" bind:value={property.bedrooms} min="0" />
-	<input type="number" bind:value={property.bathrooms} min="0" />
-	<!-- ... more fields ... -->
+  <!-- Optional Fields -->
+  <input type="number" bind:value={property.bedrooms} min="0" />
+  <input type="number" bind:value={property.bathrooms} min="0" />
+  <!-- ... more fields ... -->
 
-	<button type="submit">Create Property</button>
+  <button type="submit">Create Property</button>
 </form>
 ```
 
@@ -1378,42 +1409,44 @@ const loadContacts = async () => {
 
 ```typescript
 const handleSubmit = async (e: Event) => {
-	e.preventDefault();
+    e.preventDefault();
 
-	const payload = {
-		...property,
-		contact: useExistingContact ? { id: selectedContactId } : newContact
-	};
+    const payload = {
+        ...property,
+        contact: useExistingContact
+            ? {id: selectedContactId}
+            : newContact
+    };
 
-	const response = await apiClient.post<PropertyDTO>('/properties', payload);
+    const response = await apiClient.post<PropertyDTO>('/properties', payload);
 
-	if (response.data.success) {
-		// Property created, get ID
-		const propertyId = response.data.data.id;
+    if (response.data.success) {
+        // Property created, get ID
+        const propertyId = response.data.data.id;
 
-		// Now upload images if any
-		if (selectedImages.length > 0) {
-			await uploadImages(propertyId);
-		}
+        // Now upload images if any
+        if (selectedImages.length > 0) {
+            await uploadImages(propertyId);
+        }
 
-		goto(`/properties/${propertyId}`);
-	} else {
-		// Handle errors
-		errorMessage = response.data.error?.message;
+        goto(`/properties/${propertyId}`);
+    } else {
+        // Handle errors
+        errorMessage = response.data.error?.message;
 
-		// Specific error handling
-		switch (response.data.error?.code) {
-			case 'INVALID_DISTRICT':
-				districtError = 'Please select a valid district';
-				break;
-			case 'INVALID_MUNICIPALITY':
-				municipalityError = 'Please select a valid municipality';
-				break;
-			case 'INVALID_POSTAL_CODE':
-				postalCodeError = 'Format must be XXXX-XXX (e.g., 1000-001)';
-				break;
-		}
-	}
+        // Specific error handling
+        switch (response.data.error?.code) {
+            case 'INVALID_DISTRICT':
+                districtError = 'Please select a valid district';
+                break;
+            case 'INVALID_MUNICIPALITY':
+                municipalityError = 'Please select a valid municipality';
+                break;
+            case 'INVALID_POSTAL_CODE':
+                postalCodeError = 'Format must be XXXX-XXX (e.g., 1000-001)';
+                break;
+        }
+    }
 };
 ```
 
@@ -1421,17 +1454,20 @@ const handleSubmit = async (e: Event) => {
 
 ```typescript
 const uploadImages = async (propertyId: number) => {
-	for (let i = 0; i < selectedImages.length; i++) {
-		const formData = new FormData();
-		formData.append('file', selectedImages[i]);
-		formData.append('displayOrder', i.toString());
+    for (let i = 0; i < selectedImages.length; i++) {
+        const formData = new FormData();
+        formData.append('file', selectedImages[i]);
+        formData.append('displayOrder', i.toString());
 
-		const response = await apiClient.post(`/properties/${propertyId}/images`, formData);
+        const response = await apiClient.post(
+            `/properties/${propertyId}/images`,
+            formData
+        );
 
-		if (!response.data.success) {
-			console.error('Failed to upload image', response.data.error);
-		}
-	}
+        if (!response.data.success) {
+            console.error('Failed to upload image', response.data.error);
+        }
+    }
 };
 ```
 
@@ -1528,22 +1564,22 @@ m²</p>
 
 ```typescript
 const handlePropertyError = (error: ServerAPIError) => {
-	// Map backend error codes to user messages
-	const errorMessages: Record<string, string> = {
-		PROPERTY_NOT_FOUND: 'Property not found',
-		ACCESS_DENIED: 'You do not have permission to modify this property',
-		INVALID_DISTRICT: 'Please select a valid district from the list',
-		INVALID_MUNICIPALITY: 'Please select a valid municipality from the list',
-		INVALID_PARISH: 'Please select a valid parish from the list',
-		INVALID_POSTAL_CODE: 'Postal code must be in format XXXX-XXX',
-		PROPERTY_VALIDATION: 'Please fill in all required fields',
-		CONTACT_ACCESS_DENIED: 'You can only use your own contacts',
-		IMAGE_TOO_LARGE: 'Image file size must be less than 10MB',
-		INVALID_IMAGE_FORMAT: 'Supported formats: JPEG, PNG, WebP, TIFF, BMP',
-		IMAGE_FORMAT_NOT_SUPPORTED: 'iPhone HEIC images require conversion. Please convert to JPEG first.'
-	};
+    // Map backend error codes to user messages
+    const errorMessages: Record<string, string> = {
+        'PROPERTY_NOT_FOUND': 'Property not found',
+        'ACCESS_DENIED': 'You do not have permission to modify this property',
+        'INVALID_DISTRICT': 'Please select a valid district from the list',
+        'INVALID_MUNICIPALITY': 'Please select a valid municipality from the list',
+        'INVALID_PARISH': 'Please select a valid parish from the list',
+        'INVALID_POSTAL_CODE': 'Postal code must be in format XXXX-XXX',
+        'PROPERTY_VALIDATION': 'Please fill in all required fields',
+        'CONTACT_ACCESS_DENIED': 'You can only use your own contacts',
+        'IMAGE_TOO_LARGE': 'Image file size must be less than 10MB',
+        'INVALID_IMAGE_FORMAT': 'Supported formats: JPEG, PNG, WebP, TIFF, BMP',
+        'IMAGE_FORMAT_NOT_SUPPORTED': 'iPhone HEIC images require conversion. Please convert to JPEG first.'
+    };
 
-	return errorMessages[error.code || ''] || error.message || 'An error occurred';
+    return errorMessages[error.code || ''] || error.message || 'An error occurred';
 };
 ```
 
@@ -1604,7 +1640,6 @@ energyRating: Aplus | A | B | C | D | E | F | G
 - Content type detection by file signature (magic bytes)
 
 **For iPhone HEIC Images**:
-
 - Frontend should implement client-side conversion using JavaScript libraries like `heic2any`
 - Convert HEIC → JPEG/PNG/WebP before upload
 - Modern browsers support Canvas API for this conversion
@@ -1625,12 +1660,12 @@ All errors follow this structure:
 
 ```json
 {
-	"success": false,
-	"data": null,
-	"error": {
-		"code": "ERROR_CODE",
-		"message": "Human-readable error message"
-	}
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message"
+  }
 }
 ```
 
@@ -1670,31 +1705,35 @@ All errors follow this structure:
 
 ```typescript
 // Generic API call wrapper
-const apiCall = async <T>(apiFunction: () => Promise<AxiosResponse<ServerAPIResponse<T>>>): Promise<T | null> => {
-	try {
-		const response = await apiFunction();
+const apiCall = async <T>(
+    apiFunction: () => Promise<AxiosResponse<ServerAPIResponse<T>>>
+): Promise<T | null> => {
+    try {
+        const response = await apiFunction();
 
-		if (response.data.success) {
-			return response.data.data;
-		} else {
-			// Handle error
-			toastError(handlePropertyError(response.data.error!));
-			return null;
-		}
-	} catch (error) {
-		// Network or unexpected error
-		toastError('An unexpected error occurred. Please try again.');
-		console.error('API Error:', error);
-		return null;
-	}
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            // Handle error
+            toastError(handlePropertyError(response.data.error!));
+            return null;
+        }
+    } catch (error) {
+        // Network or unexpected error
+        toastError('An unexpected error occurred. Please try again.');
+        console.error('API Error:', error);
+        return null;
+    }
 };
 
 // Usage
-const property = await apiCall(() => apiClient.get<PropertyDTO>(`/properties/${id}`));
+const property = await apiCall(() =>
+    apiClient.get<PropertyDTO>(`/properties/${id}`)
+);
 
 if (property) {
-	// Success
-	displayProperty(property);
+    // Success
+    displayProperty(property);
 }
 ```
 

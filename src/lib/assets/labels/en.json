@@ -26,6 +26,7 @@
 			"newest": "Newest First",
 			"oldest": "Oldest First",
 			"popular": "Most Popular",
+			"status": "Availability",
 			"priceLowHigh": "Price: Low to High",
 			"priceHighLow": "Price: High to Low",
 			"location": "Location (A-Z)"

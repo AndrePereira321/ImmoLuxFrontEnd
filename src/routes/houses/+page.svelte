@@ -17,7 +17,7 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 
-	type OrderBy = 'price_asc' | 'price_desc' | 'created_asc' | 'created_desc' | 'popularity' | 'location';
+	type OrderBy = 'price_asc' | 'price_desc' | 'created_asc' | 'created_desc' | 'popularity' | 'location' | 'status';
 
 	interface PropertyListResponse {
 		properties: PropertyDTO[];
@@ -317,6 +317,7 @@
 							>
 								<option value="created_desc">{$_('houses.sort.newest')}</option>
 								<option value="popularity">{$_('houses.sort.popular')}</option>
+								<option value="status">{$_('houses.sort.status')}</option>
 								<option value="price_asc">{$_('houses.sort.priceLowHigh')}</option>
 								<option value="price_desc">{$_('houses.sort.priceHighLow')}</option>
 								<option value="location">{$_('houses.sort.location')}</option>
