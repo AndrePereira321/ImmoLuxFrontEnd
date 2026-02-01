@@ -7,6 +7,7 @@
 	import { changeLanguage } from '$lib/utils/language';
 	import AppTooltip from '$lib/components/AppTooltip.svelte';
 	import pacaGroupLogo from '$lib/assets/images/paca_group.jpg';
+	import immoLuxLogo from '$lib/assets/images/logo_transparent_white.png';
 
 	const currentYear = new Date().getFullYear();
 	const contactEmail = 'info@immolux.pt';
@@ -19,6 +20,9 @@
 		<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
 			<!-- Company Info -->
 			<div class="space-y-3">
+				<a href={resolve('/')} class="mb-3 block">
+					<img src={immoLuxLogo} alt="ImmoLux" class="h-12 w-auto" />
+				</a>
 				<h3 class="text-lg font-semibold text-light-50">{$_('footer.about')}</h3>
 				<p class="text-sm leading-relaxed">
 					{$_('footer.aboutDescription')}

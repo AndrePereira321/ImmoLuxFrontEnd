@@ -96,14 +96,14 @@
 
 <nav class="bg-primary-600 shadow-xl dark:bg-dark-900">
 	<div class="px-4">
-		<div class="flex h-16 items-center justify-between">
+		<div class="flex h-20 items-center justify-between">
 			<!-- Logo and Menu Items (Left Side) -->
 			<div class="flex items-center gap-8">
 				<!-- Logo/Brand -->
-				<a href={resolve('/')} class="flex items-center gap-3 transition-opacity hover:opacity-90">
-					<img src={logoTransparentWhite} alt="ImmoLux" class="h-8 w-auto dark:hidden" />
-					<img src={logoTransparentDark} alt="ImmoLux" class="hidden h-8 w-auto dark:block" />
-					<span class="text-2xl font-bold tracking-tight text-light-50">ImmoLux</span>
+				<a href={resolve('/')} class="flex items-center gap-3 transition-all hover:scale-105">
+					<img src={logoTransparentWhite} alt="ImmoLux" class="h-12 w-auto drop-shadow-lg dark:hidden" />
+					<img src={logoTransparentDark} alt="ImmoLux" class="hidden h-12 w-auto drop-shadow-lg dark:block" />
+					<span class="text-3xl font-bold tracking-tight text-light-50 drop-shadow-md">ImmoLux</span>
 				</a>
 
 				<!-- Vertical Divider -->

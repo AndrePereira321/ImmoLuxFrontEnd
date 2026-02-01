@@ -9,6 +9,8 @@
 	import AppSectionDivider from '$lib/components/AppSectionDivider.svelte';
 	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
 	import type { PropertyDTO } from '$lib/types/property';
+	import immoLuxLogo from '$lib/assets/images/logo_transparent_white.png';
+	import immoLuxLogoDark from '$lib/assets/images/logo_transparent_dark.png';
 
 	interface PropertyImageMap {
 		[propertyId: number]: number[];
@@ -72,33 +74,52 @@
 	<meta property="og:description" content={$t('homepage.meta.description')} />
 	<meta property="og:type" content="website" />
 	<link rel="canonical" href="https://immolux.pt/" />
+	<style>
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+	</style>
 </svelte:head>
 
-<div class="min-h-screen">
+<div
+	class="min-h-screen bg-gradient-to-br from-light-50 via-light-100 to-light-200 dark:from-dark-950 dark:via-dark-900 dark:to-dark-850"
+>
 	<!-- Block 1: Hero Section - Available Houses -->
-	<AppSection
-		variant="primary"
-		class="relative overflow-hidden bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900 dark:to-dark-850"
-	>
-		<!-- Decorative background -->
-		<div class="absolute inset-0 -z-10 opacity-20 dark:opacity-10">
-			<div class="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary-200 blur-3xl dark:bg-primary-950"></div>
+	<AppSection variant="primary" class="relative overflow-hidden">
+		<!-- Decorative background patterns -->
+		<div class="absolute inset-0 -z-10">
+			<!-- Gradient orbs -->
 			<div
-				class="absolute right-1/4 bottom-20 h-96 w-96 rounded-full bg-secondary-200 blur-3xl dark:bg-secondary-950"
+				class="absolute top-0 left-0 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-primary-200/40 to-transparent blur-3xl dark:from-primary-900/40"
+			></div>
+			<div
+				class="absolute right-0 bottom-0 h-[600px] w-[600px] rounded-full bg-gradient-to-tl from-secondary-200/40 to-transparent blur-3xl dark:from-secondary-900/40"
+			></div>
+			<div
+				class="absolute top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-primary-100/30 to-secondary-100/30 blur-2xl dark:from-primary-950/30 dark:to-secondary-950/30"
+			></div>
+
+			<!-- Subtle grid pattern -->
+			<div
+				class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30 dark:opacity-10"
 			></div>
 		</div>
 
 		<div class="mx-auto max-w-5xl text-center">
-			<!-- Icon -->
+			<!-- Logo -->
 			<div class="mb-8 inline-block">
 				<div class="relative">
-					<div
-						class="absolute inset-0 animate-pulse rounded-full bg-primary-400 opacity-20 blur-2xl dark:bg-primary-600"
-					></div>
-					<div
-						class="relative rounded-full bg-gradient-to-br from-primary-500 to-primary-700 p-10 shadow-2xl dark:from-primary-600 dark:to-primary-800"
-					>
-						<FontAwesomeIcon icon={faHouse} size="3x" class="text-light-50" />
+					<div class="absolute inset-0 animate-pulse bg-primary-400 opacity-30 blur-3xl dark:bg-primary-600"></div>
+					<div class="relative">
+						<img src={immoLuxLogo} alt="ImmoLux" class="h-32 w-auto drop-shadow-2xl md:h-40 dark:hidden" />
+						<img src={immoLuxLogoDark} alt="ImmoLux" class="hidden h-32 w-auto drop-shadow-2xl md:h-40 dark:block" />
 					</div>
 				</div>
 			</div>
@@ -121,14 +142,28 @@
 			<!-- Recent Properties -->
 			{#if loading}
 				<div class="flex justify-center py-16">
-					<FontAwesomeIcon icon={faHouse} class="animate-spin text-6xl text-primary-600 dark:text-primary-400" />
+					<div class="relative">
+						<div class="absolute inset-0 animate-ping rounded-full bg-primary-400/50 dark:bg-primary-600/50"></div>
+						<FontAwesomeIcon
+							icon={faHouse}
+							class="relative animate-spin text-6xl text-primary-600 dark:text-primary-400"
+						/>
+					</div>
 				</div>
 			{:else if hasProperties}
-				<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{#each properties as property (property.id)}
+				<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+					{#each properties as property, i (property.id)}
 						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-						<a href="/houses/{property.id}" class="block transition-transform duration-200 hover:scale-[1.02]">
-							<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id!] || []} compact={true} />
+						<a
+							href="/houses/{property.id}"
+							class="group block transform transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]"
+							style="animation: fadeInUp 0.6s ease-out {i * 0.1}s both"
+						>
+							<div
+								class="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-light-300/50 transition-all duration-300 group-hover:shadow-2xl group-hover:ring-primary-300 dark:bg-dark-800 dark:ring-dark-700/50 dark:group-hover:ring-primary-700"
+							>
+								<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id!] || []} compact={true} />
+							</div>
 						</a>
 					{/each}
 				</div>
@@ -172,7 +207,19 @@
 	<AppSectionDivider variant="decorative" />
 
 	<!-- Block 2: About ImmoLux -->
-	<AppSection variant="secondary" class="bg-light-100 dark:bg-dark-850">
+	<AppSection
+		variant="secondary"
+		class="relative overflow-hidden bg-gradient-to-br from-light-100/80 via-white/50 to-light-100/80 dark:from-dark-850/80 dark:via-dark-800/50 dark:to-dark-850/80"
+	>
+		<!-- Decorative elements -->
+		<div class="absolute inset-0 -z-10">
+			<div
+				class="absolute top-10 right-10 h-64 w-64 rounded-full bg-primary-100/20 blur-3xl dark:bg-primary-900/20"
+			></div>
+			<div
+				class="absolute bottom-10 left-10 h-64 w-64 rounded-full bg-secondary-100/20 blur-3xl dark:bg-secondary-900/20"
+			></div>
+		</div>
 		<div class="mx-auto max-w-6xl">
 			<!-- Section Header -->
 			<div class="mb-12 text-center">
@@ -249,8 +296,17 @@
 	<!-- Block 3: Contact Information -->
 	<AppSection
 		variant="tertiary"
-		class="bg-gradient-to-b from-light-200 to-light-100 dark:from-dark-800 dark:to-dark-850"
+		class="relative overflow-hidden bg-gradient-to-br from-light-200/90 via-secondary-50/20 to-light-100/90 dark:from-dark-800/90 dark:via-secondary-950/20 dark:to-dark-850/90"
 	>
+		<!-- Decorative elements -->
+		<div class="absolute inset-0 -z-10">
+			<div
+				class="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-secondary-200/30 blur-3xl dark:bg-secondary-900/30"
+			></div>
+			<div
+				class="absolute right-1/4 bottom-0 h-96 w-96 rounded-full bg-primary-200/30 blur-3xl dark:bg-primary-900/30"
+			></div>
+		</div>
 		<div class="mx-auto max-w-4xl text-center">
 			<!-- Icon -->
 			<div class="mb-8 inline-block">
