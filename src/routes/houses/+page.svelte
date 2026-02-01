@@ -16,6 +16,7 @@
 		faTimes
 	} from '@fortawesome/free-solid-svg-icons';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import homeImage from '$lib/assets/images/home_image.jpeg';
 
 	type OrderBy = 'price_asc' | 'price_desc' | 'created_asc' | 'created_desc' | 'popularity' | 'location' | 'status';
 
@@ -218,10 +219,7 @@
 	<!-- Hero Section -->
 	<div class="relative overflow-hidden">
 		<!-- Background Image -->
-		<div
-			class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-			style="background-image: url('/src/lib/assets/images/home_image.jpeg')"
-		></div>
+		<div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url({homeImage})"></div>
 
 		<!-- Transparent Overlay -->
 		<div class="absolute inset-0 bg-primary-900/70 dark:bg-dark-950/80"></div>
