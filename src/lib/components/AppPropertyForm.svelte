@@ -154,7 +154,7 @@
 			hasElevator: false,
 			energyRating: undefined as EnergyRating | undefined,
 			virtualTourUrl: '',
-			contactId: undefined as number | undefined
+			contactIds: [] as number[]
 		},
 		{
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -196,7 +196,7 @@
 						hasElevator: $form.hasElevator,
 						energyRating: $form.energyRating,
 						virtualTourUrl: $form.virtualTourUrl?.trim() || undefined,
-						contact: { id: $form.contactId }
+						contacts: $form.contactIds.map((id) => ({ id }))
 					};
 
 					if (isEditMode && propertyId) {
@@ -271,7 +271,7 @@
 		$form.hasElevator = propertyData.hasElevator || false;
 		$form.energyRating = propertyData.energyRating;
 		$form.virtualTourUrl = propertyData.virtualTourUrl || '';
-		$form.contactId = propertyData.contactId;
+		$form.contactIds = propertyData.contactIds || [];
 	};
 
 	// Combined images for display in AppImageUpload
@@ -527,6 +527,14 @@
 				};
 			})
 	);
+
+	const toggleContact = (contactId: number) => {
+		if ($form.contactIds.includes(contactId)) {
+			$form.contactIds = $form.contactIds.filter((id) => id !== contactId);
+		} else {
+			$form.contactIds = [...$form.contactIds, contactId];
+		}
+	};
 
 	const isFormValid = $derived($allErrors.length === 0);
 </script>
@@ -838,16 +846,50 @@
 
 			<!-- Contact Information -->
 			<AppCollapsibleSection title={$_('properties.sections.contact')} icon={faAddressCard}>
-				<div>
-					<AppAutocomplete
-						id="contactId"
-						label={$_('properties.contact')}
-						bind:value={$form.contactId}
-						options={contactOptions}
-						placeholder={$_('properties.selectContact')}
-						error={translateError($errors.contactId?.[0])}
-						required
-					/>
+				<div class="space-y-4">
+					<p class="text-sm text-dark-600 dark:text-light-400">
+						{$_('properties.selectMultipleContacts')}
+						{#if $form.contactIds.length > 0}
+							<span class="font-semibold text-primary-600 dark:text-primary-400">
+								({$form.contactIds.length}
+								{$_('properties.contactsSelected')})
+							</span>
+						{/if}
+					</p>
+
+					{#if contactOptions.length === 0}
+						<p class="text-sm text-warning-600 dark:text-warning-400">
+							{$_('properties.noContactsAvailable')}
+						</p>
+					{:else}
+						<div class="grid gap-3 sm:grid-cols-2">
+							{#each contactOptions as option (option.value)}
+								<label
+									class="flex cursor-pointer items-center gap-3 rounded-lg border-2 p-4 transition-all {$form.contactIds.includes(
+										option.value
+									)
+										? 'border-primary-600 bg-primary-50 dark:border-primary-500 dark:bg-primary-900/20'
+										: 'border-light-300 bg-white hover:border-primary-300 dark:border-dark-600 dark:bg-dark-700 dark:hover:border-primary-700'}"
+								>
+									<input
+										type="checkbox"
+										checked={$form.contactIds.includes(option.value)}
+										onchange={() => toggleContact(option.value)}
+										class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+									/>
+									<span class="flex-1 text-sm font-medium text-dark-900 dark:text-light-50">
+										{option.label}
+									</span>
+								</label>
+							{/each}
+						</div>
+					{/if}
+
+					{#if $errors.contactIds?.[0]}
+						<p class="text-sm text-error-600 dark:text-error-400">
+							{translateError($errors.contactIds?.[0])}
+						</p>
+					{/if}
 				</div>
 			</AppCollapsibleSection>
 

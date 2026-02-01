@@ -40,8 +40,8 @@ export interface PropertyDTO {
 	virtualTourUrl?: string;
 
 	// Relationships
-	contactId?: number;
-	contact?: import('./contact').ContactDTO;
+	contactIds?: number[];
+	contacts?: import('./contact').ContactDTO[];
 	publisherId?: number;
 
 	// Metadata

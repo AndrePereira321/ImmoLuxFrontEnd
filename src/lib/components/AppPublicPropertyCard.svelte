@@ -277,19 +277,25 @@
 			</div>
 		{/if}
 
-		<!-- Contact info (hidden in compact mode) -->
-		{#if !compact && property.contact}
+		<!-- Contact info (hidden in compact mode) - Display first contact only -->
+		{#if !compact && property.contacts && property.contacts.length > 0}
 			<div
 				class="mt-auto flex flex-col gap-1 rounded-lg border border-light-300 bg-light-50 p-3 text-sm dark:border-dark-600 dark:bg-dark-800"
 			>
-				{#if property.contact.name}
-					<p class="font-semibold text-dark-900 dark:text-light-100">{property.contact.name}</p>
+				{#if property.contacts[0].name}
+					<p class="font-semibold text-dark-900 dark:text-light-100">{property.contacts[0].name}</p>
 				{/if}
-				{#if property.contact.phone}
-					<p class="text-dark-600 dark:text-light-400">📞 {property.contact.phone}</p>
+				{#if property.contacts[0].phone}
+					<p class="text-dark-600 dark:text-light-400">📞 {property.contacts[0].phone}</p>
 				{/if}
-				{#if property.contact.email}
-					<p class="text-dark-600 dark:text-light-400">✉️ {property.contact.email}</p>
+				{#if property.contacts[0].email}
+					<p class="text-dark-600 dark:text-light-400">✉️ {property.contacts[0].email}</p>
+				{/if}
+				{#if property.contacts.length > 1}
+					<p class="mt-1 text-xs text-primary-600 dark:text-primary-400">
+						+{property.contacts.length - 1}
+						{$_('properties.moreContacts')}
+					</p>
 				{/if}
 			</div>
 		{/if}

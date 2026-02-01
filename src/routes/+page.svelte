@@ -116,7 +116,7 @@
 			<!-- Logo -->
 			<div class="mb-8 inline-block">
 				<div class="relative">
-					<div class="absolute inset-0 animate-pulse bg-primary-400 opacity-30 blur-3xl dark:bg-primary-600"></div>
+					<div class="absolute inset-0 animate-pulse"></div>
 					<div class="relative">
 						<img src={immoLuxLogo} alt="ImmoLux" class="h-32 w-auto drop-shadow-2xl md:h-40 dark:hidden" />
 						<img src={immoLuxLogoDark} alt="ImmoLux" class="hidden h-32 w-auto drop-shadow-2xl md:h-40 dark:block" />

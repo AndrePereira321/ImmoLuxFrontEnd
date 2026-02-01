@@ -661,7 +661,7 @@
 				<!-- Right Column - Contact -->
 				<div class="lg:col-span-1">
 					<div class="sticky top-8">
-						{#if property.contact}
+						{#if property.contacts && property.contacts.length > 0}
 							<div
 								class="overflow-hidden rounded-2xl border border-light-300 bg-white shadow-xl dark:border-dark-700 dark:bg-dark-800"
 							>
@@ -671,89 +671,99 @@
 								>
 									<h2 class="mb-1 text-sm font-medium tracking-wide text-primary-100 uppercase">
 										{$_('properties.sections.contact')}
+										{#if property.contacts.length > 1}
+											<span class="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">
+												{property.contacts.length}
+											</span>
+										{/if}
 									</h2>
 									<p class="text-xl font-bold text-white">
 										{$_('homepage.contact.interested').split('.')[0]}
 									</p>
 								</div>
 
-								<div class="p-6">
-									<!-- Contact Person -->
-									<div
-										class="dark:bg-dark-750 mb-6 flex items-center gap-3 rounded-xl border-2 border-light-200 bg-white p-4 dark:border-dark-600"
-									>
-										<div class="text-3xl text-primary-600 dark:text-primary-400">
-											<FontAwesomeIcon icon={faUser} />
-										</div>
-										<div>
-											<p class="text-xs font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
-												{$_('properties.contact')}
-											</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">
-												{property.contact.name}
-											</p>
-										</div>
-									</div>
-
-									<!-- Contact Buttons -->
-									<div class="space-y-3">
-										{#if property.contact.phone}
-											<a
-												href="tel:{property.contact.phone}"
-												class="group flex items-center gap-3 rounded-xl border-2 border-success-200 bg-success-50 p-4 transition-all hover:border-success-400 hover:bg-success-100 hover:shadow-md dark:border-success-800 dark:bg-success-900/20 dark:hover:border-success-600 dark:hover:bg-success-900/40"
+								<div class="space-y-6 p-6">
+									{#each property.contacts as contact, index (contact.id)}
+										<!-- Contact Person -->
+										<div class={index > 0 ? 'border-t border-light-200 pt-6 dark:border-dark-600' : ''}>
+											<div
+												class="dark:bg-dark-750 mb-4 flex items-center gap-3 rounded-xl border-2 border-light-200 bg-white p-4 dark:border-dark-600"
 											>
-												<div
-													class="text-2xl text-success-600 transition-transform group-hover:scale-110 dark:text-success-400"
-												>
-													<FontAwesomeIcon icon={faPhone} />
+												<div class="text-3xl text-primary-600 dark:text-primary-400">
+													<FontAwesomeIcon icon={faUser} />
 												</div>
-												<div class="flex-1">
-													<p
-														class="text-xs font-semibold tracking-wide text-success-700 uppercase dark:text-success-300"
-													>
-														{$_('contacts.phone')}
+												<div>
+													<p class="text-xs font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
+														{$_('properties.contact')}
+														{property.contacts.length > 1 ? `${index + 1}` : ''}
 													</p>
-													<p class="text-base font-bold text-dark-900 dark:text-light-50">{property.contact.phone}</p>
+													<p class="text-lg font-bold text-dark-900 dark:text-light-50">
+														{contact.name}
+													</p>
 												</div>
-											</a>
-										{/if}
+											</div>
 
-										{#if property.contact.email}
-											<a
-												href="mailto:{property.contact.email}"
-												class="group flex items-center gap-3 rounded-xl border-2 border-primary-200 bg-primary-50 p-4 transition-all hover:border-primary-400 hover:bg-primary-100 hover:shadow-md dark:border-primary-800 dark:bg-primary-900/20 dark:hover:border-primary-600 dark:hover:bg-primary-900/40"
-											>
-												<div
-													class="text-2xl text-primary-600 transition-transform group-hover:scale-110 dark:text-primary-400"
-												>
-													<FontAwesomeIcon icon={faEnvelope} />
-												</div>
-												<div class="flex-1 overflow-hidden">
-													<p
-														class="text-xs font-semibold tracking-wide text-primary-700 uppercase dark:text-primary-300"
+											<!-- Contact Buttons -->
+											<div class="space-y-3">
+												{#if contact.phone}
+													<a
+														href="tel:{contact.phone}"
+														class="group flex items-center gap-3 rounded-xl border-2 border-success-200 bg-success-50 p-4 transition-all hover:border-success-400 hover:bg-success-100 hover:shadow-md dark:border-success-800 dark:bg-success-900/20 dark:hover:border-success-600 dark:hover:bg-success-900/40"
 													>
-														{$_('contacts.email')}
-													</p>
-													<p class="truncate text-base font-bold text-dark-900 dark:text-light-50">
-														{property.contact.email}
-													</p>
-												</div>
-											</a>
-										{/if}
-									</div>
+														<div
+															class="text-2xl text-success-600 transition-transform group-hover:scale-110 dark:text-success-400"
+														>
+															<FontAwesomeIcon icon={faPhone} />
+														</div>
+														<div class="flex-1">
+															<p
+																class="text-xs font-semibold tracking-wide text-success-700 uppercase dark:text-success-300"
+															>
+																{$_('contacts.phone')}
+															</p>
+															<p class="text-base font-bold text-dark-900 dark:text-light-50">{contact.phone}</p>
+														</div>
+													</a>
+												{/if}
 
-									{#if property.contact.notes}
-										<div
-											class="mt-6 rounded-xl border border-light-300 bg-light-100 p-4 dark:border-dark-600 dark:bg-dark-700"
-										>
-											<p class="text-sm font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
-												{$_('contacts.notes')}
-											</p>
-											<p class="mt-2 text-sm leading-relaxed text-dark-700 dark:text-light-300">
-												{property.contact.notes}
-											</p>
+												{#if contact.email}
+													<a
+														href="mailto:{contact.email}"
+														class="group flex items-center gap-3 rounded-xl border-2 border-primary-200 bg-primary-50 p-4 transition-all hover:border-primary-400 hover:bg-primary-100 hover:shadow-md dark:border-primary-800 dark:bg-primary-900/20 dark:hover:border-primary-600 dark:hover:bg-primary-900/40"
+													>
+														<div
+															class="text-2xl text-primary-600 transition-transform group-hover:scale-110 dark:text-primary-400"
+														>
+															<FontAwesomeIcon icon={faEnvelope} />
+														</div>
+														<div class="flex-1 overflow-hidden">
+															<p
+																class="text-xs font-semibold tracking-wide text-primary-700 uppercase dark:text-primary-300"
+															>
+																{$_('contacts.email')}
+															</p>
+															<p class="truncate text-base font-bold text-dark-900 dark:text-light-50">
+																{contact.email}
+															</p>
+														</div>
+													</a>
+												{/if}
+
+												{#if contact.notes}
+													<div
+														class="rounded-xl border border-light-300 bg-light-100 p-4 dark:border-dark-600 dark:bg-dark-700"
+													>
+														<p class="text-sm font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
+															{$_('contacts.notes')}
+														</p>
+														<p class="mt-2 text-sm leading-relaxed text-dark-700 dark:text-light-300">
+															{contact.notes}
+														</p>
+													</div>
+												{/if}
+											</div>
 										</div>
-									{/if}
+									{/each}
 								</div>
 							</div>
 						{/if}

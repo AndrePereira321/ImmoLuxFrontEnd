@@ -42,8 +42,8 @@ export const propertySchema = z.object({
 	energyRating: z.enum(['Aplus', 'A', 'B', 'C', 'D', 'E', 'F', 'G']).optional(),
 	virtualTourUrl: z.string().url('properties.virtualTourUrlInvalid').max(500).optional().or(z.literal('')),
 
-	// Contact
-	contactId: z.number().int().positive('properties.contactRequired')
+	// Contacts (at least one required)
+	contactIds: z.array(z.number().int().positive()).min(1, 'properties.contactRequired')
 });
 
 export type PropertyFormData = z.infer<typeof propertySchema>;
