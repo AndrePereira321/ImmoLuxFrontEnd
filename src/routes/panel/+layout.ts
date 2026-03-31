@@ -1,2 +1,2 @@
-// Disable prerendering for admin panel routes
+export const ssr = false;
 export const prerender = false;

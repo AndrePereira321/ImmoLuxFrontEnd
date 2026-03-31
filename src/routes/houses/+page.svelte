@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { apiClient } from '$lib/api/api-client';
 	import type { LocationsResponse, PropertyDTO } from '$lib/types/property';
 	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
@@ -29,10 +29,16 @@
 		[propertyId: number]: number[];
 	}
 
+	let { data } = $props();
+
+	// Capture initial server values non-reactively — intentionally only the initial value.
+	// properties/total/propertyImageMap are subsequently managed by client-side loadProperties().
+	const { properties: _initProperties, total: _initTotal, propertyImageMap: _initMap } = untrack(() => data);
+
 	// Mutable state for client-side updates
-	let properties = $state<PropertyDTO[]>([]);
-	let total = $state(0);
-	let loading = $state(true);
+	let properties = $state<PropertyDTO[]>(_initProperties);
+	let total = $state<number>(_initTotal);
+	let loading = $state(false);
 	let showFilters = $state(false);
 
 	// Locations data
@@ -56,12 +62,11 @@
 	});
 
 	// Image IDs map
-	let propertyImageMap = $state<PropertyImageMap>({});
+	let propertyImageMap = $state<PropertyImageMap>(_initMap);
 
-	// Initialize on mount
+	// Initialize on mount — properties already loaded from server
 	onMount(() => {
 		loadLocations();
-		loadProperties();
 	});
 
 	// Pagination
@@ -207,12 +212,30 @@
 </script>
 
 <svelte:head>
-	<title>{$_('houses.title')} - ImmoLux</title>
+	<title>{$_('houses.meta.title')} - ImmoLux</title>
 	<meta name="description" content={$_('houses.meta.description')} />
-	<meta property="og:title" content="{$_('houses.title')} - ImmoLux" />
+	<meta property="og:title" content="{$_('houses.meta.title')} - ImmoLux" />
 	<meta property="og:description" content={$_('houses.meta.description')} />
 	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://immolux.pt/houses" />
+	<meta property="og:image" content="https://immolux.pt{homeImage}" />
+	<meta property="og:image:alt" content={$_('houses.hero.title')} />
+	<meta name="twitter:title" content="{$_('houses.meta.title')} - ImmoLux" />
+	<meta name="twitter:description" content={$_('houses.meta.description')} />
+	<meta name="twitter:image" content="https://immolux.pt{homeImage}" />
 	<link rel="canonical" href="https://immolux.pt/houses" />
+	<!-- CollectionPage structured data -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "CollectionPage",
+			"@id": "https://immolux.pt/houses#collection",
+			"name": "Properties in Portugal",
+			"url": "https://immolux.pt/houses",
+			"description": "Browse houses, apartments and land for sale in Portugal",
+			"publisher": { "@id": "https://immolux.pt/#organization" }
+		}
+	</script>
 </svelte:head>
 
 <div class="min-h-screen bg-light-50 dark:bg-dark-900">
@@ -232,10 +255,10 @@
 					</div>
 				</div>
 				<h1 class="mb-4 text-5xl font-bold tracking-tight text-white drop-shadow-lg sm:text-6xl">
-					{$_('homepage.availableHouses.title')}
+					{$_('houses.hero.title')}
 				</h1>
 				<p class="mx-auto max-w-2xl text-xl text-white drop-shadow-md">
-					{$_('homepage.availableHouses.subtitle')}
+					{$_('houses.hero.subtitle')}
 				</p>
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 # Allow all crawlers
 User-agent: *
 Allow: /
+Disallow: /panel/
 
 # Sitemap location
 Sitemap: https://immolux.pt/sitemap.xml

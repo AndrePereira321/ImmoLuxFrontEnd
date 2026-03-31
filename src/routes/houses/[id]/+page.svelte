@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
@@ -24,16 +23,18 @@
 		faUser,
 		faWarehouse
 	} from '@fortawesome/free-solid-svg-icons';
-	import type { PropertyDTO, PropertyImageDTO } from '$lib/types/property';
+	import type { PropertyDTO } from '$lib/types/property';
 	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 
 	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-	// Mutable state
-	let property = $state<PropertyDTO | null>(null);
-	let images = $state<PropertyImageDTO[]>([]);
-	let loading = $state(true);
+	let { data } = $props();
+
+	// Derived from server data — never updated client-side
+	let property = $derived<PropertyDTO | null>(data.property);
+	let imageIds = $derived<number[]>(data.imageIds);
+	let loading = $state(false);
 	let currentImageIndex = $state(0);
 	let mapCoordinates = $state<[number, number] | null>(null);
 	let LeafletMap = $state<LeafletComponent>(null);
@@ -85,14 +86,14 @@
 	};
 
 	const nextImage = () => {
-		if (images.length > 0) {
-			currentImageIndex = (currentImageIndex + 1) % images.length;
+		if (imageIds.length > 0) {
+			currentImageIndex = (currentImageIndex + 1) % imageIds.length;
 		}
 	};
 
 	const prevImage = () => {
-		if (images.length > 0) {
-			currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+		if (imageIds.length > 0) {
+			currentImageIndex = (currentImageIndex - 1 + imageIds.length) % imageIds.length;
 		}
 	};
 
@@ -107,13 +108,14 @@
 {
 	"@context": "https://schema.org",
 	"@type": "RealEstateListing",
-	"name": "${property.title || 'Propriedade ImmoLux'}",
-	"description": "${(property.description || '').replace(/"/g, '\\"')}",
+	"@id": "https://immolux.pt/houses/${property.id}#listing",
+	"name": "${(property.title || 'Propriedade ImmoLux').replace(/"/g, '\\"')}",
+	"description": "${(property.description || '').replace(/"/g, '\\"').replace(/\n/g, ' ')}",
 	"url": "https://immolux.pt/houses/${property.id}",
-	${images.length > 0 ? `"image": "${serverUrl || 'https://immolux.pt'}/v1/api/images/${images[0].id}",` : ''}
+	${imageIds.length > 0 ? `"image": "https://immolux.pt/v1/api/images/${imageIds[0]}",` : ''}
 	"offers": {
 		"@type": "Offer",
-		"price": "${property.price || 0}",
+		"price": ${property.price || 0},
 		"priceCurrency": "EUR",
 		"availability": "${property.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
 	},
@@ -129,114 +131,78 @@
 			? `,
 	"floorSize": {
 		"@type": "QuantitativeValue",
-		"value": "${property.areaSqm}",
+		"value": ${property.areaSqm},
 		"unitCode": "MTK"
 	}`
 			: ''
 	}${
 		property.bedrooms
 			? `,
-	"numberOfBedrooms": "${property.bedrooms}"`
+	"numberOfBedrooms": ${property.bedrooms}`
 			: ''
 	}${
 		property.bathrooms
 			? `,
-	"numberOfBathroomsTotal": "${property.bathrooms}"`
+	"numberOfBathroomsTotal": ${property.bathrooms}`
 			: ''
 	}
 }
-</` + `script>`
+</` +
+					`script>` +
+					`<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": [
+		{ "@type": "ListItem", "position": 1, "name": "ImmoLux", "item": "https://immolux.pt/" },
+		{ "@type": "ListItem", "position": 2, "name": "Properties", "item": "https://immolux.pt/houses" },
+		{ "@type": "ListItem", "position": 3, "name": "${(property.title || 'Property').replace(/"/g, '\\"')}", "item": "https://immolux.pt/houses/${property.id}" }
+	]
+}
+</` +
+					`script>`
 			: ''
 	);
 
-	// Load property data client-side
 	onMount(async () => {
 		if (!browser) return;
 
-		try {
-			loading = true;
-			const propertyId = $page.params.id;
+		// Set map coordinates from server-loaded property data
+		if (property && property.latitude != null && property.longitude != null) {
+			mapCoordinates = [property.latitude, property.longitude];
+		} else if (property) {
+			const addressParts = [
+				property.address,
+				property.parish,
+				property.municipality,
+				property.district,
+				property.postalCode
+			]
+				.filter(Boolean)
+				.join(', ');
 
-			// Fetch property details
-			const propertyResponse = await fetch(`${serverUrl}/v1/api/properties/${propertyId}`);
-
-			if (!propertyResponse.ok) {
-				goto('/houses');
-				return;
-			}
-
-			const propertyData = await propertyResponse.json();
-
-			if (!propertyData.success || !propertyData.data) {
-				goto('/houses');
-				return;
-			}
-
-			property = propertyData.data;
-
-			// Fetch property images
-			try {
-				const imagesResponse = await fetch(`${serverUrl}/v1/api/properties/${propertyId}/images`);
-				if (imagesResponse.ok) {
-					const imagesData = await imagesResponse.json();
-					if (imagesData.success && imagesData.data) {
-						images = imagesData.data.images || [];
+			if (addressParts) {
+				try {
+					const geocodeResponse = await fetch(
+						`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`
+					);
+					const geocodeData = await geocodeResponse.json();
+					if (geocodeData?.length > 0) {
+						mapCoordinates = [parseFloat(geocodeData[0].lat), parseFloat(geocodeData[0].lon)];
 					}
-				}
-			} catch (err) {
-				console.error('Failed to load images:', err);
-			}
-
-			// Geocode address if needed
-			if (
-				property &&
-				property.latitude !== null &&
-				property.latitude !== undefined &&
-				property.longitude !== null &&
-				property.longitude !== undefined
-			) {
-				mapCoordinates = [property.latitude, property.longitude];
-			} else if (property) {
-				// Try to geocode the address
-				const addressParts = [
-					property.address,
-					property.parish,
-					property.municipality,
-					property.district,
-					property.postalCode
-				]
-					.filter(Boolean)
-					.join(', ');
-
-				if (addressParts) {
-					try {
-						const geocodeResponse = await fetch(
-							`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`
-						);
-						const geocodeData = await geocodeResponse.json();
-
-						if (geocodeData && geocodeData.length > 0) {
-							mapCoordinates = [parseFloat(geocodeData[0].lat), parseFloat(geocodeData[0].lon)];
-						}
-					} catch (err) {
-						console.error('Failed to geocode address:', err);
-					}
+				} catch {
+					/* geocoding failed, map won't show */
 				}
 			}
-
-			// Load Leaflet components
-			const leaflet = await import('svelte-leafletjs');
-			LeafletMap = leaflet.LeafletMap;
-			TileLayer = leaflet.TileLayer;
-			Marker = leaflet.Marker;
-			Popup = leaflet.Popup;
-			mapReady = true;
-		} catch (err) {
-			console.error('Failed to load property:', err);
-			goto('/houses');
-		} finally {
-			loading = false;
 		}
+
+		// Load Leaflet dynamically (must stay client-side — excluded from SSR bundle)
+		const leaflet = await import('svelte-leafletjs');
+		LeafletMap = leaflet.LeafletMap;
+		TileLayer = leaflet.TileLayer;
+		Marker = leaflet.Marker;
+		Popup = leaflet.Popup;
+		mapReady = true;
 	});
 </script>
 
@@ -257,9 +223,19 @@
 				: `${getPropertyTypeLabel(property.propertyType)} em ${property.municipality}, ${property.district}`}
 		/>
 		<meta property="og:type" content="website" />
-		{#if images.length > 0}
-			<meta property="og:image" content="{serverUrl || 'https://immolux.pt'}/v1/api/images/{images[0].id}" />
+		<meta property="og:url" content="https://immolux.pt/houses/{property.id}" />
+		{#if imageIds.length > 0}
+			<meta property="og:image" content="https://immolux.pt/v1/api/images/{imageIds[0]}" />
+			<meta property="og:image:alt" content={property.title || 'Property'} />
+			<meta name="twitter:image" content="https://immolux.pt/v1/api/images/{imageIds[0]}" />
 		{/if}
+		<meta name="twitter:title" content="{property.title || 'Property'} - ImmoLux" />
+		<meta
+			name="twitter:description"
+			content={property.description
+				? property.description.substring(0, 200)
+				: `${getPropertyTypeLabel(property.propertyType)} in ${property.municipality}, ${property.district}`}
+		/>
 		<link rel="canonical" href="https://immolux.pt/houses/{property.id}" />
 
 		<!-- Structured Data (JSON-LD) for Rich Snippets -->
@@ -301,15 +277,15 @@
 					<div
 						class="mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-light-200 to-light-300 shadow-xl dark:from-dark-600 dark:to-dark-700"
 					>
-						{#if images.length > 0}
+						{#if imageIds.length > 0}
 							<div class="relative aspect-video">
 								<img
-									src="{serverUrl}/v1/api/images/{images[currentImageIndex].id}"
+									src="{serverUrl}/v1/api/images/{imageIds[currentImageIndex]}"
 									alt={property.title || 'Property'}
 									class="h-full w-full object-cover"
 								/>
 
-								{#if images.length > 1}
+								{#if imageIds.length > 1}
 									<!-- Navigation Arrows -->
 									<button
 										type="button"
@@ -333,7 +309,7 @@
 									<div
 										class="absolute right-4 bottom-4 rounded-full bg-dark-900/75 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
 									>
-										{currentImageIndex + 1} / {images.length}
+										{currentImageIndex + 1} / {imageIds.length}
 									</div>
 								{/if}
 
@@ -352,9 +328,9 @@
 							</div>
 
 							<!-- Thumbnail Gallery -->
-							{#if images.length > 1}
+							{#if imageIds.length > 1}
 								<div class="flex gap-2 overflow-x-auto bg-light-100 p-4 dark:bg-dark-800">
-									{#each images as image, index (image.id)}
+									{#each imageIds as imageId, index (imageId)}
 										<button
 											type="button"
 											onclick={() => goToImage(index)}
@@ -364,8 +340,8 @@
 												: 'border-light-300 hover:border-primary-400 dark:border-dark-600'}"
 										>
 											<img
-												src="{serverUrl}/v1/api/images/{image.id}"
-												alt="Thumbnail {index + 1}"
+												src="{serverUrl}/v1/api/images/{imageId}"
+												alt="{property.title || 'Property'} - image {index + 1}"
 												class="h-20 w-28 object-cover"
 											/>
 										</button>

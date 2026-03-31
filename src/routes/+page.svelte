@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { t } from 'svelte-i18n';
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
@@ -11,60 +10,17 @@
 	import type { PropertyDTO } from '$lib/types/property';
 	import immoLuxLogo from '$lib/assets/images/logo_transparent_white.png';
 	import immoLuxLogoDark from '$lib/assets/images/logo_transparent_dark.png';
+	import homeImage from '$lib/assets/images/home_image.jpeg';
 
 	interface PropertyImageMap {
 		[propertyId: number]: number[];
 	}
 
-	let properties = $state<PropertyDTO[]>([]);
-	let propertyImageMap = $state<PropertyImageMap>({});
-	let hasProperties = $state(false);
-	let loading = $state(true);
+	let { data } = $props();
 
-	onMount(async () => {
-		try {
-			const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
-			const response = await fetch(
-				`${serverUrl}/v1/api/properties?status=available&page=1&limit=3&orderBy=created_desc`
-			);
-
-			if (response.ok) {
-				const data = await response.json();
-				if (data.success && data.data) {
-					properties = data.data.properties;
-					hasProperties = properties.length > 0;
-
-					// Load images for each property
-					for (const property of properties) {
-						if (property.id) {
-							try {
-								const imgResponse = await fetch(`${serverUrl}/v1/api/properties/${property.id}/images`);
-								if (imgResponse.ok) {
-									const imgData = await imgResponse.json();
-									if (imgData.success && imgData.data && imgData.data.images) {
-										const images = imgData.data.images;
-										const sortedImageIds = images
-											.sort(
-												(a: { displayOrder?: number }, b: { displayOrder?: number }) =>
-													(a.displayOrder ?? 0) - (b.displayOrder ?? 0)
-											)
-											.map((img: { id: number }) => img.id);
-										propertyImageMap[property.id] = sortedImageIds;
-									}
-								}
-							} catch (err) {
-								console.error(`Failed to load images for property ${property.id}:`, err);
-							}
-						}
-					}
-				}
-			}
-		} catch (error) {
-			console.error('Failed to load properties:', error);
-		} finally {
-			loading = false;
-		}
-	});
+	let properties = $derived<PropertyDTO[]>(data.featuredProperties);
+	let propertyImageMap = $derived<PropertyImageMap>(data.propertyImageMap);
+	let hasProperties = $derived(properties.length > 0);
 </script>
 
 <svelte:head>
@@ -73,7 +29,24 @@
 	<meta property="og:title" content="ImmoLux - {$t('homepage.meta.title')}" />
 	<meta property="og:description" content={$t('homepage.meta.description')} />
 	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://immolux.pt/" />
+	<meta property="og:image" content="https://immolux.pt{homeImage}" />
+	<meta property="og:image:alt" content="ImmoLux - {$t('homepage.meta.title')}" />
+	<meta name="twitter:title" content="ImmoLux - {$t('homepage.meta.title')}" />
+	<meta name="twitter:description" content={$t('homepage.meta.description')} />
+	<meta name="twitter:image" content="https://immolux.pt{homeImage}" />
 	<link rel="canonical" href="https://immolux.pt/" />
+	<!-- WebSite structured data -->
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			"@id": "https://immolux.pt/#website",
+			"url": "https://immolux.pt",
+			"name": "ImmoLux",
+			"publisher": { "@id": "https://immolux.pt/#organization" }
+		}
+	</script>
 	<style>
 		@keyframes fadeInUp {
 			from {
@@ -140,17 +113,7 @@
 			</p>
 
 			<!-- Recent Properties -->
-			{#if loading}
-				<div class="flex justify-center py-16">
-					<div class="relative">
-						<div class="absolute inset-0 animate-ping rounded-full bg-primary-400/50 dark:bg-primary-600/50"></div>
-						<FontAwesomeIcon
-							icon={faHouse}
-							class="relative animate-spin text-6xl text-primary-600 dark:text-primary-400"
-						/>
-					</div>
-				</div>
-			{:else if hasProperties}
+			{#if hasProperties}
 				<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
 					{#each properties as property, i (property.id)}
 						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->

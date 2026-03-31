@@ -4,7 +4,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import compression from 'vite-plugin-compression';
 import { imagetools } from 'vite-imagetools';
-import { VitePWA } from 'vite-plugin-pwa';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
 export default defineConfig({
 	server: {
@@ -22,12 +22,9 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 		devtoolsJson(),
-		// Image optimization
 		imagetools(),
-		// PWA with service worker for caching
-		VitePWA({
+		SvelteKitPWA({
 			registerType: 'autoUpdate',
-			outDir: '.svelte-kit/output/client',
 			manifest: {
 				name: 'ImmoLux',
 				short_name: 'ImmoLux',
@@ -44,8 +41,7 @@ export default defineConfig({
 				]
 			},
 			workbox: {
-				globDirectory: '.svelte-kit/output/client',
-				globPatterns: ['_app/**/*.{js,css,svg,woff2}', '*.{html,ico,png,svg,webmanifest}'],
+				globPatterns: ['client/**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
 				navigateFallback: null,
 				runtimeCaching: [
 					{
@@ -55,7 +51,7 @@ export default defineConfig({
 							cacheName: 'images',
 							expiration: {
 								maxEntries: 128,
-								maxAgeSeconds: 60 * 10 // 10 minutes
+								maxAgeSeconds: 60 * 10
 							}
 						}
 					},
@@ -66,20 +62,18 @@ export default defineConfig({
 							cacheName: 'cdn-cache',
 							expiration: {
 								maxEntries: 50,
-								maxAgeSeconds: 60 * 60 * 1 // 1 hour
+								maxAgeSeconds: 60 * 60 * 1
 							}
 						}
 					}
 				]
 			}
 		}),
-		// Gzip compression
 		compression({
 			algorithm: 'gzip',
 			ext: '.gz',
-			threshold: 1024 // Only compress files > 1KB
+			threshold: 1024
 		}),
-		// Brotli compression (better compression than gzip)
 		compression({
 			algorithm: 'brotliCompress',
 			ext: '.br',
@@ -89,25 +83,14 @@ export default defineConfig({
 	build: {
 		minify: 'terser',
 		cssMinify: true,
-		// Enable code splitting for better caching
 		rollupOptions: {
 			output: {
 				manualChunks(id) {
-					// Vendor chunks for better caching
 					if (id.includes('node_modules')) {
-						if (id.includes('svelte')) {
-							return 'vendor-svelte';
-						}
-						if (id.includes('@fortawesome')) {
-							return 'vendor-icons';
-						}
-						if (id.includes('svelte-i18n')) {
-							return 'vendor-i18n';
-						}
-						if (id.includes('leaflet')) {
-							return 'vendor-leaflet';
-						}
-						// All other node_modules
+						if (id.includes('svelte')) return 'vendor-svelte';
+						if (id.includes('@fortawesome')) return 'vendor-icons';
+						if (id.includes('svelte-i18n')) return 'vendor-i18n';
+						if (id.includes('leaflet')) return 'vendor-leaflet';
 						return 'vendor';
 					}
 				}
@@ -115,7 +98,7 @@ export default defineConfig({
 		},
 		terserOptions: {
 			compress: {
-				drop_console: true, // Remove console.log in production
+				drop_console: true,
 				drop_debugger: true,
 				pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace']
 			}

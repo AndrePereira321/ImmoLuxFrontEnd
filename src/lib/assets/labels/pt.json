@@ -3,7 +3,12 @@
 	"houses": {
 		"title": "Explorar Casas",
 		"meta": {
+			"title": "Explorar Casas e Imóveis à Venda em Portugal",
 			"description": "Explore propriedades disponíveis em Portugal. Filtre por localização, preço e tipo. Encontre a sua casa ideal em moradias, apartamentos e terrenos premium."
+		},
+		"hero": {
+			"title": "Casas e Imóveis à Venda em Portugal",
+			"subtitle": "Filtre por localização, preço e tipo de imóvel"
 		},
 		"filters": "Filtros",
 		"allTypes": "Todos os Tipos",
@@ -79,7 +84,7 @@
 	},
 	"homepage": {
 		"meta": {
-			"title": "Propriedades de Luxo em Portugal",
+			"title": "Propriedades de Luxo à Venda em Portugal",
 			"description": "Descubra propriedades de sonho em Portugal. Moradias, apartamentos e terrenos premium nas melhores localizações. Imobiliário de qualidade excecional."
 		},
 		"availableHouses": {

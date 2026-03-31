@@ -3,7 +3,12 @@
 	"houses": {
 		"title": "Parcourir les Propriétés",
 		"meta": {
+			"title": "Maisons et Propriétés à Vendre au Portugal",
 			"description": "Explorez les propriétés disponibles au Portugal. Filtrez par emplacement, prix et type. Trouvez votre maison idéale parmi les villas, appartements et terrains premium."
+		},
+		"hero": {
+			"title": "Maisons et Propriétés à Vendre au Portugal",
+			"subtitle": "Filtrez par localisation, prix et type de bien"
 		},
 		"filters": "Filtres",
 		"allTypes": "Tous les Types",
@@ -79,7 +84,7 @@
 	},
 	"homepage": {
 		"meta": {
-			"title": "Propriétés de Luxe au Portugal",
+			"title": "Propriétés et Immobilier de Luxe au Portugal",
 			"description": "Découvrez des propriétés de rêve au Portugal. Villas, appartements et terrains premium dans les meilleurs emplacements. Immobilier de qualité exceptionnelle."
 		},
 		"availableHouses": {

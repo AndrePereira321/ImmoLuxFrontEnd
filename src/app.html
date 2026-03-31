@@ -12,10 +12,6 @@
 		<!-- SEO Meta Tags -->
 		<meta name="robots" content="index, follow" />
 		<meta name="author" content="ImmoLux" />
-		<meta
-			name="keywords"
-			content="imóveis Portugal, casas venda Portugal, propriedades luxo, imobiliário Portugal, moradias, apartamentos, terrenos"
-		/>
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
@@ -24,6 +20,19 @@
 
 		<!-- Twitter -->
 		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@ImmoLux" />
+
+		<!-- Organization structured data (global) -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "RealEstateAgent",
+				"@id": "https://immolux.pt/#organization",
+				"name": "ImmoLux",
+				"url": "https://immolux.pt",
+				"description": "Real estate platform for buying and selling properties in Portugal"
+			}
+		</script>
 
 		<title>ImmoLux</title>
 		%sveltekit.head%
