@@ -7,7 +7,6 @@
 	import AppFooter from '$lib/components/AppFooter.svelte';
 	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
 	import AppNotification from '$lib/components/AppNotification.svelte';
-	import { waitLocale } from 'svelte-i18n';
 	import { authStore } from '$lib/stores/auth';
 	import { onMount } from 'svelte';
 
@@ -17,7 +16,7 @@
 
 	onMount(async () => {
 		try {
-			await Promise.all([waitLocale(), authStore.checkAuth()]);
+			await authStore.checkAuth();
 		} finally {
 			loaded = true;
 		}
@@ -28,21 +27,22 @@
 	<link href={favicon} rel="icon" />
 </svelte:head>
 
-{#if loaded}
-	<div class="flex min-h-screen flex-col">
-		<div class="sticky top-0 z-50 shadow-xl">
-			<AppMenu></AppMenu>
-		</div>
-
-		<main class="flex-grow bg-light-300 px-4 py-8 dark:bg-dark-800">
-			{@render children?.()}
-		</main>
-
-		<AppFooter />
+<div class="flex min-h-screen flex-col">
+	<div class="sticky top-0 z-50 shadow-xl">
+		<AppMenu></AppMenu>
 	</div>
 
-	<!-- Notifications -->
-	<AppNotification />
-{:else}
+	<main class="flex-grow bg-light-300 px-4 py-8 dark:bg-dark-800">
+		{@render children?.()}
+	</main>
+
+	<AppFooter />
+</div>
+
+<!-- Notifications -->
+<AppNotification />
+
+<!-- Loading overlay — shown on client until auth check completes -->
+{#if !loaded}
 	<AppLoadingSpinner />
 {/if}
