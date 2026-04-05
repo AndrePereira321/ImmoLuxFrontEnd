@@ -2,8 +2,6 @@
 	import { _ } from 'svelte-i18n';
 	import { authStore } from '$lib/stores/auth';
 	import { notificationStore } from '$lib/stores/notification';
-	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 	import AppInput from '$lib/components/AppInput.svelte';
 	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
 
@@ -53,7 +51,7 @@
 </script>
 
 <div class="w-full">
-	<form onsubmit={handleSubmit} class="space-y-6">
+	<form onsubmit={handleSubmit} class="space-y-5">
 		<AppInput
 			id="email"
 			type="email"
@@ -80,15 +78,15 @@
 				type="checkbox"
 				bind:checked={rememberMe}
 				disabled={isLoading}
-				class="h-4 w-4 rounded border-light-600 text-primary-600 focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:focus:ring-primary-600"
+				class="h-4 w-4 rounded border-light-400 text-primary-600 focus:ring-2 focus:ring-primary-500/30 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:focus:ring-primary-600"
 			/>
-			<label for="rememberMe" class="ml-2 text-sm text-dark-900 dark:text-light-50">
+			<label for="rememberMe" class="ml-2 text-sm text-dark-600 dark:text-light-400">
 				{$_('auth.rememberMe')}
 			</label>
 		</div>
 
 		{#if error}
-			<div class="rounded-lg bg-error-50 p-4 text-sm text-error-700 dark:bg-error-950 dark:text-error-300">
+			<div class="rounded-xl bg-error-50 p-3.5 text-sm text-error-700 dark:bg-error-950/50 dark:text-error-300">
 				{error}
 			</div>
 		{/if}
@@ -96,11 +94,11 @@
 		<button
 			type="submit"
 			disabled={isLoading}
-			class="w-full rounded-lg bg-primary-600 px-6 py-4 text-base font-medium text-light-50 shadow-lg transition-all duration-200 hover:bg-primary-700 hover:shadow-xl focus:ring-4 focus:ring-primary-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:bg-primary-700 dark:hover:bg-primary-800 dark:focus:ring-primary-800"
+			class="w-full rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-semibold text-light-50 shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:ring-4 focus:ring-primary-200/50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:bg-primary-700 dark:hover:bg-primary-600 dark:focus:ring-primary-800/50"
 		>
 			{#if isLoading}
 				<span class="inline-flex items-center justify-center gap-2">
-					<FontAwesomeIcon icon={faSpinner} class="animate-spin" />
+					<span class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
 					{$_('auth.loggingIn')}
 				</span>
 			{:else}

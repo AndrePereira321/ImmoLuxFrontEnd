@@ -115,6 +115,37 @@
 				"partnerName": "PacaGroup"
 			}
 		},
+		"stats": {
+			"experience": "15",
+			"experienceLabel": "Anos de Experiência",
+			"properties": "50",
+			"propertiesLabel": "Propriedades Geridas",
+			"markets": "3",
+			"marketsLabel": "Mercados Europeus",
+			"satisfaction": "100",
+			"satisfactionLabel": "Dedicação ao Cliente"
+		},
+		"whyPortugal": {
+			"title": "Porquê Portugal",
+			"subtitle": "Um Destino de Excelência para Imobiliário",
+			"description": "Portugal combina o charme do Velho Mundo com sofisticação moderna, tornando-se um dos mercados imobiliários mais atrativos da Europa para compradores e investidores exigentes.",
+			"climate": {
+				"title": "Sol Todo o Ano",
+				"description": "Mais de 300 dias de sol por ano, invernos amenos e um clima mediterrânico que atrai pessoas de todo o mundo."
+			},
+			"investment": {
+				"title": "Crescimento Sólido do Mercado",
+				"description": "O mercado imobiliário português tem demonstrado uma valorização consistente, apoiado pela estabilidade económica e pela crescente procura internacional."
+			},
+			"lifestyle": {
+				"title": "Qualidade de Vida Excecional",
+				"description": "Gastronomia de classe mundial, rico património cultural, costas pristinas e uma comunidade calorosa e acolhedora."
+			},
+			"safety": {
+				"title": "Segurança e Estabilidade",
+				"description": "Consistentemente classificado entre os países mais seguros do mundo, com excelentes cuidados de saúde e infraestruturas modernas."
+			}
+		},
 		"contact": {
 			"title": "Inicie a Sua Jornada",
 			"subtitle": "Vamos Encontrar a Sua Propriedade Perfeita",

@@ -15,16 +15,16 @@
 			case 'primary':
 				return 'bg-light-50 dark:bg-dark-900';
 			case 'secondary':
-				return 'bg-light-100 dark:bg-dark-800';
+				return 'bg-light-100 dark:bg-dark-850';
 			case 'tertiary':
-				return 'bg-light-200 dark:bg-dark-850';
+				return 'bg-light-200 dark:bg-dark-800';
 			default:
 				return 'bg-light-50 dark:bg-dark-900';
 		}
 	});
 </script>
 
-<section class={`px-6 py-12 md:px-8 md:py-16 ${variantClasses()} ${className}`}>
+<section class={`px-4 py-16 sm:px-6 md:py-20 lg:px-8 lg:py-24 ${variantClasses()} ${className}`}>
 	<div class={fullWidth ? 'mx-auto max-w-full' : 'mx-auto max-w-7xl'}>
 		{@render children?.()}
 	</div>

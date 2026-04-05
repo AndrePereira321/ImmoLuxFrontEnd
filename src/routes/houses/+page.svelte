@@ -3,7 +3,6 @@
 	import { apiClient } from '$lib/api/api-client';
 	import type { LocationsResponse, PropertyDTO } from '$lib/types/property';
 	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
-	import AppLoadingSpinner from '$lib/components/AppLoadingSpinner.svelte';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
@@ -31,23 +30,18 @@
 
 	let { data } = $props();
 
-	// Capture initial server values non-reactively — intentionally only the initial value.
-	// properties/total/propertyImageMap are subsequently managed by client-side loadProperties().
 	const { properties: _initProperties, total: _initTotal, propertyImageMap: _initMap } = untrack(() => data);
 
-	// Mutable state for client-side updates
 	let properties = $state<PropertyDTO[]>(_initProperties);
 	let total = $state<number>(_initTotal);
 	let loading = $state(false);
 	let showFilters = $state(false);
 
-	// Locations data
 	let districts = $state<string[]>([]);
 	let municipalities = $state<string[]>([]);
 	let parishes = $state<string[]>([]);
 	let loadingLocations = $state(false);
 
-	// Filters
 	let filters = $state({
 		district: '',
 		municipality: '',
@@ -61,21 +55,17 @@
 		offset: 0
 	});
 
-	// Image IDs map
 	let propertyImageMap = $state<PropertyImageMap>(_initMap);
 
-	// Initialize on mount — properties already loaded from server
 	onMount(() => {
 		loadLocations();
 	});
 
-	// Pagination
 	const currentPage = $derived(Math.floor(filters.offset / filters.limit) + 1);
 	const totalPages = $derived(Math.ceil(total / filters.limit));
 	const hasNextPage = $derived(currentPage < totalPages);
 	const hasPrevPage = $derived(currentPage > 1);
 
-	// Active filters count
 	const activeFiltersCount = $derived(
 		[
 			filters.district,
@@ -89,13 +79,10 @@
 	);
 
 	const loadLocations = async () => {
-		// Already loaded from server
 		if (districts.length > 0) return;
-
 		loadingLocations = true;
 		try {
 			const response = await apiClient.get<LocationsResponse>('/locations');
-
 			if (response.data.success) {
 				districts = response.data.data.districts;
 				municipalities = response.data.data.municipalities;
@@ -113,16 +100,12 @@
 			const response = await apiClient.get<{ images: { id: number; displayOrder: number }[] }>(
 				`/properties/${propertyId}/images`
 			);
-
 			if (response.data.success && response.data.data) {
 				const images = response.data.data.images;
-				// Ensure images is an array
 				if (Array.isArray(images)) {
-					const sortedImageIds = images
+					propertyImageMap[propertyId] = images
 						.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
 						.map((img) => img.id!);
-
-					propertyImageMap[propertyId] = sortedImageIds;
 				} else {
 					propertyImageMap[propertyId] = [];
 				}
@@ -139,7 +122,6 @@
 		loading = true;
 		try {
 			const params = new SvelteURLSearchParams();
-
 			if (filters.district) params.append('district', filters.district);
 			if (filters.municipality) params.append('municipality', filters.municipality);
 			if (filters.parish) params.append('parish', filters.parish);
@@ -152,12 +134,9 @@
 			params.append('offset', filters.offset.toString());
 
 			const response = await apiClient.get<PropertyListResponse>(`/properties?${params.toString()}`);
-
 			if (response.data.success) {
 				properties = response.data.data.properties;
 				total = response.data.data.total;
-
-				// Load images for all properties
 				propertyImageMap = {};
 				await Promise.all(properties.map((property) => property.id && loadPropertyImages(property.id)));
 			}
@@ -192,23 +171,64 @@
 	};
 
 	const nextPage = () => {
-		if (hasNextPage) {
-			goToPage(currentPage + 1);
-		}
+		if (hasNextPage) goToPage(currentPage + 1);
 	};
-
 	const prevPage = () => {
-		if (hasPrevPage) {
-			goToPage(currentPage - 1);
-		}
+		if (hasPrevPage) goToPage(currentPage - 1);
 	};
 
 	const toggleFilters = () => {
 		showFilters = !showFilters;
-		if (showFilters) {
-			loadLocations();
-		}
+		if (showFilters) loadLocations();
 	};
+
+	const propertyTypes = $derived([
+		{ value: '', label: $_('houses.allTypes') },
+		{ value: 'house', label: $_('properties.types.house') },
+		{ value: 'apartment', label: $_('properties.types.apartment') },
+		{ value: 'villa', label: $_('properties.types.villa') },
+		{ value: 'townhouse', label: $_('properties.types.townhouse') },
+		{ value: 'land', label: $_('properties.types.land') },
+		{ value: 'commercial', label: $_('properties.types.commercial') }
+	]);
+
+	const statusOptions = $derived([
+		{
+			value: '',
+			label: $_('houses.allStatuses'),
+			dot: 'bg-dark-400 dark:bg-light-600',
+			active: 'bg-dark-900 text-white dark:bg-light-50 dark:text-dark-900',
+			hover: 'hover:bg-light-200 dark:hover:bg-dark-700'
+		},
+		{
+			value: 'available',
+			label: $_('properties.statuses.available'),
+			dot: 'bg-success-500',
+			active: 'bg-success-600 text-white ring-2 ring-success-200 dark:ring-success-800',
+			hover: 'hover:bg-success-50 hover:text-success-700 dark:hover:bg-success-950/40 dark:hover:text-success-300'
+		},
+		{
+			value: 'pending',
+			label: $_('properties.statuses.pending'),
+			dot: 'bg-warning-400',
+			active: 'bg-warning-500 text-white ring-2 ring-warning-200 dark:ring-warning-800',
+			hover: 'hover:bg-warning-50 hover:text-warning-700 dark:hover:bg-warning-950/40 dark:hover:text-warning-300'
+		},
+		{
+			value: 'sold',
+			label: $_('properties.statuses.sold'),
+			dot: 'bg-error-500',
+			active: 'bg-error-600 text-white ring-2 ring-error-200 dark:ring-error-800',
+			hover: 'hover:bg-error-50 hover:text-error-700 dark:hover:bg-error-950/40 dark:hover:text-error-300'
+		},
+		{
+			value: 'rented',
+			label: $_('properties.statuses.rented'),
+			dot: 'bg-info-500',
+			active: 'bg-info-600 text-white ring-2 ring-info-200 dark:ring-info-800',
+			hover: 'hover:bg-info-50 hover:text-info-700 dark:hover:bg-info-950/40 dark:hover:text-info-300'
+		}
+	]);
 </script>
 
 <svelte:head>
@@ -224,7 +244,6 @@
 	<meta name="twitter:description" content={$_('houses.meta.description')} />
 	<meta name="twitter:image" content="https://immolux.pt{homeImage}" />
 	<link rel="canonical" href="https://immolux.pt/houses" />
-	<!-- CollectionPage structured data -->
 	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
@@ -239,147 +258,192 @@
 </svelte:head>
 
 <div class="min-h-screen bg-light-50 dark:bg-dark-900">
-	<!-- Hero Section -->
-	<div class="relative overflow-hidden">
-		<!-- Background Image -->
-		<div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url({homeImage})"></div>
+	<!-- ─── Hero Strip ─────────────────────────────────────────────── -->
+	<section class="relative overflow-hidden" style="height: 260px">
+		<!-- Background photo -->
+		<div class="absolute inset-0 bg-cover bg-center" style="background-image: url({homeImage})"></div>
+		<!-- Gradient overlay: dark left, lighter right -->
+		<div
+			class="absolute inset-0"
+			style="background: linear-gradient(120deg, rgba(10,20,45,0.92) 0%, rgba(10,20,45,0.72) 55%, rgba(10,20,45,0.45) 100%)"
+		></div>
+		<!-- Diagonal clip at bottom (matches page bg) -->
+		<div
+			class="absolute right-0 bottom-0 left-0 h-14 bg-light-50 dark:bg-dark-900"
+			style="clip-path: polygon(0 100%, 100% 30%, 100% 100%)"
+		></div>
 
-		<!-- Transparent Overlay -->
-		<div class="absolute inset-0 bg-primary-900/70 dark:bg-dark-950/80"></div>
-
-		<div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-			<div class="text-center">
-				<div class="mb-4 flex justify-center">
-					<div class="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
-						<FontAwesomeIcon icon={faHome} class="text-4xl text-white" />
-					</div>
-				</div>
-				<h1 class="mb-4 text-5xl font-bold tracking-tight text-white drop-shadow-lg sm:text-6xl">
+		<div class="relative flex h-full items-center">
+			<div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+				<p
+					class="mb-3 text-[0.688rem] font-semibold tracking-[0.22em] text-secondary-300 uppercase"
+					style="animation: fadeInUp 0.5s ease-out; font-family: 'Plus Jakarta Sans', sans-serif"
+				>
+					Portugal · Imobiliário de Luxo
+				</p>
+				<h1
+					class="mb-4 text-4xl font-normal tracking-tight text-white drop-shadow-sm sm:text-5xl"
+					style="animation: fadeInUp 0.5s ease-out 0.1s both"
+				>
 					{$_('houses.hero.title')}
 				</h1>
-				<p class="mx-auto max-w-2xl text-xl text-white drop-shadow-md">
-					{$_('houses.hero.subtitle')}
-				</p>
+				<div
+					class="flex items-center gap-4"
+					style="animation: fadeInUp 0.5s ease-out 0.2s both; font-family: 'Plus Jakarta Sans', sans-serif"
+				>
+					<p class="text-sm text-white/65">{$_('houses.hero.subtitle')}</p>
+					{#if !loading && total > 0}
+						<div class="h-px w-8 flex-shrink-0 bg-secondary-400/50"></div>
+						<p class="text-sm font-semibold text-secondary-200">
+							{total}
+							{total === 1 ? $_('houses.property') : $_('houses.properties')}
+						</p>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ─── Sticky Availability & Sort Bar ────────────────────────── -->
+	<div
+		class="sticky top-16 z-40 border-b border-light-200/80 bg-white/92 backdrop-blur-md dark:border-dark-700/70 dark:bg-dark-900/92"
+	>
+		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+			<div
+				class="flex items-center gap-3 overflow-x-auto py-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+			>
+				<!-- Availability status chips -->
+				<div class="flex flex-shrink-0 items-center gap-1.5">
+					{#each statusOptions as opt (opt.value)}
+						<button
+							type="button"
+							onclick={() => {
+								filters.status = opt.value;
+								handleFilterChange();
+							}}
+							class="flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 {filters.status ===
+							opt.value
+								? opt.active
+								: `bg-light-100 text-dark-600 dark:bg-dark-800 dark:text-light-400 ${opt.hover}`}"
+						>
+							<span
+								class="h-1.5 w-1.5 flex-shrink-0 rounded-full {filters.status === opt.value ? 'bg-white/80' : opt.dot}"
+							></span>
+							{opt.label}
+						</button>
+					{/each}
+				</div>
+
+				<!-- Divider -->
+				<div class="mx-1 h-5 w-px flex-shrink-0 bg-light-300 dark:bg-dark-600"></div>
+
+				<!-- Sort -->
+				<select
+					bind:value={filters.orderBy}
+					onchange={handleFilterChange}
+					class="flex-shrink-0 rounded-lg border border-light-200 bg-transparent py-1.5 pr-7 pl-3 text-xs font-medium text-dark-600 focus:border-primary-400 focus:outline-none dark:border-dark-700 dark:text-light-400"
+					style="font-family: 'Plus Jakarta Sans', sans-serif"
+				>
+					<option value="created_desc">{$_('houses.sort.newest')}</option>
+					<option value="popularity">{$_('houses.sort.popular')}</option>
+					<option value="status">{$_('houses.sort.status')}</option>
+					<option value="price_asc">{$_('houses.sort.priceLowHigh')}</option>
+					<option value="price_desc">{$_('houses.sort.priceHighLow')}</option>
+					<option value="location">{$_('houses.sort.location')}</option>
+					<option value="created_asc">{$_('houses.sort.oldest')}</option>
+				</select>
+
+				<!-- Results count (right-aligned) -->
+				<div
+					class="ml-auto flex-shrink-0 text-xs text-dark-400 dark:text-light-600"
+					style="font-family: 'Plus Jakarta Sans', sans-serif"
+				>
+					{#if loading}
+						<span class="animate-pulse">{$_('houses.loading')}</span>
+					{:else}
+						{total} {total === 1 ? $_('houses.property') : $_('houses.properties')}
+					{/if}
+				</div>
+
+				<!-- Clear filters -->
+				{#if activeFiltersCount > 0}
+					<button
+						type="button"
+						onclick={clearFilters}
+						class="flex flex-shrink-0 items-center gap-1 text-xs font-medium text-error-600 transition-colors hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+					>
+						<FontAwesomeIcon icon={faTimes} class="text-[0.55rem]" />
+						{$_('houses.clearFilters')}
+					</button>
+				{/if}
 			</div>
 		</div>
 	</div>
 
-	<!-- Main Content -->
-	<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-		<!-- Filters & Sort Bar -->
-		<div class="mb-8">
-			<div class="rounded-xl border border-light-300 bg-white p-4 shadow-sm dark:border-dark-700 dark:bg-dark-800">
-				<!-- Top Row: Filter Toggle, Sort, Results Count -->
-				<div class="flex flex-wrap items-center justify-between gap-3">
-					<div class="flex flex-wrap items-center gap-2">
-						<!-- Filter Toggle Button -->
-						<button
-							type="button"
-							onclick={toggleFilters}
-							class="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600"
-						>
-							<FontAwesomeIcon icon={faFilter} />
-							<span>{$_('houses.filters')}</span>
-							{#if activeFiltersCount > 0}
-								<span
-									class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-primary-600"
-								>
-									{activeFiltersCount}
-								</span>
-							{/if}
-						</button>
+	<!-- ─── Main Content ───────────────────────────────────────────── -->
+	<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+		<!-- Mobile filter toggle -->
+		<div class="mb-5 lg:hidden">
+			<button
+				type="button"
+				onclick={toggleFilters}
+				class="inline-flex items-center gap-2 rounded-xl border border-light-300 bg-white px-4 py-2.5 text-sm font-semibold text-dark-700 shadow-sm transition-all hover:border-primary-300 hover:text-primary-700 dark:border-dark-600 dark:bg-dark-800 dark:text-light-200 dark:hover:border-primary-600 dark:hover:text-primary-300"
+			>
+				<FontAwesomeIcon icon={faFilter} class="text-xs text-primary-500" />
+				{$_('houses.filters')}
+				{#if activeFiltersCount > 0}
+					<span
+						class="flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-[0.6rem] font-bold text-white"
+					>
+						{activeFiltersCount}
+					</span>
+				{/if}
+			</button>
+		</div>
 
-						<!-- Quick Filter Buttons -->
-						<button
-							type="button"
-							onclick={() => {
-								filters.minPrice = null;
-								filters.maxPrice = 200000;
-								filters.status = 'available';
-								handleFilterChange();
-							}}
-							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
+		<!-- Two-column: Sidebar + Grid -->
+		<div class="lg:grid lg:grid-cols-[248px_1fr] lg:gap-10 xl:gap-12">
+			<!-- ─── Filter Sidebar ───────────────────────────────── -->
+			<aside class="{showFilters ? 'block' : 'hidden'} mb-8 lg:mb-0 lg:block">
+				<div class="sticky top-32 space-y-4">
+					<!-- Sidebar header (desktop) -->
+					<div class="hidden items-center justify-between lg:flex">
+						<h2
+							class="text-xs font-semibold tracking-wider text-dark-500 uppercase dark:text-light-600"
+							style="font-family: 'Plus Jakarta Sans', sans-serif"
 						>
-							💰 {$_('houses.quickFilters.under200k')}
-						</button>
-						<button
-							type="button"
-							onclick={() => {
-								filters.minPrice = 200000;
-								filters.maxPrice = 500000;
-								filters.status = 'available';
-								handleFilterChange();
-							}}
-							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
-						>
-							💎 {$_('houses.quickFilters.between200k500k')}
-						</button>
-						<button
-							type="button"
-							onclick={() => {
-								filters.minPrice = 500000;
-								filters.maxPrice = null;
-								filters.status = 'available';
-								handleFilterChange();
-							}}
-							class="hidden rounded-lg border border-light-300 bg-white px-3 py-2 text-sm font-medium text-dark-700 transition-colors hover:border-primary-500 hover:bg-primary-50 hover:text-primary-700 md:inline-flex dark:border-dark-600 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-500 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
-						>
-							👑 {$_('houses.quickFilters.luxury500k')}
-						</button>
-					</div>
-
-					<div class="flex flex-wrap items-center gap-4">
-						<!-- Sort Dropdown -->
-						<div class="flex items-center gap-2">
-							<select
-								bind:value={filters.orderBy}
-								onchange={handleFilterChange}
-								class="rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 font-medium text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
-							>
-								<option value="created_desc">{$_('houses.sort.newest')}</option>
-								<option value="popularity">{$_('houses.sort.popular')}</option>
-								<option value="status">{$_('houses.sort.status')}</option>
-								<option value="price_asc">{$_('houses.sort.priceLowHigh')}</option>
-								<option value="price_desc">{$_('houses.sort.priceHighLow')}</option>
-								<option value="location">{$_('houses.sort.location')}</option>
-								<option value="created_asc">{$_('houses.sort.oldest')}</option>
-							</select>
-						</div>
-
-						<!-- Clear Filters Button -->
+							{$_('houses.filters')}
+						</h2>
 						{#if activeFiltersCount > 0}
 							<button
 								type="button"
 								onclick={clearFilters}
-								class="flex items-center gap-2 rounded-lg border border-error-500 px-3 py-2 text-sm font-medium text-error-600 transition-colors hover:bg-error-50 dark:border-error-400 dark:text-error-400 dark:hover:bg-error-900/20"
+								class="text-[0.688rem] font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
 							>
-								<FontAwesomeIcon icon={faTimes} />
-								<span>{$_('houses.clearFilters')}</span>
+								{$_('houses.clearFilters')}
 							</button>
 						{/if}
-
-						<!-- Results Count -->
-						<div class="text-sm font-semibold text-dark-600 dark:text-light-400">
-							{#if loading}
-								<span>{$_('houses.loading')}</span>
-							{:else}
-								<span>
-									{total}
-									{total === 1 ? $_('houses.property') : $_('houses.properties')}
-								</span>
-							{/if}
-						</div>
 					</div>
-				</div>
 
-				<!-- Filters Panel (Collapsible) -->
-				{#if showFilters}
-					<div class="mt-6 border-t border-light-200 pt-6 dark:border-dark-700">
-						<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-							<!-- District -->
+					<!-- Location -->
+					<div
+						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
+					>
+						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
+							<h3
+								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
+								style="font-family: 'Plus Jakarta Sans', sans-serif"
+							>
+								<FontAwesomeIcon icon={faMapMarkerAlt} class="text-primary-400" />
+								{$_('properties.district')}
+							</h3>
+						</div>
+						<div class="space-y-3 p-5">
 							<div>
-								<label for="district" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
-									<FontAwesomeIcon icon={faMapMarkerAlt} class="mr-1.5 text-primary-600" />
+								<label
+									for="district"
+									class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600"
+								>
 									{$_('properties.district')}
 								</label>
 								<select
@@ -387,7 +451,7 @@
 									bind:value={filters.district}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
+									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectDistrict')}</option>
 									{#each districts as district (district)}
@@ -395,10 +459,11 @@
 									{/each}
 								</select>
 							</div>
-
-							<!-- Municipality -->
 							<div>
-								<label for="municipality" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
+								<label
+									for="municipality"
+									class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600"
+								>
 									{$_('properties.municipality')}
 								</label>
 								<select
@@ -406,7 +471,7 @@
 									bind:value={filters.municipality}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
+									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectMunicipality')}</option>
 									{#each municipalities as municipality (municipality)}
@@ -414,10 +479,8 @@
 									{/each}
 								</select>
 							</div>
-
-							<!-- Parish -->
 							<div>
-								<label for="parish" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
+								<label for="parish" class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600">
 									{$_('properties.parish')}
 								</label>
 								<select
@@ -425,7 +488,7 @@
 									bind:value={filters.parish}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
+									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectParish')}</option>
 									{#each parishes as parish (parish)}
@@ -433,191 +496,241 @@
 									{/each}
 								</select>
 							</div>
+						</div>
+					</div>
 
-							<!-- Property Type -->
-							<div>
-								<label for="propertyType" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
-									<FontAwesomeIcon icon={faHome} class="mr-1.5 text-primary-600" />
-									{$_('properties.propertyType')}
-								</label>
-								<select
-									id="propertyType"
-									bind:value={filters.propertyType}
-									onchange={handleFilterChange}
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
+					<!-- Property Type -->
+					<div
+						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
+					>
+						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
+							<h3
+								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
+								style="font-family: 'Plus Jakarta Sans', sans-serif"
+							>
+								<FontAwesomeIcon icon={faHome} class="text-primary-400" />
+								{$_('properties.propertyType')}
+							</h3>
+						</div>
+						<div class="flex flex-wrap gap-1.5 p-5">
+							{#each propertyTypes as type (type.value)}
+								<button
+									type="button"
+									onclick={() => {
+										filters.propertyType = type.value;
+										handleFilterChange();
+									}}
+									class="rounded-lg border px-3 py-1.5 text-xs font-medium transition-all {filters.propertyType ===
+									type.value
+										? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-600/80 dark:bg-primary-950/60 dark:text-primary-300'
+										: 'border-light-300 bg-light-50 text-dark-500 hover:border-primary-300 hover:bg-primary-50/50 hover:text-primary-600 dark:border-dark-600 dark:bg-dark-700/50 dark:text-light-500 dark:hover:border-primary-700 dark:hover:text-primary-400'}"
 								>
-									<option value="">{$_('houses.allTypes')}</option>
-									<option value="house">{$_('properties.types.house')}</option>
-									<option value="apartment">{$_('properties.types.apartment')}</option>
-									<option value="villa">{$_('properties.types.villa')}</option>
-									<option value="townhouse">{$_('properties.types.townhouse')}</option>
-									<option value="land">{$_('properties.types.land')}</option>
-									<option value="commercial">{$_('properties.types.commercial')}</option>
-								</select>
-							</div>
+									{type.label}
+								</button>
+							{/each}
+						</div>
+					</div>
 
-							<!-- Status -->
-							<div>
-								<label for="status" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
-									{$_('properties.status')}
-								</label>
-								<select
-									id="status"
-									bind:value={filters.status}
-									onchange={handleFilterChange}
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
+					<!-- Price Range -->
+					<div
+						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
+					>
+						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
+							<h3
+								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
+								style="font-family: 'Plus Jakarta Sans', sans-serif"
+							>
+								<FontAwesomeIcon icon={faEuroSign} class="text-primary-400" />
+								{$_('houses.minPrice')} – {$_('houses.maxPrice')}
+							</h3>
+						</div>
+						<div class="p-5">
+							<div class="mb-3 grid grid-cols-2 gap-2">
+								<div class="relative">
+									<span
+										class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.688rem] text-dark-400 dark:text-light-700"
+										>€</span
+									>
+									<input
+										type="number"
+										bind:value={filters.minPrice}
+										onchange={handleFilterChange}
+										placeholder="Min"
+										min="0"
+										step="1000"
+										class="w-full rounded-lg border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+									/>
+								</div>
+								<div class="relative">
+									<span
+										class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.688rem] text-dark-400 dark:text-light-700"
+										>€</span
+									>
+									<input
+										type="number"
+										bind:value={filters.maxPrice}
+										onchange={handleFilterChange}
+										placeholder="Max"
+										min="0"
+										step="1000"
+										class="w-full rounded-lg border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+									/>
+								</div>
+							</div>
+							<!-- Price presets -->
+							<div class="space-y-0.5 border-t border-light-100 pt-3 dark:border-dark-700/60">
+								<button
+									type="button"
+									onclick={() => {
+										filters.minPrice = null;
+										filters.maxPrice = 200000;
+										handleFilterChange();
+									}}
+									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
 								>
-									<option value="">{$_('houses.allStatuses')}</option>
-									<option value="available">{$_('properties.statuses.available')}</option>
-									<option value="pending">{$_('properties.statuses.pending')}</option>
-									<option value="sold">{$_('properties.statuses.sold')}</option>
-									<option value="rented">{$_('properties.statuses.rented')}</option>
-								</select>
-							</div>
-
-							<!-- Min Price -->
-							<div>
-								<label for="minPrice" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
-									<FontAwesomeIcon icon={faEuroSign} class="mr-1.5 text-primary-600" />
-									{$_('houses.minPrice')}
-								</label>
-								<input
-									id="minPrice"
-									type="number"
-									bind:value={filters.minPrice}
-									onchange={handleFilterChange}
-									placeholder="0"
-									min="0"
-									step="1000"
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
-								/>
-							</div>
-
-							<!-- Max Price -->
-							<div>
-								<label for="maxPrice" class="mb-2 block text-sm font-semibold text-dark-700 dark:text-light-300">
-									{$_('houses.maxPrice')}
-								</label>
-								<input
-									id="maxPrice"
-									type="number"
-									bind:value={filters.maxPrice}
-									onchange={handleFilterChange}
-									placeholder="∞"
-									min="0"
-									step="1000"
-									class="w-full rounded-lg border border-light-400 bg-light-50 px-4 py-2.5 text-dark-900 transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-light-50"
-								/>
+									{$_('houses.quickFilters.under200k')}
+								</button>
+								<button
+									type="button"
+									onclick={() => {
+										filters.minPrice = 200000;
+										filters.maxPrice = 500000;
+										handleFilterChange();
+									}}
+									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
+								>
+									{$_('houses.quickFilters.between200k500k')}
+								</button>
+								<button
+									type="button"
+									onclick={() => {
+										filters.minPrice = 500000;
+										filters.maxPrice = null;
+										handleFilterChange();
+									}}
+									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
+								>
+									{$_('houses.quickFilters.luxury500k')}
+								</button>
 							</div>
 						</div>
+					</div>
+				</div>
+			</aside>
 
-						<!-- Clear Filters Button -->
-						{#if activeFiltersCount > 0}
-							<div class="mt-6 flex justify-end">
+			<!-- ─── Property Grid ────────────────────────────────── -->
+			<div class="min-w-0">
+				{#if loading}
+					<!-- Loading -->
+					<div class="flex min-h-[50vh] items-center justify-center">
+						<div class="text-center">
+							<div class="relative mx-auto mb-4 h-10 w-10">
+								<div class="absolute inset-0 rounded-full border-2 border-light-300 dark:border-dark-700"></div>
+								<div
+									class="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-600 dark:border-t-primary-400"
+									style="animation-duration: 0.75s"
+								></div>
+							</div>
+							<p class="text-sm text-dark-400 dark:text-light-600">{$_('houses.loading')}</p>
+						</div>
+					</div>
+				{:else if properties.length === 0}
+					<!-- Empty State -->
+					<div
+						class="flex min-h-[50vh] items-center justify-center rounded-2xl border border-dashed border-light-300/80 dark:border-dark-700/60"
+					>
+						<div class="px-8 py-16 text-center">
+							<div
+								class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-light-300/80 bg-light-100 dark:border-dark-700/60 dark:bg-dark-800"
+							>
+								<FontAwesomeIcon icon={faHome} class="text-3xl text-dark-300/50 dark:text-light-700/30" />
+							</div>
+							<h2
+								class="mb-2 text-xl font-normal text-dark-800 dark:text-light-100"
+								style="font-family: 'Playfair Display', Georgia, serif"
+							>
+								{$_('houses.noProperties')}
+							</h2>
+							<p class="mb-7 text-sm text-dark-400 dark:text-light-600">
+								{$_('houses.noPropertiesDescription')}
+							</p>
+							{#if activeFiltersCount > 0}
 								<button
 									type="button"
 									onclick={clearFilters}
-									class="flex items-center gap-2 rounded-lg border-2 border-error-600 px-4 py-2 font-semibold text-error-600 transition-colors hover:bg-error-50 dark:border-error-400 dark:text-error-400 dark:hover:bg-error-900/20"
+									class="rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600"
 								>
-									<FontAwesomeIcon icon={faTimes} />
-									<span>{$_('houses.clearFilters')}</span>
+									{$_('houses.clearFilters')}
+								</button>
+							{/if}
+						</div>
+					</div>
+				{:else}
+					<!-- Grid -->
+					<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+						{#each properties as property, i (property.id)}
+							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+							<a
+								href="/houses/{property.id}"
+								class="group block transition-all duration-300 hover:-translate-y-1"
+								style="animation: fadeInUp 0.45s ease-out {i * 0.05}s both"
+							>
+								<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id ?? 0] || []} />
+							</a>
+						{/each}
+					</div>
+
+					<!-- Pagination -->
+					{#if totalPages > 1}
+						<div class="mt-14 flex flex-col items-center gap-3">
+							<div class="flex items-center gap-1.5">
+								<button
+									type="button"
+									onclick={prevPage}
+									disabled={!hasPrevPage}
+									aria-label="Previous page"
+									class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
+								>
+									<FontAwesomeIcon icon={faChevronLeft} class="text-xs" />
+								</button>
+
+								{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page (page)}
+									{#if page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)}
+										<button
+											type="button"
+											onclick={() => goToPage(page)}
+											class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition-all {page ===
+											currentPage
+												? 'border-primary-600 bg-primary-600 text-white shadow-sm'
+												: 'border-light-300 bg-white text-dark-600 shadow-sm hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300'}"
+										>
+											{page}
+										</button>
+									{:else if page === currentPage - 3 || page === currentPage + 3}
+										<span class="flex h-9 w-9 items-center justify-center text-sm text-dark-400 dark:text-light-600"
+											>…</span
+										>
+									{/if}
+								{/each}
+
+								<button
+									type="button"
+									onclick={nextPage}
+									disabled={!hasNextPage}
+									aria-label="Next page"
+									class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
+								>
+									<FontAwesomeIcon icon={faChevronRight} class="text-xs" />
 								</button>
 							</div>
-						{/if}
-					</div>
+
+							<p class="text-xs text-dark-400 dark:text-light-600" style="font-family: 'Plus Jakarta Sans', sans-serif">
+								{$_('houses.pageInfo', { values: { current: currentPage, total: totalPages } })}
+							</p>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>
-
-		<!-- Loading State -->
-		{#if loading}
-			<AppLoadingSpinner message={$_('houses.loading')} overlay={false} />
-		{:else if properties.length === 0}
-			<!-- Empty State -->
-			<div class="flex min-h-[400px] items-center justify-center">
-				<div class="text-center">
-					<div class="mb-4 flex justify-center">
-						<div class="flex h-24 w-24 items-center justify-center rounded-full bg-light-200 dark:bg-dark-700">
-							<FontAwesomeIcon icon={faHome} class="text-5xl text-dark-300 dark:text-light-600" />
-						</div>
-					</div>
-					<h2 class="mb-2 text-2xl font-bold text-dark-900 dark:text-light-50">
-						{$_('houses.noProperties')}
-					</h2>
-					<p class="mb-6 text-dark-600 dark:text-light-400">
-						{$_('houses.noPropertiesDescription')}
-					</p>
-					{#if activeFiltersCount > 0}
-						<button
-							type="button"
-							onclick={clearFilters}
-							class="rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600"
-						>
-							{$_('houses.clearFilters')}
-						</button>
-					{/if}
-				</div>
-			</div>
-		{:else}
-			<!-- Properties Grid -->
-			<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-				{#each properties as property (property.id)}
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-					<a href="/houses/{property.id}" class="block transition-transform duration-200 hover:scale-[1.02]">
-						<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id ?? 0] || []} />
-					</a>
-				{/each}
-			</div>
-
-			<!-- Pagination -->
-			{#if totalPages > 1}
-				<div class="mt-12 flex items-center justify-center gap-2">
-					<!-- Previous Button -->
-					<button
-						type="button"
-						onclick={prevPage}
-						disabled={!hasPrevPage}
-						class="flex h-10 w-10 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-900 transition-all hover:bg-light-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-dark-700 dark:bg-dark-800 dark:text-light-50 dark:hover:bg-dark-700"
-						aria-label="Previous page"
-					>
-						<FontAwesomeIcon icon={faChevronLeft} />
-					</button>
-
-					<!-- Page Numbers -->
-					{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page (page)}
-						{#if page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)}
-							<button
-								type="button"
-								onclick={() => goToPage(page)}
-								class="flex h-10 w-10 items-center justify-center rounded-lg border font-semibold transition-all {page ===
-								currentPage
-									? 'border-primary-600 bg-primary-600 text-white dark:border-primary-500 dark:bg-primary-500'
-									: 'border-light-300 bg-white text-dark-900 hover:bg-light-100 dark:border-dark-700 dark:bg-dark-800 dark:text-light-50 dark:hover:bg-dark-700'}"
-							>
-								{page}
-							</button>
-						{:else if page === currentPage - 3 || page === currentPage + 3}
-							<span class="flex h-10 w-10 items-center justify-center text-dark-500 dark:text-light-500">...</span>
-						{/if}
-					{/each}
-
-					<!-- Next Button -->
-					<button
-						type="button"
-						onclick={nextPage}
-						disabled={!hasNextPage}
-						class="flex h-10 w-10 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-900 transition-all hover:bg-light-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-dark-700 dark:bg-dark-800 dark:text-light-50 dark:hover:bg-dark-700"
-						aria-label="Next page"
-					>
-						<FontAwesomeIcon icon={faChevronRight} />
-					</button>
-				</div>
-
-				<!-- Page Info -->
-				<div class="mt-4 text-center text-sm text-dark-600 dark:text-light-400">
-					{$_('houses.pageInfo', { values: { current: currentPage, total: totalPages } })}
-				</div>
-			{/if}
-		{/if}
 	</div>
 </div>

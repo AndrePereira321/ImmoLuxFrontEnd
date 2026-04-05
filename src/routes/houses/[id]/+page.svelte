@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
-		faArrowLeft,
 		faBath,
 		faBed,
 		faBolt,
@@ -14,6 +12,7 @@
 		faChevronRight,
 		faElevator,
 		faEnvelope,
+		faExpand,
 		faLayerGroup,
 		faMapMarkerAlt,
 		faPhone,
@@ -21,11 +20,13 @@
 		faSwimmingPool,
 		faTree,
 		faUser,
-		faWarehouse
+		faWarehouse,
+		faXmark
 	} from '@fortawesome/free-solid-svg-icons';
 	import type { PropertyDTO } from '$lib/types/property';
 	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
+	import { inview } from '$lib/actions/inview';
 
 	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -43,11 +44,24 @@
 	let Popup = $state<LeafletComponent>(null);
 	let mapReady = $state(false);
 	let serverUrl = $state('');
+	let lightboxOpen = $state(false);
 
 	$effect(() => {
 		if (browser) {
 			serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
 		}
+	});
+
+	// Close lightbox on Escape key
+	$effect(() => {
+		if (!browser || !lightboxOpen) return;
+		const handleKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') lightboxOpen = false;
+			if (e.key === 'ArrowRight') nextImage();
+			if (e.key === 'ArrowLeft') prevImage();
+		};
+		window.addEventListener('keydown', handleKey);
+		return () => window.removeEventListener('keydown', handleKey);
 	});
 
 	const formatPrice = (price?: number): string => {
@@ -68,15 +82,15 @@
 	const getStatusColor = (status?: string): string => {
 		switch (status) {
 			case 'available':
-				return 'bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200';
+				return 'bg-success-100/90 text-success-800 dark:bg-success-900/80 dark:text-success-200';
 			case 'pending':
-				return 'bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-200';
+				return 'bg-warning-100/90 text-warning-800 dark:bg-warning-900/80 dark:text-warning-200';
 			case 'sold':
-				return 'bg-error-100 text-error-800 dark:bg-error-900 dark:text-error-200';
+				return 'bg-error-100/90 text-error-800 dark:bg-error-900/80 dark:text-error-200';
 			case 'rented':
-				return 'bg-info-100 text-info-800 dark:bg-info-900 dark:text-info-200';
+				return 'bg-info-100/90 text-info-800 dark:bg-info-900/80 dark:text-info-200';
 			default:
-				return 'bg-light-200 text-dark-800 dark:bg-dark-700 dark:text-light-200';
+				return 'bg-light-200/90 text-dark-800 dark:bg-dark-700/80 dark:text-light-200';
 		}
 	};
 
@@ -246,39 +260,61 @@
 </svelte:head>
 
 {#if loading}
-	<div
-		class="flex min-h-screen items-center justify-center bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900 dark:to-dark-850"
-	>
+	<div class="flex min-h-screen items-center justify-center bg-light-50 dark:bg-dark-900">
 		<div class="text-center">
-			<FontAwesomeIcon icon={faRulerCombined} class="animate-spin text-6xl text-primary-600 dark:text-primary-400" />
-			<p class="mt-4 text-sm font-medium text-dark-600 dark:text-light-400">{$_('houses.loading')}</p>
+			<div class="relative mx-auto mb-5 h-12 w-12">
+				<div class="absolute inset-0 rounded-full border-2 border-light-300 dark:border-dark-700"></div>
+				<div
+					class="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-600 dark:border-t-primary-400"
+					style="animation-duration: 0.8s"
+				></div>
+			</div>
+			<p class="text-sm font-medium text-dark-400 dark:text-light-600">{$_('houses.loading')}</p>
 		</div>
 	</div>
 {:else if property}
-	<div class="min-h-screen bg-gradient-to-b from-light-50 to-light-100 dark:from-dark-900 dark:to-dark-850">
-		<!-- Back Button -->
-		<div class="border-b border-light-300 bg-white shadow-sm dark:border-dark-700 dark:bg-dark-800">
-			<div class="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
-				<button
-					onclick={() => goto(resolve('/houses'))}
-					class="group flex items-center gap-2 font-medium text-dark-600 transition-all hover:gap-3 hover:text-primary-600 dark:text-light-400 dark:hover:text-primary-400"
-				>
-					<FontAwesomeIcon icon={faArrowLeft} class="transition-transform group-hover:-translate-x-1" />
-					<span>{$_('common.back')}</span>
-				</button>
+	<div class="min-h-screen bg-light-50 dark:bg-dark-900">
+		<!-- Breadcrumb -->
+		<nav
+			class="border-b border-light-300/70 bg-white/80 backdrop-blur-sm dark:border-dark-700/60 dark:bg-dark-800/80"
+			aria-label="Breadcrumb"
+		>
+			<div class="mx-auto max-w-7xl px-4 py-3.5 sm:px-6 lg:px-8">
+				<ol class="flex items-center gap-1.5 text-[0.8rem]" style="font-family: 'Plus Jakarta Sans', sans-serif">
+					<li>
+						<a
+							href={resolve('/')}
+							class="font-medium text-dark-400 transition-colors hover:text-primary-600 dark:text-light-600 dark:hover:text-primary-400"
+						>
+							{$_('home')}
+						</a>
+					</li>
+					<li class="text-dark-300 dark:text-dark-500">/</li>
+					<li>
+						<a
+							href={resolve('/houses')}
+							class="font-medium text-dark-400 transition-colors hover:text-primary-600 dark:text-light-600 dark:hover:text-primary-400"
+						>
+							{$_('houses.title')}
+						</a>
+					</li>
+					<li class="text-dark-300 dark:text-dark-500">/</li>
+					<li class="max-w-[200px] truncate font-medium text-dark-700 sm:max-w-xs dark:text-light-300">
+						{property.title || $_('properties.untitled')}
+					</li>
+				</ol>
 			</div>
-		</div>
+		</nav>
 
-		<div class="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-			<div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-10">
-				<!-- Left Column - Images and Main Info -->
+		<!-- ━━━ MAIN CONTENT ━━━ -->
+		<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+				<!-- Left Column — Property Info -->
 				<div class="lg:col-span-2">
 					<!-- Image Carousel -->
-					<div
-						class="mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-light-200 to-light-300 shadow-xl dark:from-dark-600 dark:to-dark-700"
-					>
+					<div class="mb-8 overflow-hidden rounded-2xl shadow-lg" style="animation: fadeIn 0.5s ease-out">
 						{#if imageIds.length > 0}
-							<div class="relative aspect-video">
+							<div class="relative aspect-video bg-light-200 dark:bg-dark-800">
 								<img
 									src="{serverUrl}/v1/api/images/{imageIds[currentImageIndex]}"
 									alt={property.title || 'Property'}
@@ -286,28 +322,37 @@
 								/>
 
 								{#if imageIds.length > 1}
-									<!-- Navigation Arrows -->
 									<button
 										type="button"
 										onclick={prevImage}
-										class="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white dark:bg-dark-800/90 dark:hover:bg-dark-800"
+										class="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/85 p-3 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-white dark:bg-dark-800/85 dark:hover:bg-dark-700"
 										aria-label="Previous image"
 									>
-										<FontAwesomeIcon icon={faChevronLeft} class="h-6 w-6 text-dark-900 dark:text-light-50" />
+										<FontAwesomeIcon icon={faChevronLeft} class="h-5 w-5 text-dark-800 dark:text-light-100" />
 									</button>
-
 									<button
 										type="button"
 										onclick={nextImage}
-										class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white dark:bg-dark-800/90 dark:hover:bg-dark-800"
+										class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/85 p-3 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-white dark:bg-dark-800/85 dark:hover:bg-dark-700"
 										aria-label="Next image"
 									>
-										<FontAwesomeIcon icon={faChevronRight} class="h-6 w-6 text-dark-900 dark:text-light-50" />
+										<FontAwesomeIcon icon={faChevronRight} class="h-5 w-5 text-dark-800 dark:text-light-100" />
 									</button>
+								{/if}
 
-									<!-- Image Counter -->
+								<!-- Fullscreen button -->
+								<button
+									type="button"
+									onclick={() => (lightboxOpen = true)}
+									class="absolute right-4 bottom-4 rounded-full bg-dark-900/50 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-dark-900/70"
+									aria-label="View fullscreen"
+								>
+									<FontAwesomeIcon icon={faExpand} class="h-3.5 w-3.5" />
+								</button>
+
+								{#if imageIds.length > 1}
 									<div
-										class="absolute right-4 bottom-4 rounded-full bg-dark-900/75 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+										class="absolute bottom-4 left-4 rounded-full bg-dark-900/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm"
 									>
 										{currentImageIndex + 1} / {imageIds.length}
 									</div>
@@ -317,7 +362,7 @@
 								{#if property.status}
 									<div class="absolute top-4 left-4">
 										<span
-											class="rounded-full px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-sm {getStatusColor(
+											class="rounded-full px-3 py-1.5 text-xs font-semibold shadow-md backdrop-blur-sm {getStatusColor(
 												property.status
 											)}"
 										>
@@ -327,67 +372,61 @@
 								{/if}
 							</div>
 
-							<!-- Thumbnail Gallery -->
+							<!-- Thumbnails -->
 							{#if imageIds.length > 1}
-								<div class="flex gap-2 overflow-x-auto bg-light-100 p-4 dark:bg-dark-800">
+								<div
+									class="flex gap-2 overflow-x-auto bg-light-100 p-3 dark:bg-dark-800 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-light-400 dark:[&::-webkit-scrollbar-thumb]:bg-dark-600"
+								>
 									{#each imageIds as imageId, index (imageId)}
 										<button
 											type="button"
 											onclick={() => goToImage(index)}
 											class="flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all {index ===
 											currentImageIndex
-												? 'border-primary-600 ring-2 ring-primary-500/50'
-												: 'border-light-300 hover:border-primary-400 dark:border-dark-600'}"
+												? 'border-primary-500 ring-1 ring-primary-500/30'
+												: 'border-transparent opacity-70 hover:border-light-400 hover:opacity-100 dark:hover:border-dark-500'}"
 										>
 											<img
 												src="{serverUrl}/v1/api/images/{imageId}"
 												alt="{property.title || 'Property'} - image {index + 1}"
-												class="h-20 w-28 object-cover"
+												class="h-16 w-24 object-cover"
+												loading="lazy"
 											/>
 										</button>
 									{/each}
 								</div>
 							{/if}
 						{:else}
-							<div class="flex aspect-video items-center justify-center">
-								<FontAwesomeIcon icon={faRulerCombined} class="text-8xl text-dark-200 opacity-30 dark:text-light-400" />
+							<div class="flex aspect-video items-center justify-center bg-light-200 dark:bg-dark-800">
+								<FontAwesomeIcon icon={faRulerCombined} class="text-7xl text-dark-200/40 dark:text-light-700/20" />
 							</div>
 						{/if}
 					</div>
 
-					<!-- Property Details Card -->
-					<div class="rounded-2xl border border-light-300 bg-white p-8 shadow-xl dark:border-dark-700 dark:bg-dark-800">
-						<!-- Title and Type -->
-						<div class="mb-6 border-b border-light-200 pb-6 dark:border-dark-700">
-							<h1 class="mb-4 text-3xl leading-tight font-bold text-dark-900 sm:text-4xl dark:text-light-50">
-								{property.title || $_('properties.untitled')}
-							</h1>
-							<div class="flex flex-wrap items-center gap-3">
+					<!-- Title Block -->
+					<div class="mb-8" style="animation: fadeInUp 0.5s ease-out 0.1s both">
+						<div class="mb-4 flex flex-wrap items-center gap-2">
+							<span
+								class="rounded-md bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300"
+							>
+								{getPropertyTypeLabel(property.propertyType)}
+							</span>
+							{#if property.energyRating}
 								<span
-									class="rounded-full bg-primary-100 px-4 py-2 text-sm font-semibold text-primary-700 dark:bg-primary-900 dark:text-primary-300"
+									class="inline-flex items-center gap-1.5 rounded-md bg-success-50 px-3 py-1 text-xs font-semibold text-success-800 dark:bg-success-950/50 dark:text-success-300"
 								>
-									{getPropertyTypeLabel(property.propertyType)}
+									<FontAwesomeIcon icon={faBolt} class="text-[0.6rem]" />
+									<span>{getEnergyRatingLabel(property.energyRating)}</span>
 								</span>
-								{#if property.energyRating}
-									<span
-										class="inline-flex items-center gap-2 rounded-full bg-success-100 px-4 py-2 text-sm font-semibold text-success-800 dark:bg-success-900 dark:text-success-200"
-									>
-										<FontAwesomeIcon icon={faBolt} />
-										<span>{getEnergyRatingLabel(property.energyRating)}</span>
-									</span>
-								{/if}
-							</div>
+							{/if}
 						</div>
 
-						<!-- Price -->
-						<div class="mb-8">
-							<p class="text-xs font-medium tracking-wider text-dark-500 uppercase dark:text-light-500">
-								{$_('properties.price')}
-							</p>
-							<p class="mt-1 text-4xl font-extrabold text-primary-600 sm:text-5xl dark:text-primary-400">
-								{formatPrice(property.price)}
-							</p>
-						</div>
+						<h1
+							class="mb-3 text-3xl leading-tight font-normal text-dark-900 sm:text-4xl lg:text-[2.75rem] dark:text-light-50"
+							style="font-family: 'Playfair Display', Georgia, serif"
+						>
+							{property.title || $_('properties.untitled')}
+						</h1>
 
 						<!-- Location -->
 						<a
@@ -398,306 +437,408 @@
 							)}"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="mb-8 flex items-start gap-4 rounded-xl bg-light-50 p-5 transition-all hover:bg-light-100 hover:shadow-md dark:bg-dark-700/50 dark:hover:bg-dark-700"
+							class="group inline-flex items-center gap-2 text-sm text-dark-500 transition-colors hover:text-primary-600 dark:text-light-500 dark:hover:text-primary-400"
 						>
-							<div
-								class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
-							>
-								<FontAwesomeIcon icon={faMapMarkerAlt} class="text-lg text-primary-600 dark:text-primary-400" />
-							</div>
-							<div class="flex-1">
-								{#if property.address}
-									<p class="text-base font-medium text-dark-700 dark:text-light-300">{property.address}</p>
-								{/if}
-								<p class="text-lg font-semibold text-dark-900 dark:text-light-50">
-									{property.parish ? `${property.parish}, ` : ''}{property.municipality
-										? `${property.municipality}, `
-										: ''}{property.district ?? ''}
-								</p>
-								{#if property.postalCode}
-									<p class="mt-1 text-sm text-dark-600 dark:text-light-400">{property.postalCode}</p>
-								{/if}
-							</div>
+							<FontAwesomeIcon icon={faMapMarkerAlt} class="text-xs text-primary-500 dark:text-primary-400" />
+							<span>
+								{#if property.address}{property.address},
+								{/if}{property.parish ? `${property.parish}, ` : ''}{property.municipality
+									? `${property.municipality}, `
+									: ''}{property.district ?? ''}{#if property.postalCode}
+									&middot; {property.postalCode}{/if}
+							</span>
+							<span class="text-xs opacity-0 transition-opacity group-hover:opacity-100">&#8599;</span>
 						</a>
+					</div>
 
-						<!-- Map -->
-						{#if mapCoordinates && mapReady && LeafletMap}
-							<div class="mb-8">
-								<h2 class="mb-4 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
-									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
-									{$_('properties.sections.location')}
-								</h2>
-								<div class="overflow-hidden rounded-xl border-2 border-light-300 shadow-lg dark:border-dark-600">
-									<div class="h-96">
-										<LeafletMap options={{ center: mapCoordinates, zoom: 15 }}>
-											<TileLayer url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'} />
-											<Marker latLng={mapCoordinates}>
-												<Popup>
-													<div class="p-2">
-														<p class="font-bold">{property.title || $_('properties.untitled')}</p>
-														<p class="text-sm">{property.address}</p>
-													</div>
-												</Popup>
-											</Marker>
-										</LeafletMap>
+					<!-- Price bar -->
+					<div
+						class="mb-8 flex items-center justify-between rounded-2xl border border-light-300/70 bg-white p-6 shadow-sm sm:p-7 dark:border-dark-700/60 dark:bg-dark-800"
+						style="animation: fadeInUp 0.5s ease-out 0.2s both"
+					>
+						<div>
+							<p
+								class="mb-1 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-600"
+								style="font-family: 'Plus Jakarta Sans', sans-serif"
+							>
+								{$_('properties.price')}
+							</p>
+							<p
+								class="text-3xl font-bold text-primary-700 sm:text-4xl dark:text-primary-400"
+								style="font-family: 'Plus Jakarta Sans', sans-serif"
+							>
+								{formatPrice(property.price)}
+							</p>
+						</div>
+						<!-- Quick stats inline -->
+						<div class="hidden items-center gap-5 sm:flex">
+							{#if property.bedrooms}
+								<div class="text-center">
+									<p class="text-lg font-semibold text-dark-900 dark:text-light-50">{property.bedrooms}</p>
+									<p class="text-[0.625rem] font-medium tracking-wide text-dark-400 uppercase dark:text-light-600">
+										{$_('properties.bedrooms')}
+									</p>
+								</div>
+							{/if}
+							{#if property.bathrooms}
+								<div class="text-center">
+									<p class="text-lg font-semibold text-dark-900 dark:text-light-50">{property.bathrooms}</p>
+									<p class="text-[0.625rem] font-medium tracking-wide text-dark-400 uppercase dark:text-light-600">
+										{$_('properties.bathrooms')}
+									</p>
+								</div>
+							{/if}
+							{#if property.areaSqm}
+								<div class="text-center">
+									<p class="text-lg font-semibold text-dark-900 dark:text-light-50">
+										{property.areaSqm} m&sup2;
+									</p>
+									<p class="text-[0.625rem] font-medium tracking-wide text-dark-400 uppercase dark:text-light-600">
+										{$_('properties.areaSqm')}
+									</p>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Description -->
+					{#if property.description}
+						<div
+							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							use:inview
+						>
+							<h2
+								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
+								style="font-family: 'Playfair Display', Georgia, serif"
+							>
+								{$_('properties.description')}
+							</h2>
+							<div
+								class="reveal reveal-up reveal-d1 mb-5 h-px w-12 bg-gradient-to-r from-secondary-400 to-transparent dark:from-secondary-600"
+							></div>
+							<p
+								class="reveal reveal-up reveal-d2 text-[0.938rem] leading-relaxed whitespace-pre-wrap text-dark-500 dark:text-light-500"
+							>
+								{property.description}
+							</p>
+						</div>
+					{/if}
+
+					<!-- Property Details Grid -->
+					<div
+						class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+						use:inview
+					>
+						<h2
+							class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
+							style="font-family: 'Playfair Display', Georgia, serif"
+						>
+							{$_('properties.sections.propertyDetails')}
+						</h2>
+						<div
+							class="reveal reveal-up reveal-d1 mb-6 h-px w-12 bg-gradient-to-r from-secondary-400 to-transparent dark:from-secondary-600"
+						></div>
+						<div class="reveal reveal-up reveal-d2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+							{#if property.bedrooms}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faBed} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.bedrooms')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">{property.bedrooms}</p>
 									</div>
 								</div>
-							</div>
-						{/if}
+							{/if}
 
-						<!-- Description -->
-						{#if property.description}
-							<div class="mb-8 border-b border-light-200 pb-8 dark:border-dark-700">
-								<h2 class="mb-4 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
-									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
-									{$_('properties.description')}
-								</h2>
-								<p class="text-base leading-relaxed whitespace-pre-wrap text-dark-600 dark:text-light-400">
-									{property.description}
-								</p>
-							</div>
-						{/if}
+							{#if property.bathrooms}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faBath} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.bathrooms')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">{property.bathrooms}</p>
+									</div>
+								</div>
+							{/if}
 
-						<!-- Main Features -->
-						<div class="mb-8">
-							<h2 class="mb-6 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
-								<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
-								{$_('properties.sections.propertyDetails')}
+							{#if property.areaSqm}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faRulerCombined} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.areaSqm')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">{property.areaSqm} m&sup2;</p>
+									</div>
+								</div>
+							{/if}
+
+							{#if property.parkingSpaces}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faCar} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.parkingSpaces')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">{property.parkingSpaces}</p>
+									</div>
+								</div>
+							{/if}
+
+							{#if property.landAreaSqm}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faRulerCombined} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.landAreaSqm')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">
+											{property.landAreaSqm} m&sup2;
+										</p>
+									</div>
+								</div>
+							{/if}
+
+							{#if property.yearBuilt}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faCalendar} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.yearBuilt')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">{property.yearBuilt}</p>
+									</div>
+								</div>
+							{/if}
+
+							{#if property.floor !== null && property.floor !== undefined}
+								<div
+									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+								>
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
+									>
+										<FontAwesomeIcon icon={faLayerGroup} class="text-sm text-primary-600 dark:text-primary-400" />
+									</div>
+									<div>
+										<p class="text-[0.688rem] text-dark-400 dark:text-light-600">{$_('properties.floor')}</p>
+										<p class="text-base font-semibold text-dark-900 dark:text-light-50">
+											{property.floor}{property.totalFloors ? ` / ${property.totalFloors}` : ''}
+										</p>
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Amenities -->
+					{#if property.hasGarage || property.hasGarden || property.hasPool || property.hasElevator}
+						<div
+							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							use:inview
+						>
+							<h2
+								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
+								style="font-family: 'Playfair Display', Georgia, serif"
+							>
+								{$_('properties.sections.features')}
 							</h2>
-							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-								{#if property.bedrooms}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
+							<div
+								class="reveal reveal-up reveal-d1 mb-6 h-px w-12 bg-gradient-to-r from-secondary-400 to-transparent dark:from-secondary-600"
+							></div>
+							<div class="reveal reveal-up reveal-d2 flex flex-wrap gap-3">
+								{#if property.hasGarage}
+									<div
+										class="flex items-center gap-2.5 rounded-xl border border-primary-200/60 bg-primary-50/60 px-4 py-2.5 dark:border-primary-900/40 dark:bg-primary-950/30"
+									>
+										<FontAwesomeIcon icon={faWarehouse} class="text-sm text-primary-600 dark:text-primary-400" />
+										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
+											>{$_('properties.hasGarage')}</span
 										>
-											<FontAwesomeIcon icon={faBed} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.bedrooms')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.bedrooms}</p>
-										</div>
 									</div>
 								{/if}
-
-								{#if property.bathrooms}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
+								{#if property.hasGarden}
+									<div
+										class="flex items-center gap-2.5 rounded-xl border border-success-200/60 bg-success-50/60 px-4 py-2.5 dark:border-success-900/40 dark:bg-success-950/30"
+									>
+										<FontAwesomeIcon icon={faTree} class="text-sm text-success-600 dark:text-success-400" />
+										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
+											>{$_('properties.hasGarden')}</span
 										>
-											<FontAwesomeIcon icon={faBath} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.bathrooms')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.bathrooms}</p>
-										</div>
 									</div>
 								{/if}
-
-								{#if property.areaSqm}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
+								{#if property.hasPool}
+									<div
+										class="flex items-center gap-2.5 rounded-xl border border-info-200/60 bg-info-50/60 px-4 py-2.5 dark:border-info-900/40 dark:bg-info-950/30"
+									>
+										<FontAwesomeIcon icon={faSwimmingPool} class="text-sm text-info-600 dark:text-info-400" />
+										<span class="text-sm font-medium text-dark-800 dark:text-light-200">{$_('properties.hasPool')}</span
 										>
-											<FontAwesomeIcon icon={faRulerCombined} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.areaSqm')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.areaSqm} m²</p>
-										</div>
 									</div>
 								{/if}
-
-								{#if property.parkingSpaces}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
+								{#if property.hasElevator}
+									<div
+										class="flex items-center gap-2.5 rounded-xl border border-secondary-200/60 bg-secondary-50/60 px-4 py-2.5 dark:border-secondary-900/40 dark:bg-secondary-950/30"
+									>
+										<FontAwesomeIcon icon={faElevator} class="text-sm text-secondary-700 dark:text-secondary-400" />
+										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
+											>{$_('properties.hasElevator')}</span
 										>
-											<FontAwesomeIcon icon={faCar} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.parkingSpaces')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.parkingSpaces}</p>
-										</div>
-									</div>
-								{/if}
-
-								{#if property.landAreaSqm}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
-										>
-											<FontAwesomeIcon icon={faRulerCombined} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.landAreaSqm')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.landAreaSqm} m²</p>
-										</div>
-									</div>
-								{/if}
-
-								{#if property.yearBuilt}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
-										>
-											<FontAwesomeIcon icon={faCalendar} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.yearBuilt')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">{property.yearBuilt}</p>
-										</div>
-									</div>
-								{/if}
-
-								{#if property.floor !== null && property.floor !== undefined}
-									<div class="flex items-center gap-3 rounded-lg bg-light-100 p-4 dark:bg-dark-700">
-										<div
-											class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900"
-										>
-											<FontAwesomeIcon icon={faLayerGroup} class="text-xl text-primary-600 dark:text-primary-400" />
-										</div>
-										<div>
-											<p class="text-sm text-dark-600 dark:text-light-400">{$_('properties.floor')}</p>
-											<p class="text-lg font-bold text-dark-900 dark:text-light-50">
-												{property.floor}{property.totalFloors ? ` / ${property.totalFloors}` : ''}
-											</p>
-										</div>
 									</div>
 								{/if}
 							</div>
 						</div>
+					{/if}
 
-						<!-- Amenities -->
-						{#if property.hasGarage || property.hasGarden || property.hasPool || property.hasElevator}
-							<div class="mb-8 border-b border-light-200 pb-8 dark:border-dark-700">
-								<h2 class="mb-6 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
-									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
-									{$_('properties.sections.features')}
-								</h2>
-								<div class="flex flex-wrap gap-4">
-									{#if property.hasGarage}
-										<div
-											class="flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-4 py-2 dark:border-primary-800 dark:bg-primary-900/30"
-										>
-											<FontAwesomeIcon icon={faWarehouse} class="text-primary-600 dark:text-primary-400" />
-											<span class="font-medium text-dark-900 dark:text-light-50">{$_('properties.hasGarage')}</span>
-										</div>
-									{/if}
-									{#if property.hasGarden}
-										<div
-											class="flex items-center gap-2 rounded-lg border border-success-200 bg-success-50 px-4 py-2 dark:border-success-800 dark:bg-success-900/30"
-										>
-											<FontAwesomeIcon icon={faTree} class="text-success-600 dark:text-success-400" />
-											<span class="font-medium text-dark-900 dark:text-light-50">{$_('properties.hasGarden')}</span>
-										</div>
-									{/if}
-									{#if property.hasPool}
-										<div
-											class="flex items-center gap-2 rounded-lg border border-info-200 bg-info-50 px-4 py-2 dark:border-info-800 dark:bg-info-900/30"
-										>
-											<FontAwesomeIcon icon={faSwimmingPool} class="text-info-600 dark:text-info-400" />
-											<span class="font-medium text-dark-900 dark:text-light-50">{$_('properties.hasPool')}</span>
-										</div>
-									{/if}
-									{#if property.hasElevator}
-										<div
-											class="flex items-center gap-2 rounded-lg border border-secondary-200 bg-secondary-50 px-4 py-2 dark:border-secondary-800 dark:bg-secondary-900/30"
-										>
-											<FontAwesomeIcon icon={faElevator} class="text-secondary-600 dark:text-secondary-400" />
-											<span class="font-medium text-dark-900 dark:text-light-50">{$_('properties.hasElevator')}</span>
-										</div>
-									{/if}
-								</div>
-							</div>
-						{/if}
-
-						<!-- Virtual Tour -->
-						{#if property.virtualTourUrl}
-							<div>
-								<h2 class="mb-4 flex items-center gap-3 text-2xl font-bold text-dark-900 dark:text-light-50">
-									<div class="h-1 w-12 rounded-full bg-primary-600 dark:bg-primary-400"></div>
-									{$_('properties.virtualTourUrl')}
-								</h2>
-								<!-- External link - data-sveltekit-reload bypasses SvelteKit routing -->
-								<a
-									href={property.virtualTourUrl}
-									data-sveltekit-reload
-									target="_blank"
-									rel="noopener noreferrer"
-									class="group inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-8 py-4 text-lg font-semibold text-light-50 shadow-lg transition-all hover:-translate-y-1 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl dark:from-primary-700 dark:to-primary-800 dark:hover:from-primary-600 dark:hover:to-primary-700"
+					<!-- Map -->
+					{#if mapCoordinates && mapReady && LeafletMap}
+						<div
+							class="mb-8 overflow-hidden rounded-2xl border border-light-300/70 bg-white shadow-sm dark:border-dark-700/60 dark:bg-dark-800"
+							use:inview
+						>
+							<div class="p-7 pb-0 sm:p-8 sm:pb-0">
+								<h2
+									class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
+									style="font-family: 'Playfair Display', Georgia, serif"
 								>
-									<span>{$_('properties.virtualTourUrl')}</span>
-									<span class="transition-transform group-hover:translate-x-1">→</span>
-								</a>
+									{$_('properties.sections.location')}
+								</h2>
+								<div
+									class="reveal reveal-up reveal-d1 mb-6 h-px w-12 bg-gradient-to-r from-secondary-400 to-transparent dark:from-secondary-600"
+								></div>
 							</div>
-						{/if}
-					</div>
+							<div class="reveal reveal-scale reveal-d2 h-80">
+								<LeafletMap options={{ center: mapCoordinates, zoom: 15 }}>
+									<TileLayer url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'} />
+									<Marker latLng={mapCoordinates}>
+										<Popup>
+											<div class="p-2">
+												<p class="font-bold">{property.title || $_('properties.untitled')}</p>
+												<p class="text-sm">{property.address}</p>
+											</div>
+										</Popup>
+									</Marker>
+								</LeafletMap>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Virtual Tour -->
+					{#if property.virtualTourUrl}
+						<div
+							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							use:inview
+						>
+							<h2
+								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
+								style="font-family: 'Playfair Display', Georgia, serif"
+							>
+								{$_('properties.virtualTourUrl')}
+							</h2>
+							<a
+								href={property.virtualTourUrl}
+								data-sveltekit-reload
+								target="_blank"
+								rel="noopener noreferrer"
+								class="reveal reveal-up reveal-d1 group inline-flex items-center gap-2.5 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-semibold text-light-50 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-primary-700 hover:shadow-md dark:bg-primary-700 dark:hover:bg-primary-600"
+							>
+								<span>{$_('properties.virtualTourUrl')}</span>
+								<span class="text-xs transition-transform group-hover:translate-x-0.5">&#8594;</span>
+							</a>
+						</div>
+					{/if}
 				</div>
 
-				<!-- Right Column - Contact -->
+				<!-- Right Column — Contact Sidebar -->
 				<div class="lg:col-span-1">
-					<div class="sticky top-8">
+					<div class="sticky top-24" style="animation: fadeInUp 0.5s ease-out 0.3s both">
 						{#if property.contacts && property.contacts.length > 0}
 							<div
-								class="overflow-hidden rounded-2xl border border-light-300 bg-white shadow-xl dark:border-dark-700 dark:bg-dark-800"
+								class="rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm dark:border-dark-700/60 dark:bg-dark-800"
 							>
-								<!-- Header -->
-								<div
-									class="bg-gradient-to-r from-primary-600 to-primary-700 p-6 dark:from-primary-700 dark:to-primary-800"
+								<!-- Header — matches other card sections -->
+								<h2
+									class="mb-2 text-lg font-normal text-dark-900 dark:text-light-50"
+									style="font-family: 'Playfair Display', Georgia, serif"
 								>
-									<h2 class="mb-1 text-sm font-medium tracking-wide text-primary-100 uppercase">
-										{$_('properties.sections.contact')}
-										{#if property.contacts.length > 1}
-											<span class="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">
-												{property.contacts.length}
-											</span>
-										{/if}
-									</h2>
-									<p class="text-xl font-bold text-white">
-										{$_('homepage.contact.interested').split('.')[0]}
-									</p>
-								</div>
+									{$_('properties.sections.contact')}
+								</h2>
+								<div
+									class="mb-6 h-px w-12 bg-gradient-to-r from-secondary-400 to-transparent dark:from-secondary-600"
+								></div>
 
-								<div class="space-y-6 p-6">
+								<div class="space-y-6">
 									{#each property.contacts as contact, index (contact.id)}
-										<!-- Contact Person -->
-										<div class={index > 0 ? 'border-t border-light-200 pt-6 dark:border-dark-600' : ''}>
-											<div
-												class="dark:bg-dark-750 mb-4 flex items-center gap-3 rounded-xl border-2 border-light-200 bg-white p-4 dark:border-dark-600"
-											>
-												<div class="text-3xl text-primary-600 dark:text-primary-400">
-													<FontAwesomeIcon icon={faUser} />
+										<div class={index > 0 ? 'border-t border-light-200/80 pt-6 dark:border-dark-700/60' : ''}>
+											<!-- Contact Name -->
+											<div class="mb-4 flex items-center gap-3">
+												<div
+													class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-950/50"
+												>
+													<FontAwesomeIcon icon={faUser} class="text-sm text-primary-600 dark:text-primary-400" />
 												</div>
 												<div>
-													<p class="text-xs font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
-														{$_('properties.contact')}
-														{property.contacts.length > 1 ? `${index + 1}` : ''}
-													</p>
-													<p class="text-lg font-bold text-dark-900 dark:text-light-50">
+													{#if property.contacts.length > 1}
+														<p
+															class="text-[0.625rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-600"
+														>
+															{$_('properties.contact')}
+															{index + 1}
+														</p>
+													{/if}
+													<p class="text-sm font-semibold text-dark-900 dark:text-light-50">
 														{contact.name}
 													</p>
 												</div>
 											</div>
 
-											<!-- Contact Buttons -->
-											<div class="space-y-3">
+											<!-- Contact Actions -->
+											<div class="space-y-2">
 												{#if contact.phone}
 													<a
 														href="tel:{contact.phone}"
-														class="group flex items-center gap-3 rounded-xl border-2 border-success-200 bg-success-50 p-4 transition-all hover:border-success-400 hover:bg-success-100 hover:shadow-md dark:border-success-800 dark:bg-success-900/20 dark:hover:border-success-600 dark:hover:bg-success-900/40"
+														class="group flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 													>
 														<div
-															class="text-2xl text-success-600 transition-transform group-hover:scale-110 dark:text-success-400"
+															class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-success-50 transition-transform group-hover:scale-105 dark:bg-success-950/40"
 														>
-															<FontAwesomeIcon icon={faPhone} />
+															<FontAwesomeIcon icon={faPhone} class="text-sm text-success-600 dark:text-success-400" />
 														</div>
 														<div class="flex-1">
 															<p
-																class="text-xs font-semibold tracking-wide text-success-700 uppercase dark:text-success-300"
+																class="text-[0.625rem] font-medium tracking-wide text-dark-400 uppercase dark:text-light-600"
 															>
 																{$_('contacts.phone')}
 															</p>
-															<p class="text-base font-bold text-dark-900 dark:text-light-50">{contact.phone}</p>
+															<p class="text-sm font-semibold text-dark-900 dark:text-light-50">
+																{contact.phone}
+															</p>
 														</div>
 													</a>
 												{/if}
@@ -705,39 +846,35 @@
 												{#if contact.email}
 													<a
 														href="mailto:{contact.email}"
-														class="group flex items-center gap-3 rounded-xl border-2 border-primary-200 bg-primary-50 p-4 transition-all hover:border-primary-400 hover:bg-primary-100 hover:shadow-md dark:border-primary-800 dark:bg-primary-900/20 dark:hover:border-primary-600 dark:hover:bg-primary-900/40"
+														class="group flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 													>
 														<div
-															class="text-2xl text-primary-600 transition-transform group-hover:scale-110 dark:text-primary-400"
+															class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 transition-transform group-hover:scale-105 dark:bg-primary-950/40"
 														>
-															<FontAwesomeIcon icon={faEnvelope} />
+															<FontAwesomeIcon
+																icon={faEnvelope}
+																class="text-sm text-primary-600 dark:text-primary-400"
+															/>
 														</div>
 														<div class="flex-1 overflow-hidden">
 															<p
-																class="text-xs font-semibold tracking-wide text-primary-700 uppercase dark:text-primary-300"
+																class="text-[0.625rem] font-medium tracking-wide text-dark-400 uppercase dark:text-light-600"
 															>
 																{$_('contacts.email')}
 															</p>
-															<p class="truncate text-base font-bold text-dark-900 dark:text-light-50">
+															<p class="truncate text-sm font-semibold text-dark-900 dark:text-light-50">
 																{contact.email}
 															</p>
 														</div>
 													</a>
 												{/if}
-
-												{#if contact.notes}
-													<div
-														class="rounded-xl border border-light-300 bg-light-100 p-4 dark:border-dark-600 dark:bg-dark-700"
-													>
-														<p class="text-sm font-medium tracking-wide text-dark-500 uppercase dark:text-light-500">
-															{$_('contacts.notes')}
-														</p>
-														<p class="mt-2 text-sm leading-relaxed text-dark-700 dark:text-light-300">
-															{contact.notes}
-														</p>
-													</div>
-												{/if}
 											</div>
+
+											{#if contact.notes}
+												<p class="mt-3 text-[0.813rem] leading-relaxed text-dark-500 dark:text-light-500">
+													{contact.notes}
+												</p>
+											{/if}
 										</div>
 									{/each}
 								</div>
@@ -748,4 +885,57 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- ━━━ LIGHTBOX ━━━ -->
+	{#if lightboxOpen && imageIds.length > 0}
+		<div
+			class="fixed inset-0 z-[100] flex items-center justify-center bg-dark-950/95 backdrop-blur-sm"
+			role="dialog"
+			aria-modal="true"
+			style="animation: fadeIn 0.2s ease-out"
+		>
+			<!-- Close -->
+			<button
+				type="button"
+				onclick={() => (lightboxOpen = false)}
+				class="absolute top-4 right-4 z-10 rounded-full bg-white/10 p-3 text-white transition-all hover:bg-white/20"
+				aria-label="Close"
+			>
+				<FontAwesomeIcon icon={faXmark} class="h-5 w-5" />
+			</button>
+
+			<!-- Counter -->
+			<div class="absolute top-5 left-1/2 -translate-x-1/2 text-sm font-medium text-white/70">
+				{currentImageIndex + 1} / {imageIds.length}
+			</div>
+
+			<!-- Navigation -->
+			{#if imageIds.length > 1}
+				<button
+					type="button"
+					onclick={prevImage}
+					class="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white transition-all hover:bg-white/20"
+					aria-label="Previous"
+				>
+					<FontAwesomeIcon icon={faChevronLeft} class="h-6 w-6" />
+				</button>
+				<button
+					type="button"
+					onclick={nextImage}
+					class="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white transition-all hover:bg-white/20"
+					aria-label="Next"
+				>
+					<FontAwesomeIcon icon={faChevronRight} class="h-6 w-6" />
+				</button>
+			{/if}
+
+			<!-- Image -->
+			<img
+				src="{serverUrl}/v1/api/images/{imageIds[currentImageIndex]}"
+				alt="{property.title || 'Property'} - image {currentImageIndex + 1}"
+				class="max-h-[85vh] max-w-[92vw] rounded-lg object-contain shadow-2xl"
+				style="animation: fadeIn 0.15s ease-out"
+			/>
+		</div>
+	{/if}
 {/if}

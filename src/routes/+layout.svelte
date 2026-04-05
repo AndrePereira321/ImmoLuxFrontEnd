@@ -27,12 +27,12 @@
 	<link href={favicon} rel="icon" />
 </svelte:head>
 
-<div class="flex min-h-screen flex-col">
-	<div class="sticky top-0 z-50 shadow-xl">
+<div class="flex min-h-screen flex-col bg-light-100 dark:bg-dark-900">
+	<div class="sticky top-0 z-50">
 		<AppMenu></AppMenu>
 	</div>
 
-	<main class="flex-grow bg-light-300 px-4 py-8 dark:bg-dark-800">
+	<main class="flex-grow">
 		{@render children?.()}
 	</main>
 

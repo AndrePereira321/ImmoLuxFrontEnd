@@ -17,69 +17,66 @@
 		switch (iconColor) {
 			case 'primary':
 				return {
-					bg: 'bg-primary-100 dark:bg-primary-900',
+					bg: 'bg-primary-50 dark:bg-primary-950/40',
 					icon: 'text-primary-600 dark:text-primary-400',
-					glow: 'bg-primary-100 dark:bg-primary-900'
+					border: 'group-hover:border-primary-200 dark:group-hover:border-primary-800/60'
 				};
 			case 'secondary':
 				return {
-					bg: 'bg-secondary-100 dark:bg-secondary-900',
-					icon: 'text-secondary-600 dark:text-secondary-400',
-					glow: 'bg-secondary-100 dark:bg-secondary-900'
+					bg: 'bg-secondary-50 dark:bg-secondary-950/40',
+					icon: 'text-secondary-700 dark:text-secondary-400',
+					border: 'group-hover:border-secondary-200 dark:group-hover:border-secondary-800/60'
 				};
 			case 'success':
 				return {
-					bg: 'bg-success-100 dark:bg-success-900',
+					bg: 'bg-success-50 dark:bg-success-950/40',
 					icon: 'text-success-600 dark:text-success-400',
-					glow: 'bg-success-100 dark:bg-success-900'
+					border: 'group-hover:border-success-200 dark:group-hover:border-success-800/60'
 				};
 			case 'info':
 				return {
-					bg: 'bg-info-100 dark:bg-info-900',
+					bg: 'bg-info-50 dark:bg-info-950/40',
 					icon: 'text-info-600 dark:text-info-400',
-					glow: 'bg-info-100 dark:bg-info-900'
+					border: 'group-hover:border-info-200 dark:group-hover:border-info-800/60'
 				};
 			case 'warning':
 				return {
-					bg: 'bg-warning-100 dark:bg-warning-900',
+					bg: 'bg-warning-50 dark:bg-warning-950/40',
 					icon: 'text-warning-600 dark:text-warning-400',
-					glow: 'bg-warning-100 dark:bg-warning-900'
+					border: 'group-hover:border-warning-200 dark:group-hover:border-warning-800/60'
 				};
 			default:
 				return {
-					bg: 'bg-primary-100 dark:bg-primary-900',
+					bg: 'bg-primary-50 dark:bg-primary-950/40',
 					icon: 'text-primary-600 dark:text-primary-400',
-					glow: 'bg-primary-100 dark:bg-primary-900'
+					border: 'group-hover:border-primary-200 dark:group-hover:border-primary-800/60'
 				};
 		}
 	});
 </script>
 
 <div
-	class={`group relative overflow-hidden rounded-2xl bg-light-50 p-8 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl md:p-10 dark:bg-dark-700 ${className}`}
+	class={`group relative overflow-hidden rounded-2xl border border-light-300/80 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg md:p-10 dark:border-dark-700/60 dark:bg-dark-800 ${colorClasses().border} ${className}`}
 >
-	<!-- Glow Effect -->
-	<div
-		class={`absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full opacity-30 blur-3xl transition-transform duration-500 group-hover:scale-150 ${colorClasses().glow}`}
-	></div>
-
 	<div class="relative text-center">
 		<!-- Icon -->
-		<div class="mb-5 flex justify-center">
-			<div class={`inline-block rounded-full p-4 ${colorClasses().bg}`}>
-				<FontAwesomeIcon {icon} size="2x" class={colorClasses().icon} />
+		<div class="mb-6 flex justify-center">
+			<div
+				class={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colorClasses().bg} transition-transform duration-300 group-hover:scale-110`}
+			>
+				<FontAwesomeIcon {icon} size="lg" class={colorClasses().icon} />
 			</div>
 		</div>
 
 		<!-- Title (optional) -->
 		{#if title}
-			<h3 class="mb-4 text-xl font-light text-dark-900 dark:text-light-50">
+			<h3 class="mb-3 text-xl font-normal text-dark-900 dark:text-light-50">
 				{title}
 			</h3>
 		{/if}
 
 		<!-- Content -->
-		<div class="text-base leading-relaxed font-light text-dark-700 dark:text-light-200">
+		<div class="text-[0.938rem] leading-relaxed text-dark-500 dark:text-light-500">
 			{@render children?.()}
 		</div>
 	</div>

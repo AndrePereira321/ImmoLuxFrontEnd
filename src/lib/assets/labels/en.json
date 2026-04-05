@@ -115,6 +115,37 @@
 				"partnerName": "PacaGroup"
 			}
 		},
+		"stats": {
+			"experience": "15",
+			"experienceLabel": "Years of Experience",
+			"properties": "50",
+			"propertiesLabel": "Properties Managed",
+			"markets": "3",
+			"marketsLabel": "European Markets",
+			"satisfaction": "100",
+			"satisfactionLabel": "Client Dedication"
+		},
+		"whyPortugal": {
+			"title": "Why Portugal",
+			"subtitle": "A Premier Destination for Real Estate",
+			"description": "Portugal combines Old World charm with modern sophistication, making it one of Europe's most attractive property markets for discerning buyers and investors alike.",
+			"climate": {
+				"title": "Year-Round Sunshine",
+				"description": "Over 300 days of sunshine annually, mild winters, and a Mediterranean climate that draws people from across the globe."
+			},
+			"investment": {
+				"title": "Strong Market Growth",
+				"description": "Portugal's property market has shown consistent appreciation, supported by economic stability and growing international demand."
+			},
+			"lifestyle": {
+				"title": "Exceptional Quality of Life",
+				"description": "World-class gastronomy, rich cultural heritage, pristine coastlines, and a warm, welcoming community."
+			},
+			"safety": {
+				"title": "Safety & Stability",
+				"description": "Consistently ranked among the safest countries in the world, with excellent healthcare and modern infrastructure."
+			}
+		},
 		"contact": {
 			"title": "Begin Your Journey",
 			"subtitle": "Let's Find Your Perfect Property",

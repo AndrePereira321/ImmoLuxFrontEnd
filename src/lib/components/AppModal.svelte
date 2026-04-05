@@ -57,29 +57,36 @@
 {#if open}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-dark-900/50 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-dark-900/40 p-4 backdrop-blur-md"
 		onclick={handleBackdropClick}
 		role="presentation"
+		style="animation: fadeIn 0.15s ease-out"
 	>
 		<!-- Modal -->
 		<div
-			class="relative w-full {sizeClasses[size]} rounded-lg bg-light-50 shadow-xl dark:bg-dark-800"
+			class="relative w-full {sizeClasses[
+				size
+			]} overflow-hidden rounded-2xl border border-light-300/60 bg-white shadow-2xl dark:border-dark-700/60 dark:bg-dark-800"
 			role="dialog"
 			aria-modal="true"
+			style="animation: fadeInUp 0.2s ease-out"
 		>
 			<!-- Close Button -->
 			<button
 				onclick={handleClose}
-				class="absolute top-4 right-4 text-dark-400 transition-colors hover:text-dark-900 dark:text-light-400 dark:hover:text-light-50"
+				class="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg text-dark-400 transition-all hover:bg-light-100 hover:text-dark-700 dark:text-light-500 dark:hover:bg-dark-700 dark:hover:text-light-200"
 				aria-label="Close"
 			>
-				<FontAwesomeIcon icon={faTimes} class="text-xl" />
+				<FontAwesomeIcon icon={faTimes} class="text-sm" />
 			</button>
 
 			<!-- Content -->
-			<div class="space-y-6 p-6">
+			<div class="space-y-5 p-6">
 				{#if title}
-					<h3 class="pr-8 text-2xl font-semibold text-dark-900 dark:text-light-50">
+					<h3
+						class="pr-10 text-xl font-normal text-dark-900 dark:text-light-50"
+						style="font-family: 'Playfair Display', Georgia, serif"
+					>
 						{title}
 					</h3>
 				{/if}

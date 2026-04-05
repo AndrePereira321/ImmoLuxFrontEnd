@@ -115,6 +115,37 @@
 				"partnerName": "PacaGroup"
 			}
 		},
+		"stats": {
+			"experience": "15",
+			"experienceLabel": "Ans d'Expérience",
+			"properties": "50",
+			"propertiesLabel": "Propriétés Gérées",
+			"markets": "3",
+			"marketsLabel": "Marchés Européens",
+			"satisfaction": "100",
+			"satisfactionLabel": "Dévouement Client"
+		},
+		"whyPortugal": {
+			"title": "Pourquoi le Portugal",
+			"subtitle": "Une Destination de Premier Choix pour l'Immobilier",
+			"description": "Le Portugal allie le charme de l'Ancien Monde à une sophistication moderne, en faisant l'un des marchés immobiliers les plus attractifs d'Europe pour les acheteurs et investisseurs exigeants.",
+			"climate": {
+				"title": "Soleil Toute l'Année",
+				"description": "Plus de 300 jours d'ensoleillement par an, des hivers doux et un climat méditerranéen qui attire des gens du monde entier."
+			},
+			"investment": {
+				"title": "Croissance Solide du Marché",
+				"description": "Le marché immobilier portugais a montré une appréciation constante, soutenu par la stabilité économique et la demande internationale croissante."
+			},
+			"lifestyle": {
+				"title": "Qualité de Vie Exceptionnelle",
+				"description": "Gastronomie de classe mondiale, riche patrimoine culturel, littoraux immaculés et une communauté chaleureuse et accueillante."
+			},
+			"safety": {
+				"title": "Sécurité et Stabilité",
+				"description": "Régulièrement classé parmi les pays les plus sûrs au monde, avec d'excellents soins de santé et des infrastructures modernes."
+			}
+		},
 		"contact": {
 			"title": "Commencez Votre Voyage",
 			"subtitle": "Trouvons Votre Propriété Parfaite",

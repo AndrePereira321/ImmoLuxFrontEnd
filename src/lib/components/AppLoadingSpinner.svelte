@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-
 	interface Props {
 		message?: string;
 		overlay?: boolean;
@@ -12,11 +9,19 @@
 
 <div
 	class="fixed inset-0 flex items-center justify-center {overlay
-		? 'z-[100] bg-dark-900/70 backdrop-blur-sm'
+		? 'z-[100] bg-dark-900/50 backdrop-blur-sm'
 		: 'z-50 bg-light-50 dark:bg-dark-900'}"
+	style="animation: fadeIn 0.2s ease-out"
 >
 	<div class="text-center">
-		<FontAwesomeIcon icon={faSpinner} class="animate-spin text-6xl text-primary-600 dark:text-primary-400" />
-		<p class="mt-4 text-lg font-medium {overlay ? 'text-light-50' : 'text-dark-600 dark:text-light-400'}">{message}</p>
+		<!-- Elegant spinner -->
+		<div class="relative mx-auto mb-5 h-12 w-12">
+			<div class="absolute inset-0 rounded-full border-2 border-light-300 dark:border-dark-600"></div>
+			<div
+				class="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-600 dark:border-t-primary-400"
+				style="animation-duration: 0.8s"
+			></div>
+		</div>
+		<p class="text-sm font-medium {overlay ? 'text-light-100' : 'text-dark-500 dark:text-light-500'}">{message}</p>
 	</div>
 </div>
