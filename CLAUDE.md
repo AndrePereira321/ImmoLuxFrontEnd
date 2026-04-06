@@ -16,35 +16,109 @@ npm run format        # Auto-format with Prettier
 
 ## Architecture
 
-**Pure SPA.** SvelteKit with `@sveltejs/adapter-static` and `fallback: 'index.html'`. Every route file exports `export const ssr = false; export const prerender = false;`. There is no server-side rendering anywhere.
+**Hybrid SSR + Client-only.** SvelteKit with `@sveltejs/adapter-node`. Public-facing pages use server-side rendering for SEO; the admin panel is client-only.
 
-**Route map:**
+| Route                    | Rendering       | Notes                                                    |
+| ------------------------ | --------------- | -------------------------------------------------------- |
+| `/`                      | **SSR**         | `+page.server.ts` fetches 3 featured properties + images |
+| `/houses`                | **SSR**         | `+page.server.ts` handles filters, pagination, images    |
+| `/houses/[id]`           | **SSR**         | `+page.server.ts` fetches single property + images       |
+| `/panel/*`               | **Client-only** | `+layout.ts` sets `ssr = false`; auth-guarded            |
+| `/panel/properties/new`  | **Client-only** | Create property form                                     |
+| `/panel/properties/[id]` | **Client-only** | Edit property form; `+page.ts` loads data client-side    |
+| `/sitemap.xml`           | **Dynamic**     | `+server.ts`; `prerender = false`; 1h CDN cache          |
+
+**Server load functions** use `PRIVATE_SERVER_URL` (not `VITE_SERVER_URL`) to reach the backend directly. Client-side code uses `VITE_SERVER_URL` via `apiClient`.
+
+**Route file map:**
 
 ```
 src/routes/
-├── +layout.svelte          # Global: menu, footer, auth + i18n init on mount
-├── +page.svelte            # Homepage (featured properties)
-├── houses/+page.svelte     # Public listing with filters + pagination
-├── houses/[id]/+page.svelte # Public property detail + map + contacts
-├── panel/properties/       # Admin area (auth-guarded)
-│   ├── +page.svelte        # User's own properties
-│   ├── new/+page.svelte    # Create property (thin wrapper over AppPropertyForm)
-│   └── [id]/+page.svelte   # Edit property (thin wrapper over AppPropertyForm)
-└── sitemap.xml/+server.ts  # Dynamic XML sitemap
+├── +layout.svelte            # Global layout: menu, footer, auth check, i18n init
+├── +layout.ts                # Awaits waitLocale() before first render
+├── +page.svelte              # Homepage — receives server-loaded properties via `data`
+├── +page.server.ts           # SSR load: fetches 3 featured properties + images
+├── houses/
+│   ├── +page.svelte          # Property listing with filters + pagination
+│   └── +page.server.ts       # SSR load: filtered/paginated properties + images
+├── houses/[id]/
+│   ├── +page.svelte          # Property detail + map + contact form
+│   └── +page.server.ts       # SSR load: single property + images; 404 on missing
+├── panel/
+│   ├── +layout.ts            # Sets ssr = false, prerender = false for entire panel
+│   └── properties/
+│       ├── +page.svelte      # User's own properties (client fetch on mount)
+│       ├── new/+page.svelte  # Create property (thin wrapper over AppPropertyForm)
+│       └── [id]/
+│           ├── +page.svelte  # Edit property (thin wrapper over AppPropertyForm)
+│           └── +page.ts      # Client-side load: fetches property by id
+└── sitemap.xml/+server.ts    # Dynamic XML sitemap (fetches all available properties)
 ```
 
 **Key lib layout:**
 
 ```
 src/lib/
-├── api/api-client.ts       # Axios wrapper — single export `apiClient`
-├── stores/                 # auth, notification, theme, locations
-├── components/             # All reusable UI components
-├── types/                  # TypeScript interfaces (DTOs match backend)
-├── schemas/                # Zod validation schemas for forms
-├── assets/labels/          # i18n JSON files (pt.json, en.json, fr.json)
-└── i18n.ts                 # Registers + initializes svelte-i18n
+├── api/api-client.ts         # Axios wrapper — single export `apiClient`
+├── stores/                   # auth, notification, theme, locations
+├── components/               # All reusable UI components (see Components section)
+├── types/                    # TypeScript interfaces (DTOs match backend)
+├── schemas/                  # Zod validation schemas for forms
+├── assets/labels/            # i18n JSON files (pt.json, en.json, fr.json)
+├── styles/app.css            # Tailwind v4 theme: OKLCH color tokens, animations, utilities
+└── i18n.ts                   # Registers + initializes svelte-i18n
 ```
+
+## Styling
+
+**Framework:** Tailwind CSS v4 via `@tailwindcss/vite` plugin. No `tailwind.config.js` — all theme customization lives in `src/lib/styles/app.css`.
+
+**Color tokens (OKLCH):**
+
+| Token prefix          | Palette                 | Use                   |
+| --------------------- | ----------------------- | --------------------- |
+| `--color-primary-*`   | Deep navy (50–950)      | Brand, buttons, links |
+| `--color-secondary-*` | Champagne gold (50–950) | Accents, highlights   |
+| `--color-tertiary-*`  | Warm gray-blue (50–950) | Neutral UI elements   |
+| `--color-light-*`     | Warm ivory/cream        | Light backgrounds     |
+| `--color-dark-*`      | Deep midnight blue      | Dark mode backgrounds |
+
+Status tokens: `--color-error-*`, `--color-warning-*`, `--color-success-*`, `--color-info-*`.
+
+**Typography:**
+
+- Body: Plus Jakarta Sans (300/400/500/600/700) — falls back to Inter (local WOFF2)
+- Headings: Playfair Display serif — **weight 400 only** (600 weight file is corrupted, do not use)
+
+**Utilities defined in `app.css`:**
+
+- `.grain::before` — subtle noise texture overlay (used on hero sections)
+- Animations: `fadeInUp`, `fadeIn`, `shimmer`, `float`, `pulse-soft`
+- Scrollbar styling (8px, blue-tinted, respects dark mode)
+- Dark mode via `.dark` class on `document.documentElement` (managed by `themeStore`)
+
+**Plugins:** `@tailwindcss/forms` (form element resets), `@tailwindcss/typography` (prose content).
+
+## SEO
+
+Public pages are SSR-rendered and include full meta tags. Follow this pattern when adding new public pages:
+
+```svelte
+<svelte:head>
+	<title>{$_('page.title')}</title>
+	<meta name="description" content={$_('page.description')} />
+	<meta property="og:title" content={$_('page.title')} />
+	<meta property="og:description" content={$_('page.description')} />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://immolux.pt/..." />
+	<meta property="og:image" content="..." />
+	<link rel="canonical" href="https://immolux.pt/..." />
+</svelte:head>
+```
+
+- **Sitemap:** `/src/routes/sitemap.xml/+server.ts` — dynamically lists all properties; CDN-cached 1h
+- **robots.txt:** `/static/robots.txt` — disallows `/panel/*`, points to sitemap
+- **Structured data:** JSON-LD on property detail pages
 
 ## Svelte 5 Runes
 
@@ -85,7 +159,7 @@ All URLs are auto-prefixed with `/v1/api` inside the client. Pass paths without 
 apiClient.get('/properties'); // → GET /v1/api/properties
 ```
 
-Backend URL comes from `VITE_SERVER_URL` (set in `env/.env.development`, not `.env`).
+Browser-side URL comes from `VITE_SERVER_URL`. Server load functions (`+page.server.ts`) use `PRIVATE_SERVER_URL` instead (not exposed to the client). Both are set in `env/.env.development` (not the project root `.env`).
 
 ## Authentication
 

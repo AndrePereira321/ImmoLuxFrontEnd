@@ -5,13 +5,7 @@
 	import AppPropertyGrid from '$lib/components/AppPropertyGrid.svelte';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import {
-		faEuroSign,
-		faFilter,
-		faHome,
-		faMapMarkerAlt,
-		faTimes
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faEuroSign, faFilter, faHome, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import homeImage from '$lib/assets/images/home_image.jpeg';
 
