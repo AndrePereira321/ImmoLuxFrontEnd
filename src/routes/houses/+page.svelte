@@ -2,12 +2,10 @@
 	import { onMount, untrack } from 'svelte';
 	import { apiClient } from '$lib/api/api-client';
 	import type { LocationsResponse, PropertyDTO } from '$lib/types/property';
-	import AppPublicPropertyCard from '$lib/components/AppPublicPropertyCard.svelte';
+	import AppPropertyGrid from '$lib/components/AppPropertyGrid.svelte';
 	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
-		faChevronLeft,
-		faChevronRight,
 		faEuroSign,
 		faFilter,
 		faHome,
@@ -60,11 +58,6 @@
 	onMount(() => {
 		loadLocations();
 	});
-
-	const currentPage = $derived(Math.floor(filters.offset / filters.limit) + 1);
-	const totalPages = $derived(Math.ceil(total / filters.limit));
-	const hasNextPage = $derived(currentPage < totalPages);
-	const hasPrevPage = $derived(currentPage > 1);
 
 	const activeFiltersCount = $derived(
 		[
@@ -162,19 +155,6 @@
 		filters.maxPrice = null;
 		filters.offset = 0;
 		loadProperties();
-	};
-
-	const goToPage = (page: number) => {
-		filters.offset = (page - 1) * filters.limit;
-		loadProperties();
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	};
-
-	const nextPage = () => {
-		if (hasNextPage) goToPage(currentPage + 1);
-	};
-	const prevPage = () => {
-		if (hasPrevPage) goToPage(currentPage - 1);
 	};
 
 	const toggleFilters = () => {
@@ -619,118 +599,18 @@
 			</aside>
 
 			<!-- ─── Property Grid ────────────────────────────────── -->
-			<div class="min-w-0">
-				{#if loading}
-					<!-- Loading -->
-					<div class="flex min-h-[50vh] items-center justify-center">
-						<div class="text-center">
-							<div class="relative mx-auto mb-4 h-10 w-10">
-								<div class="absolute inset-0 rounded-full border-2 border-light-300 dark:border-dark-700"></div>
-								<div
-									class="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-600 dark:border-t-primary-400"
-									style="animation-duration: 0.75s"
-								></div>
-							</div>
-							<p class="text-sm text-dark-400 dark:text-light-600">{$_('houses.loading')}</p>
-						</div>
-					</div>
-				{:else if properties.length === 0}
-					<!-- Empty State -->
-					<div
-						class="flex min-h-[50vh] items-center justify-center rounded-2xl border border-dashed border-light-300/80 dark:border-dark-700/60"
-					>
-						<div class="px-8 py-16 text-center">
-							<div
-								class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-light-300/80 bg-light-100 dark:border-dark-700/60 dark:bg-dark-800"
-							>
-								<FontAwesomeIcon icon={faHome} class="text-3xl text-dark-300/50 dark:text-light-700/30" />
-							</div>
-							<h2
-								class="mb-2 text-xl font-normal text-dark-800 dark:text-light-100"
-								style="font-family: 'Playfair Display', Georgia, serif"
-							>
-								{$_('houses.noProperties')}
-							</h2>
-							<p class="mb-7 text-sm text-dark-400 dark:text-light-600">
-								{$_('houses.noPropertiesDescription')}
-							</p>
-							{#if activeFiltersCount > 0}
-								<button
-									type="button"
-									onclick={clearFilters}
-									class="rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600"
-								>
-									{$_('houses.clearFilters')}
-								</button>
-							{/if}
-						</div>
-					</div>
-				{:else}
-					<!-- Grid -->
-					<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-						{#each properties as property, i (property.id)}
-							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-							<a
-								href="/houses/{property.id}"
-								class="group block transition-all duration-300 hover:-translate-y-1"
-								style="animation: fadeInUp 0.45s ease-out {i * 0.05}s both"
-							>
-								<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id ?? 0] || []} />
-							</a>
-						{/each}
-					</div>
-
-					<!-- Pagination -->
-					{#if totalPages > 1}
-						<div class="mt-14 flex flex-col items-center gap-3">
-							<div class="flex items-center gap-1.5">
-								<button
-									type="button"
-									onclick={prevPage}
-									disabled={!hasPrevPage}
-									aria-label="Previous page"
-									class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
-								>
-									<FontAwesomeIcon icon={faChevronLeft} class="text-xs" />
-								</button>
-
-								{#each Array.from({ length: totalPages }, (_, i) => i + 1) as page (page)}
-									{#if page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)}
-										<button
-											type="button"
-											onclick={() => goToPage(page)}
-											class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition-all {page ===
-											currentPage
-												? 'border-primary-600 bg-primary-600 text-white shadow-sm'
-												: 'border-light-300 bg-white text-dark-600 shadow-sm hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300'}"
-										>
-											{page}
-										</button>
-									{:else if page === currentPage - 3 || page === currentPage + 3}
-										<span class="flex h-9 w-9 items-center justify-center text-sm text-dark-400 dark:text-light-600"
-											>…</span
-										>
-									{/if}
-								{/each}
-
-								<button
-									type="button"
-									onclick={nextPage}
-									disabled={!hasNextPage}
-									aria-label="Next page"
-									class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
-								>
-									<FontAwesomeIcon icon={faChevronRight} class="text-xs" />
-								</button>
-							</div>
-
-							<p class="text-xs text-dark-400 dark:text-light-600" style="font-family: 'Plus Jakarta Sans', sans-serif">
-								{$_('houses.pageInfo', { values: { current: currentPage, total: totalPages } })}
-							</p>
-						</div>
-					{/if}
-				{/if}
-			</div>
+			<AppPropertyGrid
+				{properties}
+				{propertyImageMap}
+				{total}
+				limit={filters.limit}
+				offset={filters.offset}
+				{loading}
+				onPageChange={(newOffset) => {
+					filters.offset = newOffset;
+					loadProperties();
+				}}
+			/>
 		</div>
 	</div>
 </div>
