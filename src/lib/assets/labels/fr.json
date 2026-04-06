@@ -316,5 +316,30 @@
 		"createError": "Échec de la création du contact",
 		"updateSuccess": "Contact mis à jour avec succès",
 		"updateError": "Échec de la mise à jour du contact"
+	},
+	"location": {
+		"breadcrumb": {
+			"houses": "Biens Immobiliers"
+		},
+		"district": {
+			"metaTitle": "Maisons à Vendre à {location} | ImmoLux",
+			"metaDescription": "Parcourez {total} propriétés à vendre à {location}. Prix de €{min} à €{max}.",
+			"heroTitle": "Propriétés à Vendre à {location}",
+			"heroSubtitle": "Découvrez les biens disponibles à {location}"
+		},
+		"municipality": {
+			"metaTitle": "Maisons à Vendre à {location}, {district} | ImmoLux",
+			"metaDescription": "Parcourez {total} propriétés à vendre à {location}, {district}. Prix de €{min} à €{max}.",
+			"heroTitle": "Propriétés à Vendre à {location}",
+			"heroSubtitle": "{location}, {district}"
+		},
+		"stats": {
+			"available": "{total} propriétés disponibles",
+			"priceRange": "€{min} – €{max}",
+			"avgPrice": "Moyenne : €{avg}",
+			"mostCommon": "Type le plus courant : {type}",
+			"noProperties": "Aucune propriété disponible dans cette zone pour le moment",
+			"browsAll": "Voir toutes les propriétés"
+		}
 	}
 }

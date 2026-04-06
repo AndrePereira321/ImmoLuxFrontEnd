@@ -316,5 +316,30 @@
 		"createError": "Falha ao criar contacto",
 		"updateSuccess": "Contacto atualizado com sucesso",
 		"updateError": "Falha ao atualizar contacto"
+	},
+	"location": {
+		"breadcrumb": {
+			"houses": "Imóveis"
+		},
+		"district": {
+			"metaTitle": "Casas à Venda em {location} | ImmoLux",
+			"metaDescription": "Explore {total} propriedades à venda em {location}. Preços de €{min} a €{max}.",
+			"heroTitle": "Propriedades à Venda em {location}",
+			"heroSubtitle": "Explore os imóveis disponíveis em {location}"
+		},
+		"municipality": {
+			"metaTitle": "Casas à Venda em {location}, {district} | ImmoLux",
+			"metaDescription": "Explore {total} propriedades à venda em {location}, {district}. Preços de €{min} a €{max}.",
+			"heroTitle": "Propriedades à Venda em {location}",
+			"heroSubtitle": "{location}, {district}"
+		},
+		"stats": {
+			"available": "{total} propriedades disponíveis",
+			"priceRange": "€{min} – €{max}",
+			"avgPrice": "Média: €{avg}",
+			"mostCommon": "Tipo mais comum: {type}",
+			"noProperties": "Nenhuma propriedade disponível nesta área de momento",
+			"browsAll": "Ver todos os imóveis"
+		}
 	}
 }

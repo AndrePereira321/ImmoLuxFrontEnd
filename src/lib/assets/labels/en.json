@@ -316,5 +316,30 @@
 		"createError": "Failed to create contact",
 		"updateSuccess": "Contact updated successfully",
 		"updateError": "Failed to update contact"
+	},
+	"location": {
+		"breadcrumb": {
+			"houses": "Houses"
+		},
+		"district": {
+			"metaTitle": "Houses for Sale in {location} | ImmoLux",
+			"metaDescription": "Browse {total} properties for sale in {location}. Prices from €{min} to €{max}.",
+			"heroTitle": "Properties for Sale in {location}",
+			"heroSubtitle": "Browse available listings in {location}"
+		},
+		"municipality": {
+			"metaTitle": "Houses for Sale in {location}, {district} | ImmoLux",
+			"metaDescription": "Browse {total} properties for sale in {location}, {district}. Prices from €{min} to €{max}.",
+			"heroTitle": "Properties for Sale in {location}",
+			"heroSubtitle": "{location}, {district}"
+		},
+		"stats": {
+			"available": "{total} properties available",
+			"priceRange": "€{min} – €{max}",
+			"avgPrice": "Average: €{avg}",
+			"mostCommon": "Most common: {type}",
+			"noProperties": "No properties currently available in this area",
+			"browsAll": "Browse all properties"
+		}
 	}
 }
