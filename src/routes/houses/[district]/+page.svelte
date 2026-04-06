@@ -53,6 +53,8 @@
                 await Promise.all(
                     properties.map((p) => p.id && loadPropertyImages(p.id))
                 );
+            } else {
+                notificationStore.error($_('houses.noProperties'));
             }
         } catch {
             notificationStore.error($_('houses.noProperties'));

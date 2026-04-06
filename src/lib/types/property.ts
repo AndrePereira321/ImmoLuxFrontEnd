@@ -67,3 +67,13 @@ export interface LocationsResponse {
 	municipalities: string[];
 	parishes: string[];
 }
+
+export interface LocationStatsDTO {
+	district: string;
+	municipality: string | null;
+	total: number;
+	minPrice: number;
+	maxPrice: number;
+	avgPrice: number;
+	mostCommonType: string;
+}

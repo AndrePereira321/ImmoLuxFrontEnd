@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { PRIVATE_SERVER_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
-import type { PropertyDTO } from '$lib/types/property';
+import type { PropertyDTO, LocationStatsDTO } from '$lib/types/property';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
     const districtSlug = params.district;
@@ -19,9 +19,12 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
         error(404, 'Location not found');
     }
 
-    const stats = statsData.data;
+    const stats = statsData.data as LocationStatsDTO;
     const canonicalDistrict: string = stats.district;
-    const canonicalMunicipality: string = stats.municipality ?? '';
+    if (!stats.municipality) {
+        error(404, 'Location not found');
+    }
+    const canonicalMunicipality: string = stats.municipality;
 
     // Fetch first page of properties
     const propsRes = await fetch(
