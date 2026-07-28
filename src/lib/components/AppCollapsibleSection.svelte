@@ -36,7 +36,13 @@
 				{title}
 			</h3>
 		</div>
-		<FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} class="text-dark-600 dark:text-light-400" />
+		<!-- Separate blocks, not one switched prop: svelte-fontawesome reads its icon
+		     once at creation, so the chevron never turned over. -->
+		{#if isOpen}
+			<FontAwesomeIcon icon={faChevronUp} class="text-dark-600 dark:text-light-400" />
+		{:else}
+			<FontAwesomeIcon icon={faChevronDown} class="text-dark-600 dark:text-light-400" />
+		{/if}
 	</button>
 
 	{#if isOpen}

@@ -29,6 +29,3 @@ export const formatArea = (area?: number | null, lang?: string | null): string |
 	// Non-breaking space: the number and its unit must never wrap apart.
 	return `${new Intl.NumberFormat(intlLocale(lang)).format(area)}\u00a0m²`;
 };
-
-/** Catalogue reference: 1 → "01". */
-export const formatLotNumber = (index: number): string => String(index + 1).padStart(2, '0');

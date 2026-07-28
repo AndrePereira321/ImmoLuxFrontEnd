@@ -83,16 +83,18 @@ export default defineConfig({
 	build: {
 		minify: 'terser',
 		cssMinify: true,
-		rollupOptions: {
+		rolldownOptions: {
 			output: {
-				manualChunks(id) {
-					if (id.includes('node_modules')) {
-						if (id.includes('svelte')) return 'vendor-svelte';
-						if (id.includes('@fortawesome')) return 'vendor-icons';
-						if (id.includes('svelte-i18n')) return 'vendor-i18n';
-						if (id.includes('leaflet')) return 'vendor-leaflet';
-						return 'vendor';
-					}
+				// Rolldown (Vite 8) replaces the manualChunks function with
+				// declarative codeSplitting groups — first matching group wins.
+				codeSplitting: {
+					groups: [
+						{ name: 'vendor-svelte', test: /node_modules\/.*svelte/ },
+						{ name: 'vendor-icons', test: /node_modules\/.*@fortawesome/ },
+						{ name: 'vendor-i18n', test: /node_modules\/.*svelte-i18n/ },
+						{ name: 'vendor-leaflet', test: /node_modules\/.*leaflet/ },
+						{ name: 'vendor', test: /node_modules/ }
+					]
 				}
 			}
 		},

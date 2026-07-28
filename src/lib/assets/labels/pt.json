@@ -7,40 +7,59 @@
 			"description": "Explore propriedades disponíveis em Portugal. Filtre por localização, preço e tipo. Encontre a sua casa ideal em moradias, apartamentos e terrenos premium."
 		},
 		"hero": {
-			"title": "Casas e Imóveis à Venda em Portugal",
-			"subtitle": "Filtre por localização, preço e tipo de imóvel",
-			"eyebrow": "Portugal · Norte"
+			"title": "Imóveis à venda",
+			"subtitle": "Todo o catálogo ImmoLux numa página. Cada filtro mostra quantos imóveis tem — os que não têm nenhum não aparecem.",
+			"eyebrow": "Catálogo"
 		},
-		"filters": "Filtros",
-		"allTypes": "Todos os Tipos",
-		"allStatuses": "Todos os Estados",
 		"minPrice": "Preço Mín (€)",
 		"maxPrice": "Preço Máx (€)",
 		"min": "Mín",
 		"max": "Máx",
-		"clearFilters": "Limpar Filtros",
+		"clearFilters": "Limpar filtros",
 		"loading": "A carregar propriedades…",
-		"property": "propriedade",
-		"properties": "propriedades",
+		"property": "imóvel",
+		"properties": "imóveis",
 		"noProperties": "Nenhuma propriedade encontrada",
-		"noPropertiesDescription": "Tente ajustar os filtros para ver mais resultados",
 		"pageInfo": "Página {current} de {total}",
 		"prevPage": "Página anterior",
 		"nextPage": "Página seguinte",
-		"quickFilters": {
-			"under200k": "Até 200 mil",
-			"between200k500k": "200 - 500 mil",
-			"luxury500k": "Luxo +500 mil"
-		},
 		"sort": {
-			"newest": "Mais Recentes",
-			"oldest": "Mais Antigas",
-			"popular": "Mais Populares",
-			"status": "Disponibilidade",
-			"priceLowHigh": "Preço: Baixo para Alto",
-			"priceHighLow": "Preço: Alto para Baixo",
-			"location": "Localização (A-Z)"
-		}
+			"location": "Localidade (A–Z)",
+			"label": "Ordenar",
+			"created_desc": "Mais recentes",
+			"created_asc": "Mais antigos",
+			"popularity": "Mais vistos",
+			"price_asc": "Preço mais baixo",
+			"price_desc": "Preço mais alto"
+		},
+		"pagination": "Páginas de resultados",
+		"search": {
+			"label": "Procurar imóveis",
+			"placeholder": "Nome, tipo ou localidade",
+			"submit": "Procurar"
+		},
+		"facets": {
+			"where": "Onde",
+			"type": "Tipo",
+			"availability": "Estado",
+			"price": "Preço",
+			"applyPrice": "Aplicar preço",
+			"rangeIs": "Neste momento entre {min} e {max}.",
+			"rangeSingle": "Neste momento apenas {min}."
+		},
+		"empty": {
+			"title": "Nada corresponde a esta procura",
+			"body": "Retire um dos filtros abaixo para alargar a pesquisa.",
+			"drop": "Retirar {filter}",
+			"showAll": "Ver todos os imóveis"
+		},
+		"applied": {
+			"remove": "Remover filtro",
+			"selectedRemove": "Selecionado. Escolher outra vez para remover.",
+			"from": "desde {value}",
+			"to": "até {value}"
+		},
+		"filters": "Filtros"
 	},
 	"common": {
 		"save": "Guardar",
@@ -62,7 +81,9 @@
 		"login": "Entrar",
 		"logout": "Sair",
 		"userMenu": "Menu de utilizador",
-		"myProperties": "As Minhas Propriedades"
+		"myProperties": "As Minhas Propriedades",
+		"themeToDark": "Mudar para tema escuro",
+		"themeToLight": "Mudar para tema claro"
 	},
 	"auth": {
 		"login": "Login",

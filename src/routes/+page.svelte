@@ -152,20 +152,29 @@
 			</div>
 		</div>
 
-		<div class="reveal reveal-up reveal-d1 azulejo-panel mt-9 grid-cols-2 lg:grid-cols-4">
+		<!-- A frieze of four where there is room to lay one, and a run of single
+		     tiles where there is not. Two columns at phone width left each caption
+		     in an 18-character gutter, seven lines deep and staggered against its
+		     neighbour; below sm the mark moves beside its name and the sentence
+		     gets the full width of the field. -->
+		<div class="reveal reveal-up reveal-d1 azulejo-panel mt-9 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 			{#each tiles as tile (tile.motif)}
-				<div class="azulejo-cell flex flex-col">
-					<div class="p-5 sm:p-7">
-						<div class="mx-auto aspect-square w-full max-w-[10.5rem] text-primary-700 dark:text-primary-300">
+				<div class="azulejo-cell grid grid-cols-[5rem_minmax(0,1fr)] items-center gap-x-4 p-5 sm:block sm:p-0">
+					<div class="sm:p-7">
+						<div class="mx-auto aspect-square w-full text-primary-700 sm:max-w-[10.5rem] dark:text-primary-300">
 							<AppAzulejo motif={tile.motif} />
 						</div>
 					</div>
-					<!-- No mt-auto: the captions differ in length, and pushing each to its
-					     own cell's floor would stagger the grout rules across the frieze. -->
-					<div class="azulejo-rule border-t p-5 sm:p-6">
-						<p class="type-label text-primary-700 dark:text-primary-300">{tile.label}</p>
-						<p class="mt-2.5 text-sm leading-relaxed text-dark-500 dark:text-light-500">{tile.body}</p>
-					</div>
+					<!-- azulejo-rule carries only the colour; the width arrives at sm, where
+					     the caption sits below the mark instead of beside it. -->
+					<p class="type-label azulejo-rule text-primary-700 sm:border-t sm:px-6 sm:pt-5 dark:text-primary-300">
+						{tile.label}
+					</p>
+					<p
+						class="col-span-2 mt-3 text-sm leading-relaxed text-dark-500 sm:mt-2.5 sm:px-6 sm:pb-6 dark:text-light-500"
+					>
+						{tile.body}
+					</p>
 				</div>
 			{/each}
 		</div>
@@ -177,48 +186,54 @@
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <section class="bg-light-200 pb-14 dark:bg-dark-850">
 	<div class="mx-auto max-w-[84rem] px-5 sm:px-8 lg:px-12">
-		<div class="azulejo-panel grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-			<div class="azulejo-cell-ink p-8 sm:p-10 lg:p-12">
-				<p class="type-label text-secondary-400">{$_('homepage.contact.eyebrow')}</p>
+		<!-- One tall ink field, and beside it two glazed ones stacked. The row gap
+		     is the same grout as everywhere else, so the split reads as masonry
+		     rather than as a column that ran short. -->
+		<div class="azulejo-panel grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:grid-rows-[auto_1fr]">
+			<div class="azulejo-cell-ink p-8 sm:p-10 lg:row-span-2 lg:p-12">
+				<p class="type-label text-secondary-300">{$_('homepage.contact.eyebrow')}</p>
 				<h2 class="type-display mt-6 text-[clamp(1.9rem,3.5vw,2.9rem)] text-light-50">
 					{$_('homepage.contact.headline')}
 				</h2>
 				<p class="mt-6 max-w-[46ch] leading-relaxed text-light-300/80">{$_('homepage.contact.body')}</p>
 
-				<!-- The one place the champagne runs at full strength on the whole page.
-				     One label inside the button, not two competing for it. -->
+				<!-- The one champagne field on the page. Set as a plate — label left,
+				     address right — so it belongs to the same run of fields as
+				     everything else, instead of floating as a button. -->
 				<a
 					href="mailto:info@immolux.pt"
-					translate="no"
-					class="group mt-9 inline-flex w-fit max-w-full items-center gap-4 bg-secondary-400 px-7 py-4 text-dark-950 transition-colors hover:bg-secondary-300"
+					class="group mt-9 flex w-full max-w-[30rem] flex-col items-start gap-1.5 bg-secondary-300 px-6 py-4 text-dark-950 transition-colors hover:bg-secondary-200 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
 				>
-					<span class="type-record min-w-0 truncate text-base sm:text-lg">info@immolux.pt</span>
-					<span aria-hidden="true" class="shrink-0 transition-transform duration-300 group-hover:translate-x-1">→</span>
+					<span class="type-label shrink-0">{$_('homepage.contact.emailCta')}</span>
+					<span class="flex min-w-0 items-center gap-3">
+						<span translate="no" class="type-record min-w-0 truncate text-base">info@immolux.pt</span>
+						<span aria-hidden="true" class="shrink-0 transition-transform duration-300 group-hover:translate-x-1">
+							→
+						</span>
+					</span>
 				</a>
+			</div>
 
-				<p class="type-record mt-7 text-sm text-light-400/75">
+			<div class="azulejo-cell p-8 sm:p-10 lg:p-12 lg:py-10">
+				<p class="type-label text-primary-700 dark:text-primary-300">{$_('footer.contact')}</p>
+				<p class="mt-4">
 					<a
 						href="tel:+351913160232"
 						translate="no"
-						class="underline decoration-light-50/25 underline-offset-4 transition-colors hover:text-secondary-300 hover:decoration-secondary-400"
+						class="type-record text-base text-dark-800 underline decoration-primary-300 underline-offset-4 transition-colors hover:text-primary-700 hover:decoration-primary-500 dark:text-light-200 dark:decoration-primary-700 dark:hover:text-primary-300"
 					>
 						+351 913 160 232
 					</a>
-					<span aria-hidden="true" class="mx-2.5 opacity-40">·</span>
-					<span translate="no">Lousada, Portugal</span>
 				</p>
+				<p translate="no" class="type-record mt-2 text-sm text-dark-400 dark:text-light-600">Lousada, Portugal</p>
 			</div>
 
-			<!-- justify-center, not justify-between: pinning the action to the cell
-			     floor left a stranded gap whenever this text ran short. -->
-			<div class="azulejo-cell flex flex-col justify-center p-8 sm:p-10 lg:p-12">
+			<div class="azulejo-cell flex flex-col justify-center p-8 sm:p-10 lg:p-12 lg:py-10">
 				<p class="type-label text-primary-700 dark:text-primary-300">{$_('homepage.contact.ownersLabel')}</p>
-				<span aria-hidden="true" class="azulejo-rule mt-4 block w-10 border-t"></span>
 				<p class="mt-4 max-w-[38ch] leading-relaxed text-dark-600 dark:text-light-400">
 					{$_('homepage.contact.ownersBody')}
 				</p>
-				<!-- A link, not a second button: two bordered buttons in one panel
-				     compete, and this is the quieter of the two invitations. -->
+				<!-- A link, not a second plate: this is the quieter of the two invitations. -->
 				<a
 					href="mailto:info@immolux.pt?subject=Im%C3%B3vel"
 					class="group mt-6 inline-flex w-fit items-center gap-2.5 text-sm font-medium text-primary-700 transition-colors hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200"

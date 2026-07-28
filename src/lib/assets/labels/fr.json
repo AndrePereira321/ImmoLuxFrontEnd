@@ -7,40 +7,59 @@
 			"description": "Explorez les propriétés disponibles au Portugal. Filtrez par emplacement, prix et type. Trouvez votre maison idéale parmi les villas, appartements et terrains premium."
 		},
 		"hero": {
-			"title": "Maisons et Propriétés à Vendre au Portugal",
-			"subtitle": "Filtrez par localisation, prix et type de bien",
-			"eyebrow": "Portugal · Nord"
+			"title": "Biens à vendre",
+			"subtitle": "Tout le catalogue ImmoLux sur une page. Chaque filtre indique combien de biens il contient — ceux qui n'en contiennent aucun ne sont pas proposés.",
+			"eyebrow": "Catalogue"
 		},
-		"filters": "Filtres",
-		"allTypes": "Tous les Types",
-		"allStatuses": "Tous les États",
 		"minPrice": "Prix Min (€)",
 		"maxPrice": "Prix Max (€)",
 		"min": "Min",
 		"max": "Max",
-		"clearFilters": "Effacer les Filtres",
+		"clearFilters": "Effacer les filtres",
 		"loading": "Chargement des propriétés…",
-		"property": "propriété",
-		"properties": "propriétés",
+		"property": "bien",
+		"properties": "biens",
 		"noProperties": "Aucune propriété trouvée",
-		"noPropertiesDescription": "Essayez d’ajuster vos filtres pour voir plus de résultats",
 		"pageInfo": "Page {current} sur {total}",
 		"prevPage": "Page précédente",
 		"nextPage": "Page suivante",
-		"quickFilters": {
-			"under200k": "Moins de 200k",
-			"between200k500k": "200k - 500k",
-			"luxury500k": "Luxe +500k"
-		},
 		"sort": {
-			"newest": "Plus Récentes",
-			"oldest": "Plus Anciennes",
-			"popular": "Plus Populaires",
-			"status": "Disponibilité",
-			"priceLowHigh": "Prix: Bas à Élevé",
-			"priceHighLow": "Prix: Élevé à Bas",
-			"location": "Emplacement (A-Z)"
-		}
+			"location": "Commune (A–Z)",
+			"label": "Trier",
+			"created_desc": "Plus récents",
+			"created_asc": "Plus anciens",
+			"popularity": "Plus consultés",
+			"price_asc": "Prix croissant",
+			"price_desc": "Prix décroissant"
+		},
+		"pagination": "Pages de résultats",
+		"search": {
+			"label": "Rechercher des biens",
+			"placeholder": "Nom, type ou commune",
+			"submit": "Rechercher"
+		},
+		"facets": {
+			"where": "Où",
+			"type": "Type",
+			"availability": "Disponibilité",
+			"price": "Prix",
+			"applyPrice": "Appliquer le prix",
+			"rangeIs": "Actuellement entre {min} et {max}.",
+			"rangeSingle": "Actuellement uniquement {min}."
+		},
+		"empty": {
+			"title": "Aucun bien ne correspond",
+			"body": "Retirez l'un des filtres ci-dessous pour élargir la recherche.",
+			"drop": "Retirer {filter}",
+			"showAll": "Voir tous les biens"
+		},
+		"applied": {
+			"remove": "Retirer le filtre",
+			"selectedRemove": "Sélectionné. Choisir à nouveau pour retirer.",
+			"from": "à partir de {value}",
+			"to": "jusqu'à {value}"
+		},
+		"filters": "Filtres"
 	},
 	"common": {
 		"save": "Enregistrer",
@@ -62,7 +81,9 @@
 		"login": "Connexion",
 		"logout": "Déconnexion",
 		"userMenu": "Menu utilisateur",
-		"myProperties": "Mes Propriétés"
+		"myProperties": "Mes Propriétés",
+		"themeToDark": "Passer au thème sombre",
+		"themeToLight": "Passer au thème clair"
 	},
 	"auth": {
 		"login": "Login",

@@ -7,40 +7,59 @@
 			"description": "Explore available properties in Portugal. Filter by location, price and type. Find your ideal home in premium villas, apartments and land."
 		},
 		"hero": {
-			"title": "Houses and Properties for Sale in Portugal",
-			"subtitle": "Filter by location, price and property type",
-			"eyebrow": "Portugal · North"
+			"title": "Properties for sale",
+			"subtitle": "The whole ImmoLux catalogue on one page. Every filter shows how many properties it holds — the ones holding none aren't listed.",
+			"eyebrow": "Catalogue"
 		},
-		"filters": "Filters",
-		"allTypes": "All Types",
-		"allStatuses": "All Statuses",
 		"minPrice": "Min Price (€)",
 		"maxPrice": "Max Price (€)",
 		"min": "Min",
 		"max": "Max",
-		"clearFilters": "Clear Filters",
+		"clearFilters": "Clear filters",
 		"loading": "Loading properties…",
 		"property": "property",
 		"properties": "properties",
 		"noProperties": "No properties found",
-		"noPropertiesDescription": "Try adjusting your filters to see more results",
 		"pageInfo": "Page {current} of {total}",
 		"prevPage": "Previous page",
 		"nextPage": "Next page",
-		"quickFilters": {
-			"under200k": "Under 200k",
-			"between200k500k": "200k - 500k",
-			"luxury500k": "Luxury 500k+"
-		},
 		"sort": {
-			"newest": "Newest First",
-			"oldest": "Oldest First",
-			"popular": "Most Popular",
-			"status": "Availability",
-			"priceLowHigh": "Price: Low to High",
-			"priceHighLow": "Price: High to Low",
-			"location": "Location (A-Z)"
-		}
+			"location": "Town (A–Z)",
+			"label": "Sort",
+			"created_desc": "Newest first",
+			"created_asc": "Oldest first",
+			"popularity": "Most viewed",
+			"price_asc": "Lowest price",
+			"price_desc": "Highest price"
+		},
+		"pagination": "Result pages",
+		"search": {
+			"label": "Search properties",
+			"placeholder": "Name, type or town",
+			"submit": "Search"
+		},
+		"facets": {
+			"where": "Where",
+			"type": "Type",
+			"availability": "Availability",
+			"price": "Price",
+			"applyPrice": "Apply price",
+			"rangeIs": "Currently between {min} and {max}.",
+			"rangeSingle": "Currently only {min}."
+		},
+		"empty": {
+			"title": "Nothing matches this search",
+			"body": "Drop one of the filters below to widen it.",
+			"drop": "Drop {filter}",
+			"showAll": "Show every property"
+		},
+		"applied": {
+			"remove": "Remove filter",
+			"selectedRemove": "Selected. Choose again to remove.",
+			"from": "from {value}",
+			"to": "up to {value}"
+		},
+		"filters": "Filters"
 	},
 	"common": {
 		"save": "Save",
@@ -62,7 +81,9 @@
 		"login": "Login",
 		"logout": "Logout",
 		"userMenu": "User menu",
-		"myProperties": "My Properties"
+		"myProperties": "My Properties",
+		"themeToDark": "Switch to dark theme",
+		"themeToLight": "Switch to light theme"
 	},
 	"auth": {
 		"login": "Login",

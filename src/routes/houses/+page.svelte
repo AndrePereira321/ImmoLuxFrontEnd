@@ -1,211 +1,125 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
-	import { apiClient } from '$lib/api/api-client';
-	import type { LocationsResponse, PropertyDTO } from '$lib/types/property';
-	import AppPropertyGrid from '$lib/components/AppPropertyGrid.svelte';
-	import { _ } from 'svelte-i18n';
+	/**
+	 * The catalogue.
+	 *
+	 * Ten buildings in two towns, so the page is built as a register rather than a
+	 * search engine: the rail is an index of what exists, every entry carries the
+	 * number of properties behind it, and an entry that would find nothing is not
+	 * offered at all. Counts come from the API with each dimension measured against
+	 * the other filters, which is what lets the page promise that every remaining
+	 * choice leads somewhere.
+	 *
+	 * All of the state is in the query string. Nothing here mirrors it, so a search
+	 * survives a reload, answers the back button, and can be sent to somebody else.
+	 */
+	import { _, locale } from 'svelte-i18n';
+	import { resolve } from '$app/paths';
+	import { goto } from '$app/navigation';
+	import { navigating } from '$app/state';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faEuroSign, faFilter, faHome, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
-	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import { faMagnifyingGlass, faSliders, faXmark } from '@fortawesome/free-solid-svg-icons';
+	import AppPropertyGrid from '$lib/components/AppPropertyGrid.svelte';
+	import type { FacetBucket, PropertyDTO } from '$lib/types/property';
+	import { formatPrice } from '$lib/utils/format';
+	import {
+		DEFAULT_SORT,
+		PROPERTY_SORTS,
+		SEARCH_PAGE_SIZE,
+		activeFilters,
+		toPageQuery,
+		without,
+		type NarrowingKey,
+		type PropertySearch,
+		type PropertySort
+	} from '$lib/utils/property-search';
 	import homeImage from '$lib/assets/images/home_image.jpeg';
-
-	type OrderBy = 'price_asc' | 'price_desc' | 'created_asc' | 'created_desc' | 'popularity' | 'location' | 'status';
-
-	interface PropertyListResponse {
-		properties: PropertyDTO[];
-		total: number;
-	}
-
-	interface PropertyImageMap {
-		[propertyId: number]: number[];
-	}
 
 	let { data } = $props();
 
-	const { properties: _initProperties, total: _initTotal, propertyImageMap: _initMap } = untrack(() => data);
+	const search = $derived(data.search);
+	const facets = $derived(data.facets);
+	const active = $derived(activeFilters(search));
+	const busy = $derived(Boolean(navigating.to));
 
-	let properties = $state<PropertyDTO[]>(_initProperties);
-	let total = $state<number>(_initTotal);
-	let loading = $state(false);
-	let showFilters = $state(false);
+	const base = resolve('/houses');
+	const urlFor = (patch: Partial<PropertySearch>): string =>
+		`${base}${toPageQuery({ ...search, ...patch, offset: 0 })}`;
 
-	let districts = $state<string[]>([]);
-	let municipalities = $state<string[]>([]);
-	let parishes = $state<string[]>([]);
-	let loadingLocations = $state(false);
+	/** Choosing what is already chosen releases it — the rail has no separate undo. */
+	const toggleUrl = (key: NarrowingKey, value: string): string => urlFor({ [key]: search[key] === value ? '' : value });
 
-	let filters = $state({
-		district: '',
-		municipality: '',
-		parish: '',
-		propertyType: '',
-		status: '',
-		minPrice: null as number | null,
-		maxPrice: null as number | null,
-		orderBy: 'created_desc' as OrderBy,
-		limit: 12,
-		offset: 0
-	});
+	/**
+	 * Types and availability have a settled order — a plan of a house, then the
+	 * stages of a sale — and shuffling them by how many there are would move the
+	 * ground under a reader who is scanning the same list for the second time.
+	 */
+	const inOrder = (buckets: FacetBucket[], order: string[]): FacetBucket[] =>
+		[...buckets].sort((a, b) => order.indexOf(a.value) - order.indexOf(b.value));
 
-	let propertyImageMap = $state<PropertyImageMap>(_initMap);
-
-	onMount(() => {
-		loadLocations();
-	});
-
-	const activeFiltersCount = $derived(
-		[
-			filters.district,
-			filters.municipality,
-			filters.parish,
-			filters.propertyType,
-			filters.status,
-			filters.minPrice,
-			filters.maxPrice
-		].filter((f) => f !== '' && f !== null).length
+	const typeBuckets = $derived(
+		inOrder(facets.propertyTypes, ['house', 'apartment', 'villa', 'townhouse', 'land', 'commercial'])
 	);
+	const statusBuckets = $derived(inOrder(facets.statuses, ['available', 'pending', 'sold', 'rented']));
 
-	const loadLocations = async () => {
-		if (districts.length > 0) return;
-		loadingLocations = true;
-		try {
-			const response = await apiClient.get<LocationsResponse>('/locations');
-			if (response.data.success) {
-				districts = response.data.data.districts;
-				municipalities = response.data.data.municipalities;
-				parishes = response.data.data.parishes;
-			}
-		} catch (error) {
-			console.error('Failed to load locations:', error);
-		} finally {
-			loadingLocations = false;
+	/** "Lousada, Porto" — the town first, because that is what a buyer is looking for. */
+	const placeLabel = (bucket: FacetBucket): string =>
+		bucket.parent ? `${bucket.value}, ${bucket.parent}` : bucket.value;
+
+	const filterLabel = (key: NarrowingKey): string => {
+		switch (key) {
+			case 'q':
+				return `“${search.q}”`;
+			case 'municipality':
+			case 'district':
+			case 'parish':
+				return search[key];
+			case 'propertyType':
+				return $_(`properties.types.${search.propertyType}`);
+			case 'status':
+				return $_(`properties.statuses.${search.status}`);
+			case 'minPrice':
+				return $_('houses.applied.from', { values: { value: formatPrice(search.minPrice, $locale) } });
+			case 'maxPrice':
+				return $_('houses.applied.to', { values: { value: formatPrice(search.maxPrice, $locale) } });
 		}
 	};
 
-	const loadPropertyImages = async (propertyId: number) => {
-		try {
-			const response = await apiClient.get<{ images: { id: number; displayOrder: number }[] }>(
-				`/properties/${propertyId}/images`
-			);
-			if (response.data.success && response.data.data) {
-				const images = response.data.data.images;
-				if (Array.isArray(images)) {
-					propertyImageMap[propertyId] = images
-						.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-						.map((img) => img.id!);
-				} else {
-					propertyImageMap[propertyId] = [];
-				}
-			} else {
-				propertyImageMap[propertyId] = [];
-			}
-		} catch (error) {
-			console.error(`Failed to load images for property ${propertyId}:`, error);
-			propertyImageMap[propertyId] = [];
-		}
+	/**
+	 * The box navigates as you type. The value is read from the URL rather than
+	 * bound to it, so the back button rewinds the field along with the results and
+	 * a stale keystroke can never overwrite a newer one.
+	 */
+	let searchTimer: ReturnType<typeof setTimeout>;
+	const onSearchInput = (event: Event) => {
+		const value = (event.currentTarget as HTMLInputElement).value;
+		clearTimeout(searchTimer);
+		searchTimer = setTimeout(() => {
+			// replaceState: typing is one act of searching, not a dozen history entries.
+			goto(urlFor({ q: value.trim() }), { keepFocus: true, noScroll: true, replaceState: true });
+		}, 280);
 	};
 
-	const loadProperties = async () => {
-		loading = true;
-		try {
-			const params = new SvelteURLSearchParams();
-			if (filters.district) params.append('district', filters.district);
-			if (filters.municipality) params.append('municipality', filters.municipality);
-			if (filters.parish) params.append('parish', filters.parish);
-			if (filters.propertyType) params.append('propertyType', filters.propertyType);
-			if (filters.status) params.append('status', filters.status);
-			if (filters.minPrice !== null) params.append('minPrice', filters.minPrice.toString());
-			if (filters.maxPrice !== null) params.append('maxPrice', filters.maxPrice.toString());
-			if (filters.orderBy) params.append('orderBy', filters.orderBy);
-			params.append('limit', filters.limit.toString());
-			params.append('offset', filters.offset.toString());
-
-			const response = await apiClient.get<PropertyListResponse>(`/properties?${params.toString()}`);
-			if (response.data.success) {
-				properties = response.data.data.properties;
-				total = response.data.data.total;
-				propertyImageMap = {};
-				await Promise.all(properties.map((property) => property.id && loadPropertyImages(property.id)));
-			}
-		} catch (error) {
-			console.error('Failed to load properties:', error);
-		} finally {
-			loading = false;
-		}
+	const onSortChange = (event: Event) => {
+		const value = (event.currentTarget as HTMLSelectElement).value as PropertySort;
+		goto(urlFor({ orderBy: value }), { noScroll: true });
 	};
 
-	const handleFilterChange = () => {
-		filters.offset = 0;
-		loadProperties();
-	};
+	let filtersOpen = $state(false);
 
-	const clearFilters = () => {
-		filters.district = '';
-		filters.municipality = '';
-		filters.parish = '';
-		filters.propertyType = '';
-		filters.status = '';
-		filters.minPrice = null;
-		filters.maxPrice = null;
-		filters.offset = 0;
-		loadProperties();
-	};
+	/**
+	 * What the price fields are worth typing, given everything else that is set.
+	 * Narrow far enough and the range closes onto a single property, where naming
+	 * one figure twice would read as a mistake rather than as a range.
+	 */
+	const rangeCaption = $derived.by(() => {
+		const { minPrice, maxPrice } = facets;
+		if (minPrice === null || maxPrice === null) return '';
+		const min = formatPrice(minPrice, $locale);
+		if (minPrice === maxPrice) return $_('houses.facets.rangeSingle', { values: { min } });
+		return $_('houses.facets.rangeIs', { values: { min, max: formatPrice(maxPrice, $locale) } });
+	});
 
-	const toggleFilters = () => {
-		showFilters = !showFilters;
-		if (showFilters) loadLocations();
-	};
-
-	const propertyTypes = $derived([
-		{ value: '', label: $_('houses.allTypes') },
-		{ value: 'house', label: $_('properties.types.house') },
-		{ value: 'apartment', label: $_('properties.types.apartment') },
-		{ value: 'villa', label: $_('properties.types.villa') },
-		{ value: 'townhouse', label: $_('properties.types.townhouse') },
-		{ value: 'land', label: $_('properties.types.land') },
-		{ value: 'commercial', label: $_('properties.types.commercial') }
-	]);
-
-	const statusOptions = $derived([
-		{
-			value: '',
-			label: $_('houses.allStatuses'),
-			dot: 'bg-dark-400 dark:bg-light-600',
-			active: 'bg-dark-900 text-white dark:bg-light-50 dark:text-dark-900',
-			hover: 'hover:bg-light-200 dark:hover:bg-dark-700'
-		},
-		/* Active/hover shades are the darkest step of each ramp that keeps the hue
-		   readable: these ramps run unusually light, so the 500–700 steps fail
-		   WCAG against white text or the 50-tint hover grounds. */
-		{
-			value: 'available',
-			label: $_('properties.statuses.available'),
-			dot: 'bg-success-500',
-			active: 'bg-success-900 text-white ring-2 ring-success-200 dark:ring-success-800',
-			hover: 'hover:bg-success-50 hover:text-success-900 dark:hover:bg-success-950/40 dark:hover:text-success-300'
-		},
-		{
-			value: 'pending',
-			label: $_('properties.statuses.pending'),
-			dot: 'bg-warning-400',
-			active: 'bg-warning-800 text-white ring-2 ring-warning-200 dark:ring-warning-800',
-			hover: 'hover:bg-warning-50 hover:text-warning-900 dark:hover:bg-warning-950/40 dark:hover:text-warning-300'
-		},
-		{
-			value: 'sold',
-			label: $_('properties.statuses.sold'),
-			dot: 'bg-error-500',
-			active: 'bg-error-600 text-white ring-2 ring-error-200 dark:ring-error-800',
-			hover: 'hover:bg-error-50 hover:text-error-700 dark:hover:bg-error-950/40 dark:hover:text-error-300'
-		},
-		{
-			value: 'rented',
-			label: $_('properties.statuses.rented'),
-			dot: 'bg-info-500',
-			active: 'bg-info-800 text-white ring-2 ring-info-200 dark:ring-info-800',
-			hover: 'hover:bg-info-50 hover:text-info-900 dark:hover:bg-info-950/40 dark:hover:text-info-300'
-		}
-	]);
+	const properties = $derived(data.properties as PropertyDTO[]);
 </script>
 
 <svelte:head>
@@ -220,7 +134,13 @@
 	<meta name="twitter:title" content="{$_('houses.meta.title')} - ImmoLux" />
 	<meta name="twitter:description" content={$_('houses.meta.description')} />
 	<meta name="twitter:image" content="https://immolux.pt{homeImage}" />
+	<!-- A filtered view is the same collection seen through a filter, not a page of
+	     its own: one canonical target keeps the ten listings from being indexed
+	     dozens of times over. -->
 	<link rel="canonical" href="https://immolux.pt/houses" />
+	{#if active.length > 0}
+		<meta name="robots" content="noindex, follow" />
+	{/if}
 	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
@@ -234,344 +154,337 @@
 	</script>
 </svelte:head>
 
-<div class="min-h-screen bg-light-50 dark:bg-dark-900">
-	<!-- ─── Hero Strip ─────────────────────────────────────────────── -->
-	<section class="relative overflow-hidden bg-dark-950">
-		<div class="absolute inset-0 bg-cover bg-center" style="background-image: url({homeImage})"></div>
-		<!-- Weighted toward the reading edge so the heading holds over any photo -->
-		<div class="absolute inset-0 bg-gradient-to-r from-dark-950/94 via-dark-950/72 to-dark-950/45"></div>
-		<div class="absolute inset-0 bg-primary-950/30 mix-blend-multiply"></div>
-
-		<div class="relative mx-auto w-full max-w-[84rem] px-5 py-14 sm:px-8 sm:py-16 lg:px-12">
-			<p class="type-label hero-rise text-secondary-400">
-				{$_('houses.hero.eyebrow')}
-			</p>
-			<h1
-				class="type-display hero-rise mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)] text-light-50"
-				style="animation-delay: 80ms"
-			>
-				{$_('houses.hero.title')}
-			</h1>
-			<div class="hero-rise mt-5 flex flex-wrap items-center gap-x-4 gap-y-2" style="animation-delay: 160ms">
-				<p class="text-sm text-light-200/75">{$_('houses.hero.subtitle')}</p>
-				{#if !loading && total > 0}
-					<span aria-hidden="true" class="h-px w-8 shrink-0 bg-secondary-400/50"></span>
-					<p class="type-record text-sm text-secondary-300">
-						{total}
-						{total === 1 ? $_('houses.property') : $_('houses.properties')}
-					</p>
-				{/if}
-			</div>
-		</div>
-	</section>
-
-	<!-- ─── Sticky Availability & Sort Bar ────────────────────────── -->
-	<div
-		class="sticky top-16 z-40 border-b border-light-200/80 bg-white/92 backdrop-blur-md dark:border-dark-700/70 dark:bg-dark-900/92"
-	>
-		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div
-				class="flex items-center gap-3 overflow-x-auto py-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-			>
-				<!-- Availability status chips -->
-				<div class="flex flex-shrink-0 items-center gap-1.5">
-					{#each statusOptions as opt (opt.value)}
-						<button
-							type="button"
-							onclick={() => {
-								filters.status = opt.value;
-								handleFilterChange();
-							}}
-							class="flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 {filters.status ===
-							opt.value
-								? opt.active
-								: `bg-light-100 text-dark-600 dark:bg-dark-800 dark:text-light-400 ${opt.hover}`}"
+{#snippet facetSection(title: string, key: NarrowingKey, buckets: FacetBucket[], label: (b: FacetBucket) => string)}
+	{#if buckets.length > 0}
+		<section>
+			<h3 class="type-label mb-2.5 text-dark-400 dark:text-light-600">{title}</h3>
+			<div class="azulejo-panel grid-cols-1">
+				{#each buckets as bucket (bucket.value)}
+					{@const selected = search[key] === bucket.value}
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+					<a
+						href={toggleUrl(key, bucket.value)}
+						aria-current={selected ? 'true' : undefined}
+						data-sveltekit-noscroll
+						class="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors {selected
+							? 'bg-primary-700 text-light-50 dark:bg-primary-600'
+							: 'azulejo-cell text-dark-700 hover:bg-primary-50 hover:text-primary-800 dark:text-light-300 dark:hover:bg-primary-950/50 dark:hover:text-primary-200'}"
+					>
+						<span class="min-w-0 flex-1 truncate">{label(bucket)}</span>
+						<!-- The count keeps its column whether or not the row is chosen, so the
+						     figures still read down the panel as one list. -->
+						<span
+							class="type-record shrink-0 text-xs tabular-nums {selected
+								? 'text-light-50/85'
+								: 'text-dark-400 dark:text-light-600'}"
 						>
-							<span
-								class="h-1.5 w-1.5 flex-shrink-0 rounded-full {filters.status === opt.value ? 'bg-white/80' : opt.dot}"
-							></span>
-							{opt.label}
-						</button>
-					{/each}
-				</div>
+							{bucket.count}
+						</span>
+						{#if selected}
+							<span class="sr-only">{$_('houses.applied.selectedRemove')}</span>
+							<FontAwesomeIcon icon={faXmark} class="-mr-1 shrink-0 text-[0.7rem] opacity-80" />
+						{/if}
+					</a>
+				{/each}
+			</div>
+		</section>
+	{/if}
+{/snippet}
 
-				<!-- Divider -->
-				<div class="mx-1 h-5 w-px flex-shrink-0 bg-light-300 dark:bg-dark-600"></div>
+{#snippet filterRail()}
+	<div class="space-y-6">
+		{@render facetSection($_('houses.facets.where'), 'municipality', facets.municipalities, placeLabel)}
+		{@render facetSection($_('houses.facets.type'), 'propertyType', typeBuckets, (b) =>
+			$_(`properties.types.${b.value}`)
+		)}
+		{@render facetSection($_('houses.facets.availability'), 'status', statusBuckets, (b) =>
+			$_(`properties.statuses.${b.value}`)
+		)}
 
-				<!-- Sort -->
-				<select
-					bind:value={filters.orderBy}
-					onchange={handleFilterChange}
-					class="flex-shrink-0 border border-light-800 bg-white py-1.5 pr-7 pl-3 text-xs font-medium text-dark-600 focus:border-primary-400 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300"
-				>
-					<option value="created_desc">{$_('houses.sort.newest')}</option>
-					<option value="popularity">{$_('houses.sort.popular')}</option>
-					<option value="status">{$_('houses.sort.status')}</option>
-					<option value="price_asc">{$_('houses.sort.priceLowHigh')}</option>
-					<option value="price_desc">{$_('houses.sort.priceHighLow')}</option>
-					<option value="location">{$_('houses.sort.location')}</option>
-					<option value="created_asc">{$_('houses.sort.oldest')}</option>
-				</select>
+		<section>
+			<h3 class="type-label mb-2.5 text-dark-400 dark:text-light-600">{$_('houses.facets.price')}</h3>
+			<!-- A plain GET form: it files the same search the links do, and it works
+			     before any of this page's JavaScript has arrived. -->
+			<form
+				method="GET"
+				action={base}
+				data-sveltekit-keepfocus
+				data-sveltekit-noscroll
+				class="azulejo-panel grid-cols-1"
+			>
+				<div class="azulejo-cell p-4">
+					<div class="grid grid-cols-2 gap-2">
+						<label class="block">
+							<span class="type-label mb-1.5 block text-dark-400 dark:text-light-600">{$_('houses.min')}</span>
+							<input
+								type="number"
+								name="minPrice"
+								inputmode="numeric"
+								min="0"
+								step="1000"
+								value={search.minPrice ?? ''}
+								class="type-record w-full border border-light-800 bg-light-50 px-2.5 py-2 text-sm text-dark-800 tabular-nums transition-colors placeholder:text-dark-300 focus:border-primary-600 dark:border-dark-600 dark:bg-dark-800 dark:text-light-100 dark:placeholder:text-light-700"
+							/>
+						</label>
+						<label class="block">
+							<span class="type-label mb-1.5 block text-dark-400 dark:text-light-600">{$_('houses.max')}</span>
+							<input
+								type="number"
+								name="maxPrice"
+								inputmode="numeric"
+								min="0"
+								step="1000"
+								value={search.maxPrice ?? ''}
+								class="type-record w-full border border-light-800 bg-light-50 px-2.5 py-2 text-sm text-dark-800 tabular-nums transition-colors placeholder:text-dark-300 focus:border-primary-600 dark:border-dark-600 dark:bg-dark-800 dark:text-light-100 dark:placeholder:text-light-700"
+							/>
+						</label>
+					</div>
 
-				<!-- Results count (right-aligned) -->
-				<div class="ml-auto flex-shrink-0 text-xs text-dark-400 dark:text-light-600">
-					{#if loading}
-						<span class="animate-pulse">{$_('houses.loading')}</span>
-					{:else}
-						{total} {total === 1 ? $_('houses.property') : $_('houses.properties')}
+					<!-- Everything the rail is holding travels with the form, or filing a
+					     price would quietly drop the town and the type. -->
+					{#if search.q}<input type="hidden" name="q" value={search.q} />{/if}
+					{#if search.municipality}<input type="hidden" name="municipality" value={search.municipality} />{/if}
+					{#if search.district}<input type="hidden" name="district" value={search.district} />{/if}
+					{#if search.parish}<input type="hidden" name="parish" value={search.parish} />{/if}
+					{#if search.propertyType}<input type="hidden" name="propertyType" value={search.propertyType} />{/if}
+					{#if search.status}<input type="hidden" name="status" value={search.status} />{/if}
+					{#if search.orderBy !== DEFAULT_SORT}<input type="hidden" name="orderBy" value={search.orderBy} />{/if}
+
+					<button
+						type="submit"
+						class="mt-3 w-full border border-primary-700 px-3 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-700 hover:text-light-50 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-600 dark:hover:text-light-50"
+					>
+						{$_('houses.facets.applyPrice')}
+					</button>
+
+					{#if rangeCaption}
+						<p class="type-record mt-3 text-xs leading-relaxed text-dark-400 dark:text-light-600">{rangeCaption}</p>
 					{/if}
 				</div>
+			</form>
+		</section>
+	</div>
+{/snippet}
 
-				<!-- Clear filters -->
-				{#if activeFiltersCount > 0}
-					<button
-						type="button"
-						onclick={clearFilters}
-						class="flex flex-shrink-0 items-center gap-1 text-xs font-medium text-error-600 transition-colors hover:text-error-700 dark:text-error-400 dark:hover:text-error-300"
+<div class="min-h-screen bg-light-200 dark:bg-dark-850">
+	<!-- ── Masthead ──
+	     No photograph behind the type: the same lime-washed ground the rest of the
+	     site opens on, so arriving here reads as turning a page rather than
+	     landing on a different site. -->
+	<section class="mx-auto w-full max-w-[84rem] px-5 pt-10 pb-8 sm:px-8 sm:pt-12 lg:px-12">
+		<p class="type-label text-primary-700 dark:text-primary-300">{$_('houses.hero.eyebrow')}</p>
+		<h1 class="type-display mt-4 max-w-[20ch] text-[clamp(1.9rem,4vw,3rem)] text-dark-900 dark:text-light-50">
+			{$_('houses.hero.title')}
+		</h1>
+		<p class="mt-4 max-w-[54ch] leading-relaxed text-dark-500 dark:text-light-500">
+			{$_('houses.hero.subtitle')}
+		</p>
+
+		<!-- One field, and it reaches everything: the name of a building, a kind of
+		     property, or the town it stands in. -->
+		<form method="GET" action={base} data-sveltekit-keepfocus data-sveltekit-noscroll class="mt-7 max-w-[34rem]">
+			<label for="property-search" class="sr-only">{$_('houses.search.label')}</label>
+			<!-- The focus ring sits on the wrapper because the input's own outline is
+			     suppressed to keep the field and its button reading as one object. -->
+			<div
+				class="azulejo-rule flex items-center border bg-light-50 focus-within:border-primary-600 focus-within:ring-2 focus-within:ring-primary-600/25 dark:bg-dark-800 dark:focus-within:border-primary-400 dark:focus-within:ring-primary-400/25"
+			>
+				<!-- Set at the text's own size and on the same baseline, so the mark and
+				     the words read as one line rather than as a badge beside a field. -->
+				<FontAwesomeIcon
+					icon={faMagnifyingGlass}
+					class="ml-4 hidden shrink-0 text-base text-dark-400 sm:block dark:text-light-600"
+				/>
+				<!-- border-0 / ring-0: the forms plugin gives every input a border of its
+				     own, in a grey darker than the grout — a second box drawn inside this
+				     one. The field's edge is the wrapper's, and there is only ever one. -->
+				<input
+					id="property-search"
+					type="search"
+					name="q"
+					value={search.q}
+					oninput={onSearchInput}
+					autocomplete="off"
+					placeholder={$_('houses.search.placeholder')}
+					class="min-w-0 flex-1 border-0 bg-transparent px-4 py-3.5 text-dark-900 placeholder:text-dark-400 focus:border-0 focus:ring-0 focus:outline-none sm:pr-4 sm:pl-3 dark:text-light-50 dark:placeholder:text-light-600"
+				/>
+				{#if search.municipality}<input type="hidden" name="municipality" value={search.municipality} />{/if}
+				{#if search.district}<input type="hidden" name="district" value={search.district} />{/if}
+				{#if search.propertyType}<input type="hidden" name="propertyType" value={search.propertyType} />{/if}
+				{#if search.status}<input type="hidden" name="status" value={search.status} />{/if}
+				<!-- On a phone the field needs every pixel, so the button carries the
+				     magnifier instead of its name and the decorative one steps aside. -->
+				<button
+					type="submit"
+					class="type-label flex shrink-0 items-center self-stretch bg-primary-700 px-4 text-light-50 transition-colors hover:bg-primary-600 sm:px-5 dark:bg-primary-600 dark:hover:bg-primary-500"
+				>
+					<span class="hidden sm:inline">{$_('houses.search.submit')}</span>
+					<span class="sm:hidden">
+						<span class="sr-only">{$_('houses.search.submit')}</span>
+						<FontAwesomeIcon icon={faMagnifyingGlass} class="text-sm" />
+					</span>
+				</button>
+			</div>
+		</form>
+	</section>
+
+	<!-- ── State bar ──
+	     What is being shown, what is narrowing it, and in what order. Sticks under
+	     the 65px navigation so the reader can undo a filter from anywhere down the
+	     page without scrolling back up for it. -->
+	<!-- 65px, not 64: the navigation is h-16 plus its own grout line, and sticking a
+	     pixel short slides this bar's top edge underneath it. -->
+	<div class="azulejo-rule sticky top-[65px] z-30 border-y bg-light-200/95 backdrop-blur-md dark:bg-dark-850/95">
+		<div class="mx-auto w-full max-w-[84rem] px-5 sm:px-8 lg:px-12">
+			<div class="flex items-center gap-3 py-3">
+				<p class="type-record shrink-0 text-sm text-dark-600 tabular-nums dark:text-light-400" aria-live="polite">
+					{data.total}
+					<span class="text-dark-400 dark:text-light-600">
+						{data.total === 1 ? $_('houses.property') : $_('houses.properties')}
+					</span>
+				</p>
+
+				{#if active.length > 0}
+					<!-- The filters as a row of released catches: each one names itself and
+					     comes off where it sits. -->
+					<ul
+						class="flex min-w-0 flex-1 [scrollbar-width:none] items-center gap-1.5 overflow-x-auto [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
 					>
-						<FontAwesomeIcon icon={faTimes} class="text-[0.55rem]" />
-						{$_('houses.clearFilters')}
-					</button>
+						{#each active as key (key)}
+							<li class="shrink-0">
+								<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+								<a
+									href="{base}{toPageQuery(without(search, key))}"
+									data-sveltekit-noscroll
+									class="azulejo-rule flex items-center gap-2 border bg-light-50 py-1 pr-2 pl-3 text-xs text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 dark:bg-dark-800 dark:text-light-400 dark:hover:border-primary-400 dark:hover:text-primary-300"
+								>
+									<span class="max-w-[16ch] truncate">{filterLabel(key)}</span>
+									<span class="sr-only">{$_('houses.applied.remove')}</span>
+									<FontAwesomeIcon icon={faXmark} class="text-[0.6rem] opacity-70" />
+								</a>
+							</li>
+						{/each}
+						<li class="shrink-0">
+							<a
+								href={base}
+								data-sveltekit-noscroll
+								class="px-2 text-xs font-medium text-primary-700 underline decoration-primary-300 underline-offset-4 transition-colors hover:text-primary-600 dark:text-primary-300 dark:decoration-primary-700"
+							>
+								{$_('houses.clearFilters')}
+							</a>
+						</li>
+					</ul>
+				{:else}
+					<div class="flex-1"></div>
 				{/if}
+
+				<button
+					type="button"
+					onclick={() => (filtersOpen = !filtersOpen)}
+					aria-expanded={filtersOpen}
+					aria-controls="filter-rail"
+					class="azulejo-rule flex shrink-0 items-center gap-2 border bg-light-50 px-3 py-1.5 text-xs font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 lg:hidden dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400"
+				>
+					<FontAwesomeIcon icon={faSliders} class="text-[0.7rem]" />
+					{$_('houses.filters')}
+				</button>
+
+				<label class="hidden shrink-0 items-center gap-2 lg:flex">
+					<span class="type-label text-dark-400 dark:text-light-600">{$_('houses.sort.label')}</span>
+					<select
+						value={search.orderBy}
+						onchange={onSortChange}
+						class="azulejo-rule border bg-light-50 py-1.5 pr-7 pl-2.5 text-xs text-dark-700 transition-colors focus:border-primary-600 dark:bg-dark-800 dark:text-light-300"
+					>
+						{#each PROPERTY_SORTS as sort (sort)}
+							<option value={sort}>{$_(`houses.sort.${sort}`)}</option>
+						{/each}
+					</select>
+				</label>
 			</div>
 		</div>
 	</div>
 
-	<!-- ─── Main Content ───────────────────────────────────────────── -->
-	<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-		<!-- Mobile filter toggle -->
-		<div class="mb-5 lg:hidden">
-			<button
-				type="button"
-				onclick={toggleFilters}
-				aria-expanded={showFilters}
-				class="inline-flex items-center gap-2 border border-light-300 bg-white px-4 py-2.5 text-sm font-semibold text-dark-700 shadow-sm transition-all hover:border-primary-300 hover:text-primary-700 dark:border-dark-600 dark:bg-dark-800 dark:text-light-200 dark:hover:border-primary-600 dark:hover:text-primary-300"
-			>
-				<FontAwesomeIcon icon={faFilter} class="text-xs text-primary-500" />
-				{$_('houses.filters')}
-				{#if activeFiltersCount > 0}
-					<span
-						class="flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-[0.6rem] font-bold text-white"
-					>
-						{activeFiltersCount}
-					</span>
-				{/if}
-			</button>
-		</div>
-
-		<!-- Two-column: Sidebar + Grid -->
-		<div class="lg:grid lg:grid-cols-[248px_1fr] lg:gap-10 xl:gap-12">
-			<!-- ─── Filter Sidebar ───────────────────────────────── -->
-			<aside class="{showFilters ? 'block' : 'hidden'} mb-8 lg:mb-0 lg:block">
-				<div class="sticky top-32 space-y-4">
-					<!-- Sidebar header (desktop) -->
-					<div class="hidden items-center justify-between lg:flex">
-						<h2 class="type-label text-dark-500 dark:text-light-600">
-							{$_('houses.filters')}
-						</h2>
-						{#if activeFiltersCount > 0}
-							<button
-								type="button"
-								onclick={clearFilters}
-								class="text-[0.688rem] font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+	<div class="mx-auto w-full max-w-[84rem] px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
+		<div class="lg:grid lg:grid-cols-[16.5rem_minmax(0,1fr)] lg:gap-10 xl:gap-12">
+			<aside id="filter-rail" class="{filtersOpen ? 'mb-8 block' : 'hidden'} lg:mb-0 lg:block">
+				<!-- 121px: the navigation's 65 plus the state bar's 56, so the rail comes to
+				     rest against the bar rather than a pixel beneath it. -->
+				<div class="lg:sticky lg:top-[121px]">
+					<div class="mb-4 flex items-center justify-between lg:hidden">
+						<h2 class="type-label text-dark-500 dark:text-light-500">{$_('houses.filters')}</h2>
+						<label class="flex items-center gap-2">
+							<span class="type-label text-dark-400 dark:text-light-600">{$_('houses.sort.label')}</span>
+							<select
+								value={search.orderBy}
+								onchange={onSortChange}
+								class="azulejo-rule border bg-light-50 py-1.5 pr-7 pl-2.5 text-xs text-dark-700 dark:bg-dark-800 dark:text-light-300"
 							>
-								{$_('houses.clearFilters')}
-							</button>
-						{/if}
+								{#each PROPERTY_SORTS as sort (sort)}
+									<option value={sort}>{$_(`houses.sort.${sort}`)}</option>
+								{/each}
+							</select>
+						</label>
 					</div>
-
-					<!-- Location -->
-					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
-						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
-								<FontAwesomeIcon icon={faMapMarkerAlt} class="text-primary-400" />
-								{$_('properties.district')}
-							</h3>
-						</div>
-						<div class="space-y-3 p-5">
-							<div>
-								<label
-									for="district"
-									class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600"
-								>
-									{$_('properties.district')}
-								</label>
-								<select
-									id="district"
-									bind:value={filters.district}
-									onchange={handleFilterChange}
-									disabled={loadingLocations}
-									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
-								>
-									<option value="">{$_('properties.selectDistrict')}</option>
-									{#each districts as district (district)}
-										<option value={district}>{district}</option>
-									{/each}
-								</select>
-							</div>
-							<div>
-								<label
-									for="municipality"
-									class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600"
-								>
-									{$_('properties.municipality')}
-								</label>
-								<select
-									id="municipality"
-									bind:value={filters.municipality}
-									onchange={handleFilterChange}
-									disabled={loadingLocations}
-									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
-								>
-									<option value="">{$_('properties.selectMunicipality')}</option>
-									{#each municipalities as municipality (municipality)}
-										<option value={municipality}>{municipality}</option>
-									{/each}
-								</select>
-							</div>
-							<div>
-								<label for="parish" class="mb-1.5 block text-[0.688rem] font-medium text-dark-500 dark:text-light-600">
-									{$_('properties.parish')}
-								</label>
-								<select
-									id="parish"
-									bind:value={filters.parish}
-									onchange={handleFilterChange}
-									disabled={loadingLocations}
-									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
-								>
-									<option value="">{$_('properties.selectParish')}</option>
-									{#each parishes as parish (parish)}
-										<option value={parish}>{parish}</option>
-									{/each}
-								</select>
-							</div>
-						</div>
-					</div>
-
-					<!-- Property Type -->
-					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
-						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
-								<FontAwesomeIcon icon={faHome} class="text-primary-400" />
-								{$_('properties.propertyType')}
-							</h3>
-						</div>
-						<div class="flex flex-wrap gap-1.5 p-5">
-							{#each propertyTypes as type (type.value)}
-								<button
-									type="button"
-									onclick={() => {
-										filters.propertyType = type.value;
-										handleFilterChange();
-									}}
-									class="border px-3 py-1.5 text-xs font-medium transition-all {filters.propertyType === type.value
-										? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-600/80 dark:bg-primary-950/60 dark:text-primary-300'
-										: 'border-light-300 bg-light-50 text-dark-500 hover:border-primary-300 hover:bg-primary-50/50 hover:text-primary-600 dark:border-dark-600 dark:bg-dark-700/50 dark:text-light-500 dark:hover:border-primary-700 dark:hover:text-primary-400'}"
-								>
-									{type.label}
-								</button>
-							{/each}
-						</div>
-					</div>
-
-					<!-- Price Range -->
-					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
-						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
-								<FontAwesomeIcon icon={faEuroSign} class="text-primary-400" />
-								{$_('houses.minPrice')} – {$_('houses.maxPrice')}
-							</h3>
-						</div>
-						<div class="p-5">
-							<div class="mb-3 grid grid-cols-2 gap-2">
-								<div class="relative">
-									<span
-										class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.688rem] text-dark-400 dark:text-light-700"
-										>€</span
-									>
-									<input
-										type="number"
-										bind:value={filters.minPrice}
-										onchange={handleFilterChange}
-										placeholder={$_('houses.min')}
-										aria-label={$_('houses.minPrice')}
-										min="0"
-										step="1000"
-										class="w-full border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
-									/>
-								</div>
-								<div class="relative">
-									<span
-										class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.688rem] text-dark-400 dark:text-light-700"
-										>€</span
-									>
-									<input
-										type="number"
-										bind:value={filters.maxPrice}
-										onchange={handleFilterChange}
-										placeholder={$_('houses.max')}
-										aria-label={$_('houses.maxPrice')}
-										min="0"
-										step="1000"
-										class="w-full border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
-									/>
-								</div>
-							</div>
-							<!-- Price presets -->
-							<div class="space-y-0.5 border-t border-light-100 pt-3 dark:border-dark-700/60">
-								<button
-									type="button"
-									onclick={() => {
-										filters.minPrice = null;
-										filters.maxPrice = 200000;
-										handleFilterChange();
-									}}
-									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
-								>
-									{$_('houses.quickFilters.under200k')}
-								</button>
-								<button
-									type="button"
-									onclick={() => {
-										filters.minPrice = 200000;
-										filters.maxPrice = 500000;
-										handleFilterChange();
-									}}
-									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
-								>
-									{$_('houses.quickFilters.between200k500k')}
-								</button>
-								<button
-									type="button"
-									onclick={() => {
-										filters.minPrice = 500000;
-										filters.maxPrice = null;
-										handleFilterChange();
-									}}
-									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
-								>
-									{$_('houses.quickFilters.luxury500k')}
-								</button>
-							</div>
-						</div>
-					</div>
+					{@render filterRail()}
 				</div>
 			</aside>
 
-			<!-- ─── Property Grid ────────────────────────────────── -->
-			<AppPropertyGrid
-				{properties}
-				{propertyImageMap}
-				{total}
-				limit={filters.limit}
-				offset={filters.offset}
-				{loading}
-				onPageChange={(newOffset) => {
-					filters.offset = newOffset;
-					loadProperties();
-				}}
-			/>
+			<!-- Dimmed rather than emptied while the next set is fetched: replacing the
+			     grid with a spinner collapses the page and throws away the reader's
+			     place for the sake of a few hundred milliseconds. -->
+			<div
+				class="min-w-0 transition-opacity duration-200 motion-reduce:transition-none {busy
+					? 'pointer-events-none opacity-55'
+					: ''}"
+				aria-busy={busy}
+			>
+				<AppPropertyGrid
+					{properties}
+					propertyImageMap={data.propertyImageMap}
+					total={data.total}
+					limit={SEARCH_PAGE_SIZE}
+					offset={search.offset}
+					loading={false}
+					pageHref={(offset) => `${base}${toPageQuery({ ...search, offset })}`}
+				>
+					{#snippet empty()}
+						<!-- Reaching nothing is only possible by typing or by pricing, since
+						     the rail withholds the choices that lead here. So the way out is
+						     the filters themselves, listed and individually releasable. -->
+						<div class="azulejo-panel grid-cols-1">
+							<div class="azulejo-cell p-8 sm:p-12">
+								<h2 class="type-display text-2xl text-dark-900 dark:text-light-50">{$_('houses.empty.title')}</h2>
+								<p class="mt-3 max-w-[48ch] leading-relaxed text-dark-500 dark:text-light-500">
+									{$_('houses.empty.body')}
+								</p>
+								{#if active.length > 0}
+									<ul class="mt-6 flex flex-wrap gap-2">
+										{#each active as key (key)}
+											<li>
+												<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+												<a
+													href="{base}{toPageQuery(without(search, key))}"
+													class="azulejo-rule flex items-center gap-2 border bg-light-100 px-3 py-2 text-sm text-dark-700 transition-colors hover:border-primary-600 hover:text-primary-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400"
+												>
+													<FontAwesomeIcon icon={faXmark} class="text-[0.65rem] opacity-70" />
+													{$_('houses.empty.drop', { values: { filter: filterLabel(key) } })}
+												</a>
+											</li>
+										{/each}
+									</ul>
+									<a
+										href={base}
+										class="mt-6 inline-flex items-center gap-2 border border-primary-700 px-5 py-2.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-700 hover:text-light-50 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-600 dark:hover:text-light-50"
+									>
+										{$_('houses.empty.showAll')}
+									</a>
+								{/if}
+							</div>
+						</div>
+					{/snippet}
+				</AppPropertyGrid>
+			</div>
 		</div>
 	</div>
 </div>

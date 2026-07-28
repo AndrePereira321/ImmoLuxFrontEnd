@@ -34,7 +34,7 @@
 		} else {
 			// Map error codes to translated messages
 			const errorMessage = result.error || '';
-			let errorMsg = '';
+			let errorMsg: string;
 
 			if (errorMessage === 'INVALID_CREDENTIALS') {
 				errorMsg = $_('auth.invalidCredentials');

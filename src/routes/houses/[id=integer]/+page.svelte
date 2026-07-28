@@ -44,14 +44,12 @@
 	let Marker = $state<LeafletComponent>(null);
 	let Popup = $state<LeafletComponent>(null);
 	let mapReady = $state(false);
-	let serverUrl = $state('');
 	let lightboxOpen = $state(false);
 
-	$effect(() => {
-		if (browser) {
-			serverUrl = import.meta.env.VITE_SERVER_URL || window.location.origin;
-		}
-	});
+	// Resolved at init rather than in an effect: this page is server-rendered, and
+	// an effect only runs after hydration — by then the browser has already asked
+	// the frontend origin for every image and been given a 404.
+	const serverUrl = import.meta.env.VITE_SERVER_URL ?? '';
 
 	// Close lightbox on Escape key; keep the page from scrolling underneath it
 	$effect(() => {

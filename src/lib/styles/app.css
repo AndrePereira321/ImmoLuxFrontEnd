@@ -364,89 +364,98 @@
 	transition-delay: 480ms;
 }
 
-/* ── Type roles ──
+/* Everything below sits in the components layer on purpose. Unlayered rules beat
+   every layered one whatever their specificity, so as plain CSS these classes were
+   silently winning against the utilities written beside them in markup — a tile
+   carrying `azulejo-cell hover:bg-primary-50` never changed on hover, and
+   `azulejo-rule focus-within:border-primary-600` never lit up. Tailwind orders its
+   layers theme, base, components, utilities, so from here a utility overrides
+   these, which is what anyone writing the two together expects. */
+@layer components {
+	/* ── Type roles ──
    Three voices: the display face speaks, the mono face records, the sans reads. */
 
-.type-display {
-	font-family: var(--font-display);
-	font-optical-sizing: auto;
-	font-variation-settings:
-		'SOFT' 36,
-		'WONK' 1;
-	font-weight: 400;
-	line-height: 0.98;
-	letter-spacing: -0.021em;
-	text-wrap: balance;
-}
+	.type-display {
+		font-family: var(--font-display);
+		font-optical-sizing: auto;
+		font-variation-settings:
+			'SOFT' 36,
+			'WONK' 1;
+		font-weight: 400;
+		line-height: 0.98;
+		letter-spacing: -0.021em;
+		text-wrap: balance;
+	}
 
-/* Measurements, prices, cadastral references — anything that is data */
-.type-record {
-	font-family: var(--font-mono);
-	font-weight: 400;
-	letter-spacing: 0.01em;
-	font-variant-numeric: tabular-nums;
-}
+	/* Measurements, prices, cadastral references — anything that is data */
+	.type-record {
+		font-family: var(--font-mono);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+		font-variant-numeric: tabular-nums;
+	}
 
-/* Small capitals set in mono: section eyebrows and field names */
-.type-label {
-	font-family: var(--font-mono);
-	font-weight: 500;
-	font-size: 0.6875rem;
-	line-height: 1.4;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-}
+	/* Small capitals set in mono: section eyebrows and field names */
+	.type-label {
+		font-family: var(--font-mono);
+		font-weight: 500;
+		font-size: 0.6875rem;
+		line-height: 1.4;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+	}
 
-/* ── Azulejo panel ──
+	/* ── Azulejo panel ──
    Tiles butt together over a grout ground and the 1px gaps let it show through,
    so the group reads as a panel set into a wall rather than as four cards. */
 
-.azulejo-panel {
-	display: grid;
-	gap: 1px;
-	background-color: var(--color-grout);
-	border: 1px solid var(--color-grout);
-}
+	.azulejo-panel {
+		display: grid;
+		gap: 1px;
+		background-color: var(--color-grout);
+		border: 1px solid var(--color-grout);
+	}
 
-.dark .azulejo-panel {
-	background-color: var(--color-grout-dark);
-	border-color: var(--color-grout-dark);
-}
+	.dark .azulejo-panel {
+		background-color: var(--color-grout-dark);
+		border-color: var(--color-grout-dark);
+	}
 
-.azulejo-cell {
-	background-color: var(--color-glaze);
-}
+	.azulejo-cell {
+		background-color: var(--color-glaze);
+	}
 
-.dark .azulejo-cell {
-	background-color: var(--color-glaze-dark);
-}
+	.dark .azulejo-cell {
+		background-color: var(--color-glaze-dark);
+	}
 
-/* A field fired in cobalt rather than tin: used where a panel has to carry the
+	/* A field fired in cobalt rather than tin: used where a panel has to carry the
    page rather than sit quietly in it — the hero and the closing invitation. */
-.azulejo-cell-ink {
-	background-color: var(--color-primary-950);
-	color: var(--color-light-50);
-}
+	.azulejo-cell-ink {
+		background-color: var(--color-primary-950);
+		color: var(--color-light-50);
+	}
 
-/* A field holding a photograph: no padding, the image is the glaze */
-.azulejo-cell-image {
-	background-color: var(--color-primary-950);
-	overflow: hidden;
-}
+	/* A field holding a photograph: no padding, the image is the glaze */
+	.azulejo-cell-image {
+		background-color: var(--color-primary-950);
+		overflow: hidden;
+	}
 
-/* A grout line drawn inside a field, dividing it without breaking it up */
-.azulejo-rule {
-	border-color: var(--color-grout);
-}
+	/* A grout line drawn inside a field, dividing it without breaking it up */
+	.azulejo-rule {
+		border-color: var(--color-grout);
+	}
 
-.dark .azulejo-rule {
-	border-color: var(--color-grout-dark);
-}
+	.dark .azulejo-rule {
+		border-color: var(--color-grout-dark);
+	}
 
-/* The painted line work. Hovering a tile draws it in, as if freshly glazed. */
-.azulejo-ink {
-	stroke-dasharray: var(--ink-length, 0);
-	stroke-dashoffset: 0;
+	/* The painted line work. Hovering a tile draws it in, as if freshly glazed. */
+	.azulejo-ink {
+		stroke-dasharray: var(--ink-length, 0);
+		stroke-dashoffset: 0;
+	}
 }
 
 /* ── Hero load sequence ──

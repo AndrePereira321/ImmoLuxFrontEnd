@@ -62,6 +62,30 @@ export interface PropertyImageDTO {
 	createdAt?: string;
 }
 
+/** One choosable option in the search, and how many properties sit behind it. */
+export interface FacetBucket {
+	value: string;
+	count: number;
+	/** The district a municipality belongs to. Absent on every other dimension. */
+	parent?: string;
+}
+
+/**
+ * Returned by GET /v1/api/properties/facets. Every dimension is counted with the
+ * current filters applied except its own, so a bucket's count is what choosing it
+ * would actually yield — and an option missing from a list has nothing behind it.
+ */
+export interface PropertyFacets {
+	total: number;
+	districts: FacetBucket[];
+	municipalities: FacetBucket[];
+	parishes: FacetBucket[];
+	propertyTypes: FacetBucket[];
+	statuses: FacetBucket[];
+	minPrice: number | null;
+	maxPrice: number | null;
+}
+
 export interface LocationsResponse {
 	districts: string[];
 	municipalities: string[];

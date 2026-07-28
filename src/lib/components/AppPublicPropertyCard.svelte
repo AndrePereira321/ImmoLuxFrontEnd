@@ -59,8 +59,10 @@
 	};
 </script>
 
+<!-- A single tile: the glaze and the grout line the rest of the site is built from,
+     rather than a white card floating on the wash. -->
 <article
-	class="flex h-full flex-col border border-light-800/70 bg-white transition-colors duration-300 group-hover:border-primary-400 dark:border-dark-700 dark:bg-dark-800 dark:group-hover:border-primary-600"
+	class="azulejo-cell azulejo-rule flex h-full flex-col border transition-colors duration-300 group-hover:border-primary-400 dark:group-hover:border-primary-600"
 >
 	<div class="relative aspect-[4/3] w-full overflow-hidden bg-light-400 dark:bg-dark-700">
 		{#if imageIds.length > 0}
@@ -121,7 +123,12 @@
 			{/if}
 		</p>
 
-		<h3 class="mt-2.5 line-clamp-2 font-display text-lg leading-snug text-dark-900 dark:text-light-50">
+		<!-- Titles are typed by hand and arrive at any length and any capitalisation.
+		     Two lines are reserved so that the prices below land on one line across
+		     the row, and the first letter is raised without touching what was typed. -->
+		<h3
+			class="mt-2.5 line-clamp-2 min-h-[2.75em] font-display text-lg leading-snug text-dark-900 first-letter:uppercase dark:text-light-50"
+		>
 			{property.title ?? $_('properties.untitled')}
 		</h3>
 

@@ -63,8 +63,7 @@
 		class:border-error-600={error}
 		class:dark:border-error-500={error}
 		class:focus:border-error-600={error}
-		class:dark:focus:border-error-500={error}
-	></textarea>
+		class:dark:focus:border-error-500={error}></textarea>
 
 	{#if label}
 		<label for={id} class={labelClasses()}>
