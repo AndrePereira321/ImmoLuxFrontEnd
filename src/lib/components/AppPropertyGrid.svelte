@@ -39,7 +39,8 @@
 
 	const goToPage = (page: number) => {
 		onPageChange((page - 1) * limit);
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
 	};
 </script>
 
@@ -59,24 +60,21 @@
 		</div>
 	{:else if properties.length === 0}
 		<div
-			class="flex min-h-[50vh] items-center justify-center rounded-2xl border border-dashed border-light-300/80 dark:border-dark-700/60"
+			class="flex min-h-[50vh] items-center justify-center border border-dashed border-light-800 dark:border-dark-700"
 		>
 			<div class="px-8 py-16 text-center">
 				<div
-					class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-light-300/80 bg-light-100 dark:border-dark-700/60 dark:bg-dark-800"
+					class="mx-auto mb-6 flex h-20 w-20 items-center justify-center border border-light-800 bg-light-100 dark:border-dark-700 dark:bg-dark-800"
 				>
-					<FontAwesomeIcon icon={faHome} class="text-3xl text-dark-300/50 dark:text-light-700/30" />
+					<FontAwesomeIcon icon={faHome} class="text-3xl text-primary-300/60 dark:text-primary-800" />
 				</div>
-				<h2
-					class="mb-2 text-xl font-normal text-dark-800 dark:text-light-100"
-					style="font-family: 'Playfair Display', Georgia, serif"
-				>
+				<h2 class="mb-2 font-display text-xl font-normal text-dark-800 dark:text-light-100">
 					{emptyMessage ?? $_('houses.noProperties')}
 				</h2>
 				{#if emptyLinkHref && emptyLinkLabel}
 					<a
 						href={emptyLinkHref}
-						class="mt-4 inline-block rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600"
+						class="mt-5 inline-block bg-primary-700 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500"
 					>
 						{emptyLinkLabel}
 					</a>
@@ -87,11 +85,7 @@
 		<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
 			{#each properties as property, i (property.id)}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a
-					href="/houses/{property.id}"
-					class="group block transition-all duration-300 hover:-translate-y-1"
-					style="animation: fadeInUp 0.45s ease-out {i * 0.05}s both"
-				>
+				<a href="/houses/{property.id}" class="anim-fade-in-up group block" style="animation-delay: {i * 0.05}s">
 					<AppPublicPropertyCard {property} imageIds={propertyImageMap[property.id ?? 0] || []} />
 				</a>
 			{/each}
@@ -104,8 +98,8 @@
 						type="button"
 						onclick={() => goToPage(currentPage - 1)}
 						disabled={!hasPrevPage}
-						aria-label="Previous page"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
+						aria-label={$_('houses.prevPage')}
+						class="flex h-9 w-9 items-center justify-center border border-light-800 bg-white text-dark-600 transition-colors hover:border-primary-400 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300"
 					>
 						<FontAwesomeIcon icon={faChevronLeft} class="text-xs" />
 					</button>
@@ -115,10 +109,11 @@
 							<button
 								type="button"
 								onclick={() => goToPage(page)}
-								class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition-all {page ===
+								aria-current={page === currentPage ? 'page' : undefined}
+								class="type-record flex h-9 w-9 items-center justify-center border text-sm transition-colors {page ===
 								currentPage
-									? 'border-primary-600 bg-primary-600 text-white shadow-sm'
-									: 'border-light-300 bg-white text-dark-600 shadow-sm hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300'}"
+									? 'border-primary-700 bg-primary-700 text-white'
+									: 'border-light-800 bg-white text-dark-600 hover:border-primary-400 hover:text-primary-700 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300'}"
 							>
 								{page}
 							</button>
@@ -131,14 +126,14 @@
 						type="button"
 						onclick={() => goToPage(currentPage + 1)}
 						disabled={!hasNextPage}
-						aria-label="Next page"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-light-300 bg-white text-dark-600 shadow-sm transition-all hover:border-primary-400 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-400"
+						aria-label={$_('houses.nextPage')}
+						class="flex h-9 w-9 items-center justify-center border border-light-800 bg-white text-dark-600 transition-colors hover:border-primary-400 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-30 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-600 dark:hover:text-primary-300"
 					>
 						<FontAwesomeIcon icon={faChevronRight} class="text-xs" />
 					</button>
 				</div>
 
-				<p class="text-xs text-dark-400 dark:text-light-600" style="font-family: 'Plus Jakarta Sans', sans-serif">
+				<p class="type-record text-xs text-dark-400 dark:text-light-600">
 					{$_('houses.pageInfo', { values: { current: currentPage, total: totalPages } })}
 				</p>
 			</div>

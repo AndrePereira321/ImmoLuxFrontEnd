@@ -7,6 +7,15 @@
 @variant dark (&:is(.dark *));
 
 @layer base {
+	/* Tells the browser which scrollbars, form controls and default colours to use */
+	:root {
+		color-scheme: light;
+	}
+
+	:root.dark {
+		color-scheme: dark;
+	}
+
 	body {
 		font-family:
 			'Plus Jakarta Sans',
@@ -25,7 +34,14 @@
 	h4,
 	h5,
 	h6 {
-		font-family: 'Playfair Display', Georgia, serif;
+		font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+		/* SOFT rounds the terminals, WONK swaps in the flared alternates —
+		   together they read as lettering cut by hand rather than set by machine. */
+		font-variation-settings:
+			'SOFT' 36,
+			'WONK' 1;
+		font-optical-sizing: auto;
+		text-wrap: balance;
 	}
 
 	* {
@@ -92,21 +108,52 @@
 	.dark ::selection {
 		background: oklch(0.5 0.1 250 / 0.4);
 	}
+
+	/* Keyboard focus is always visible, whatever a component does locally */
+	:focus-visible {
+		outline: 2px solid var(--color-primary-600);
+		outline-offset: 2px;
+	}
+
+	.dark :focus-visible {
+		outline-color: var(--color-primary-300);
+	}
+
+	/* Removes the 300ms double-tap delay; the tap tint is cobalt, not the OS grey */
+	a,
+	button,
+	[role='button'] {
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: oklch(0.505 0.163 263 / 0.14);
+	}
 }
 
 @theme {
-	/* Primary — Deep rich navy with warmth */
-	--color-primary-50: oklch(0.97 0.012 248);
-	--color-primary-100: oklch(0.94 0.025 248);
-	--color-primary-200: oklch(0.87 0.055 248);
-	--color-primary-300: oklch(0.79 0.085 248);
-	--color-primary-400: oklch(0.71 0.115 248);
-	--color-primary-500: oklch(0.63 0.135 248);
-	--color-primary-600: oklch(0.5 0.12 248);
-	--color-primary-700: oklch(0.43 0.105 248);
-	--color-primary-800: oklch(0.36 0.09 248);
-	--color-primary-900: oklch(0.3 0.075 248);
-	--color-primary-950: oklch(0.24 0.06 248);
+	/* ── Type roles ──
+	   display: the voice. body: the reading. mono: measurements and records. */
+	--font-display: 'Fraunces', 'Playfair Display', Georgia, serif;
+	--font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--font-mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	/* ── Azulejo ──
+	   The tin glaze a tile is fired with, and the grout between the tiles. */
+	--color-glaze: oklch(0.988 0.004 240);
+	--color-glaze-dark: oklch(0.203 0.032 263);
+	--color-grout: oklch(0.845 0.026 250);
+	--color-grout-dark: oklch(0.3 0.042 263);
+
+	/* Primary — Cobalt, the blue an azulejo is painted with */
+	--color-primary-50: oklch(0.972 0.013 262);
+	--color-primary-100: oklch(0.942 0.028 262);
+	--color-primary-200: oklch(0.872 0.058 262);
+	--color-primary-300: oklch(0.79 0.092 263);
+	--color-primary-400: oklch(0.705 0.124 263);
+	--color-primary-500: oklch(0.62 0.152 263);
+	--color-primary-600: oklch(0.505 0.163 263);
+	--color-primary-700: oklch(0.43 0.142 263);
+	--color-primary-800: oklch(0.36 0.118 263);
+	--color-primary-900: oklch(0.3 0.096 263);
+	--color-primary-950: oklch(0.235 0.078 263);
 
 	/* Secondary — Warm champagne gold */
 	--color-secondary-50: oklch(0.98 0.015 80);
@@ -186,32 +233,33 @@
 	--color-info-900: oklch(0.465 0.081 182.19);
 	--color-info-950: oklch(0.44 0.077 182.48);
 
-	/* Light — Warm ivory/cream tones */
-	--color-light-50: oklch(0.995 0.003 85);
-	--color-light-100: oklch(0.988 0.005 82);
-	--color-light-200: oklch(0.981 0.006 80);
-	--color-light-300: oklch(0.965 0.008 78);
-	--color-light-400: oklch(0.955 0.01 76);
-	--color-light-500: oklch(0.945 0.012 75);
-	--color-light-600: oklch(0.91 0.015 74);
-	--color-light-700: oklch(0.88 0.016 73);
-	--color-light-800: oklch(0.845 0.018 72);
-	--color-light-900: oklch(0.8 0.02 71);
-	--color-light-950: oklch(0.78 0.022 70);
+	/* Light — Lime-washed wall. Cool and almost colourless, so the cobalt reads
+	   as glaze rather than as ink on cream. */
+	--color-light-50: oklch(0.993 0.0025 240);
+	--color-light-100: oklch(0.986 0.0035 240);
+	--color-light-200: oklch(0.978 0.0045 242);
+	--color-light-300: oklch(0.962 0.006 242);
+	--color-light-400: oklch(0.95 0.008 244);
+	--color-light-500: oklch(0.938 0.01 244);
+	--color-light-600: oklch(0.902 0.012 246);
+	--color-light-700: oklch(0.87 0.014 246);
+	--color-light-800: oklch(0.832 0.016 248);
+	--color-light-900: oklch(0.786 0.018 248);
+	--color-light-950: oklch(0.764 0.02 250);
 
-	/* Dark — Deep midnight with blue undertone */
-	--color-dark-50: oklch(0.72 0.04 250);
-	--color-dark-100: oklch(0.65 0.04 250);
-	--color-dark-200: oklch(0.55 0.035 250);
-	--color-dark-300: oklch(0.45 0.03 250);
-	--color-dark-400: oklch(0.35 0.025 252);
-	--color-dark-500: oklch(0.25 0.02 254);
-	--color-dark-600: oklch(0.22 0.018 254);
-	--color-dark-700: oklch(0.2 0.016 254);
-	--color-dark-800: oklch(0.18 0.014 254);
-	--color-dark-850: oklch(0.165 0.013 254);
-	--color-dark-900: oklch(0.15 0.012 254);
-	--color-dark-950: oklch(0.13 0.01 255);
+	/* Dark — The same glaze after dark */
+	--color-dark-50: oklch(0.735 0.042 258);
+	--color-dark-100: oklch(0.665 0.044 259);
+	--color-dark-200: oklch(0.56 0.04 260);
+	--color-dark-300: oklch(0.458 0.036 261);
+	--color-dark-400: oklch(0.358 0.03 262);
+	--color-dark-500: oklch(0.256 0.024 262);
+	--color-dark-600: oklch(0.224 0.022 262);
+	--color-dark-700: oklch(0.204 0.02 262);
+	--color-dark-800: oklch(0.183 0.018 262);
+	--color-dark-850: oklch(0.168 0.017 262);
+	--color-dark-900: oklch(0.152 0.015 263);
+	--color-dark-950: oklch(0.128 0.013 263);
 }
 
 /* Smooth page transitions */
@@ -316,11 +364,150 @@
 	transition-delay: 480ms;
 }
 
+/* ── Type roles ──
+   Three voices: the display face speaks, the mono face records, the sans reads. */
+
+.type-display {
+	font-family: var(--font-display);
+	font-optical-sizing: auto;
+	font-variation-settings:
+		'SOFT' 36,
+		'WONK' 1;
+	font-weight: 400;
+	line-height: 0.98;
+	letter-spacing: -0.021em;
+	text-wrap: balance;
+}
+
+/* Measurements, prices, cadastral references — anything that is data */
+.type-record {
+	font-family: var(--font-mono);
+	font-weight: 400;
+	letter-spacing: 0.01em;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Small capitals set in mono: section eyebrows and field names */
+.type-label {
+	font-family: var(--font-mono);
+	font-weight: 500;
+	font-size: 0.6875rem;
+	line-height: 1.4;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+/* ── Azulejo panel ──
+   Tiles butt together over a grout ground and the 1px gaps let it show through,
+   so the group reads as a panel set into a wall rather than as four cards. */
+
+.azulejo-panel {
+	display: grid;
+	gap: 1px;
+	background-color: var(--color-grout);
+	border: 1px solid var(--color-grout);
+}
+
+.dark .azulejo-panel {
+	background-color: var(--color-grout-dark);
+	border-color: var(--color-grout-dark);
+}
+
+.azulejo-cell {
+	background-color: var(--color-glaze);
+}
+
+.dark .azulejo-cell {
+	background-color: var(--color-glaze-dark);
+}
+
+/* A field fired in cobalt rather than tin: used where a panel has to carry the
+   page rather than sit quietly in it — the hero and the closing invitation. */
+.azulejo-cell-ink {
+	background-color: var(--color-primary-950);
+	color: var(--color-light-50);
+}
+
+/* A field holding a photograph: no padding, the image is the glaze */
+.azulejo-cell-image {
+	background-color: var(--color-primary-950);
+	overflow: hidden;
+}
+
+/* A grout line drawn inside a field, dividing it without breaking it up */
+.azulejo-rule {
+	border-color: var(--color-grout);
+}
+
+.dark .azulejo-rule {
+	border-color: var(--color-grout-dark);
+}
+
+/* The painted line work. Hovering a tile draws it in, as if freshly glazed. */
+.azulejo-ink {
+	stroke-dasharray: var(--ink-length, 0);
+	stroke-dashoffset: 0;
+}
+
+/* ── Hero load sequence ──
+   One orchestrated moment: the photograph settles, then the record rises. */
+
+@keyframes heroSettle {
+	from {
+		opacity: 0;
+		transform: scale(1.045);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes heroRise {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.hero-settle {
+	animation: heroSettle 1400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-rise {
+	animation: heroRise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── One-shot entrance utilities ──
+   Card and section entrances. Stagger with an inline animation-delay;
+   tune speed with an inline animation-duration. */
+
+.anim-fade-in {
+	animation: fadeIn 0.5s ease-out both;
+}
+
+.anim-fade-in-up {
+	animation: fadeInUp 0.5s ease-out both;
+}
+
 /* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
 	.reveal {
 		opacity: 1;
 		transform: none;
 		transition: none;
+	}
+
+	.hero-settle,
+	.hero-rise,
+	.anim-fade-in,
+	.anim-fade-in-up {
+		animation: none;
+		opacity: 1;
+		transform: none;
 	}
 }

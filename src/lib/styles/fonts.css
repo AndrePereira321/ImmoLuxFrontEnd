@@ -1,5 +1,7 @@
-/* Plus Jakarta Sans — premium geometric body font via Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+/* The three webfonts — Fraunces (display), Plus Jakarta Sans (body) and DM Mono
+   (records) — are requested from a <link> in src/app.html, not @imported here,
+   so the browser can start fetching them without waiting for this stylesheet.
+   The @font-face rules below are the local fallbacks. */
 
 /* Inter Font - Regular (400) — kept as fallback */
 @font-face {

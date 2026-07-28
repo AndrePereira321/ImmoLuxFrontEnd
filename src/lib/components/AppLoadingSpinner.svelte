@@ -10,8 +10,8 @@
 <div
 	class="fixed inset-0 flex items-center justify-center {overlay
 		? 'z-[100] bg-dark-900/50 backdrop-blur-sm'
-		: 'z-50 bg-light-50 dark:bg-dark-900'}"
-	style="animation: fadeIn 0.2s ease-out"
+		: 'z-50 bg-light-50 dark:bg-dark-900'} anim-fade-in"
+	style="animation-duration: 0.2s"
 >
 	<div class="text-center">
 		<!-- Elegant spinner -->

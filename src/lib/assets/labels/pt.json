@@ -8,20 +8,25 @@
 		},
 		"hero": {
 			"title": "Casas e Imóveis à Venda em Portugal",
-			"subtitle": "Filtre por localização, preço e tipo de imóvel"
+			"subtitle": "Filtre por localização, preço e tipo de imóvel",
+			"eyebrow": "Portugal · Norte"
 		},
 		"filters": "Filtros",
 		"allTypes": "Todos os Tipos",
 		"allStatuses": "Todos os Estados",
 		"minPrice": "Preço Mín (€)",
 		"maxPrice": "Preço Máx (€)",
+		"min": "Mín",
+		"max": "Máx",
 		"clearFilters": "Limpar Filtros",
-		"loading": "A carregar propriedades...",
+		"loading": "A carregar propriedades…",
 		"property": "propriedade",
 		"properties": "propriedades",
 		"noProperties": "Nenhuma propriedade encontrada",
 		"noPropertiesDescription": "Tente ajustar os filtros para ver mais resultados",
 		"pageInfo": "Página {current} de {total}",
+		"prevPage": "Página anterior",
+		"nextPage": "Página seguinte",
 		"quickFilters": {
 			"under200k": "Até 200 mil",
 			"between200k500k": "200 - 500 mil",
@@ -39,7 +44,7 @@
 	},
 	"common": {
 		"save": "Guardar",
-		"saving": "A guardar...",
+		"saving": "A guardar…",
 		"cancel": "Cancelar",
 		"back": "Voltar",
 		"edit": "Editar",
@@ -47,11 +52,13 @@
 		"close": "Fechar",
 		"confirm": "Confirmar",
 		"yes": "Sim",
-		"no": "Não"
+		"no": "Não",
+		"breadcrumb": "Caminho de navegação"
 	},
 	"menu": {
 		"toggleTheme": "Alternar tema",
 		"selectLanguage": "Selecionar idioma",
+		"mainMenu": "Menu",
 		"login": "Entrar",
 		"logout": "Sair",
 		"userMenu": "Menu de utilizador",
@@ -63,8 +70,8 @@
 		"password": "Senha",
 		"rememberMe": "Lembrar-me",
 		"loginButton": "Login",
-		"loggingIn": "Entrando...",
-		"loggingOut": "Saindo...",
+		"loggingIn": "Entrando…",
+		"loggingOut": "Saindo…",
 		"invalidCredentials": "Email ou senha inválidos",
 		"accountLocked": "Conta bloqueada devido a muitas tentativas falhadas",
 		"loginError": "Ocorreu um erro durante o login",
@@ -76,81 +83,63 @@
 		"author": "André Pereira",
 		"language": "Idioma",
 		"about": "Sobre a ImmoLux",
-		"aboutDescription": "A ImmoLux é especializada em imobiliário de luxo em Portugal, oferecendo uma seleção curada de moradias, apartamentos e propriedades exclusivas premium.",
+		"aboutDescription": "Promotora imobiliária em Lousada. Projetamos, construímos e vendemos casas no norte de Portugal.",
 		"quickLinks": "Links Rápidos",
 		"contact": "Contacto",
 		"partners": "Os Nossos Parceiros",
-		"allRightsReserved": "Todos os direitos reservados"
+		"allRightsReserved": "Todos os direitos reservados",
+		"partnerRole": "Parceiro de construção",
+		"browse": "Imóveis"
 	},
 	"homepage": {
 		"meta": {
-			"title": "Propriedades de Luxo à Venda em Portugal",
-			"description": "Descubra propriedades de sonho em Portugal. Moradias, apartamentos e terrenos premium nas melhores localizações. Imobiliário de qualidade excecional."
+			"title": "Casas novas em Lousada e no norte de Portugal",
+			"description": "A ImmoLux projeta, constrói e vende moradias e apartamentos em Lousada e arredores. Veja o que está à venda agora."
 		},
-		"availableHouses": {
-			"title": "Descubra a Sua Propriedade de Sonho",
-			"subtitle": "Imobiliário Exclusivo em Portugal",
-			"description": "Explore o nosso portfólio cuidadosamente selecionado de propriedades premium nas localizações mais procuradas de Portugal. De moradias contemporâneas a propriedades tradicionais, cada imóvel representa qualidade excecional e design intemporal.",
-			"comingSoon": "Propriedades Premium Brevemente",
-			"comingSoonDesc": "A nossa coleção exclusiva de propriedades selecionadas estará disponível em breve"
+		"hero": {
+			"eyebrow": "Lousada, Portugal",
+			"headline": "Casas novas no norte de Portugal.",
+			"lead": "Projetamos e construímos em Lousada e nas freguesias à volta. Estas são as que estão à venda agora.",
+			"leadEmpty": "Projetamos e construímos em Lousada e nas freguesias à volta.",
+			"viewAll": "Ver todos os imóveis",
+			"viewProperty": "Ver ficha completa",
+			"comingSoonTitle": "Estamos a construir.",
+			"comingSoonBody": "Os próximos imóveis aparecem aqui assim que a obra arranca. Escreva-nos para saber o que vem a caminho."
 		},
-		"aboutUs": {
-			"title": "A Diferença ImmoLux",
-			"subtitle": "Excelência no Desenvolvimento Imobiliário",
-			"location": {
-				"title": "Localização Estratégica",
-				"description": "Com sede em Lousada, Portugal, operamos no coração do mercado imobiliário mais dinâmico do país, oferecendo conhecimento local incomparável e expertise de mercado."
-			},
-			"dedication": {
-				"title": "Qualidade Sem Compromissos",
-				"description": "A nossa equipa dedicada de especialistas em construção e arquitetos está comprometida em entregar propriedades que excedem os padrões da indústria, combinando design inovador com artesanato superior."
-			},
-			"experience": {
-				"title": "Expertise Europeia",
-				"description": "Com vasta experiência em múltiplos mercados europeus, trazemos as melhores práticas internacionais e técnicas de construção sofisticadas para cada projeto que empreendemos."
-			},
-			"partner": {
-				"title": "Parceria de Confiança",
-				"description": "Colaboramos com a {partner}, líder de construção reconhecido com décadas de excelência comprovada, garantindo que cada propriedade atende aos mais altos padrões de qualidade e durabilidade.",
-				"partnerName": "PacaGroup"
-			}
+		"studio": {
+			"eyebrow": "Quem somos",
+			"headline": "Construímos as casas que vendemos.",
+			"body": "A ImmoLux é uma promotora com sede em Lousada. Acompanhamos cada casa do terreno à escritura — e acompanhamos quem compra, esteja em Portugal, na Bélgica ou em França.",
+			"facts": "Lousada, Portugal · 15 anos de obra · 3 mercados europeus",
+			"whereLabel": "Onde",
+			"whereValue": "Lousada, distrito do Porto. Trabalhamos nas freguesias que conhecemos, não no mapa inteiro.",
+			"howLabel": "Como",
+			"howValue": "Arquitetura e construção com equipa própria. Os acabamentos são escolhidos, não herdados de um catálogo.",
+			"whoLabel": "Quem",
+			"whoValue": "Quinze anos entre Portugal e o Benelux. Atendemos em português, francês e inglês.",
+			"partnerLabel": "Com quem",
+			"partnerValue": "PacaGroup, construtora belga, connosco desde o início."
 		},
-		"stats": {
-			"experience": "15",
-			"experienceLabel": "Anos de Experiência",
-			"properties": "50",
-			"propertiesLabel": "Propriedades Geridas",
-			"markets": "3",
-			"marketsLabel": "Mercados Europeus",
-			"satisfaction": "100",
-			"satisfactionLabel": "Dedicação ao Cliente"
-		},
-		"whyPortugal": {
-			"title": "Porquê Portugal",
-			"subtitle": "Um Destino de Excelência para Imobiliário",
-			"description": "Portugal combina o charme do Velho Mundo com sofisticação moderna, tornando-se um dos mercados imobiliários mais atrativos da Europa para compradores e investidores exigentes.",
-			"climate": {
-				"title": "Sol Todo o Ano",
-				"description": "Mais de 300 dias de sol por ano, invernos amenos e um clima mediterrânico que atrai pessoas de todo o mundo."
-			},
-			"investment": {
-				"title": "Crescimento Sólido do Mercado",
-				"description": "O mercado imobiliário português tem demonstrado uma valorização consistente, apoiado pela estabilidade económica e pela crescente procura internacional."
-			},
-			"lifestyle": {
-				"title": "Qualidade de Vida Excecional",
-				"description": "Gastronomia de classe mundial, rico património cultural, costas pristinas e uma comunidade calorosa e acolhedora."
-			},
-			"safety": {
-				"title": "Segurança e Estabilidade",
-				"description": "Consistentemente classificado entre os países mais seguros do mundo, com excelentes cuidados de saúde e infraestruturas modernas."
-			}
+		"portugal": {
+			"eyebrow": "Porquê Portugal",
+			"headline": "Quatro razões para comprar aqui.",
+			"solLabel": "Sol",
+			"solBody": "Verões longos e secos, invernos amenos e chuvosos. Bem mais sol do que no norte da Europa.",
+			"mercadoLabel": "Mercado",
+			"mercadoBody": "O preço da habitação subiu de forma constante na última década, com a procura estrangeira ainda a crescer.",
+			"mesaLabel": "Vida",
+			"mesaBody": "Boa comida, custo de vida abaixo da média europeia e o Porto a quarenta minutos.",
+			"abrigoLabel": "Abrigo",
+			"abrigoBody": "Um dos países mais seguros do mundo, com serviço nacional de saúde em todo o território."
 		},
 		"contact": {
-			"title": "Inicie a Sua Jornada",
-			"subtitle": "Vamos Encontrar a Sua Propriedade Perfeita",
-			"interested": "Quer esteja à procura de comprar a casa dos seus sonhos ou investir em imobiliário premium, a nossa equipa especializada está pronta para guiá-lo em cada passo do processo.",
-			"publishAnnouncement": "Proprietários e promotores imobiliários são convidados a apresentar os seus anúncios exclusivos através da nossa plataforma. Contacte-nos para discutir oportunidades de parceria e alcançar compradores exigentes."
+			"eyebrow": "Falar connosco",
+			"body": "Tipologia, zona, orçamento — o que já souber chega para começarmos. Respondemos em português, francês ou inglês.",
+			"ownersLabel": "Proprietários e promotores",
+			"ownersBody": "Publicamos imóveis de terceiros na plataforma. Escreva-nos para falarmos de parcerias.",
+			"headline": "Diga-nos o que procura.",
+			"emailCta": "Escrever-nos",
+			"ownersCta": "Propor um imóvel"
 		}
 	},
 	"properties": {
@@ -162,17 +151,17 @@
 		"editProperty": "Editar Propriedade",
 		"noProperties": "Ainda não tem propriedades",
 		"noPropertiesDescription": "Comece por adicionar a sua primeira propriedade",
-		"loadingProperties": "A carregar propriedades...",
+		"loadingProperties": "A carregar propriedades…",
 		"contactPersons": "Pessoas de Contacto",
 		"addContact": "Adicionar Contacto",
 		"noContacts": "Ainda não tem contactos",
 		"noContactsDescription": "Comece por adicionar a sua primeira pessoa de contacto",
-		"loadingContacts": "A carregar contactos...",
+		"loadingContacts": "A carregar contactos…",
 		"contactCount": "{count, plural, =1 {Existe 1 contacto} other {Existem # contactos}}",
 		"propertyCount": "{count, plural, =1 {Existe 1 propriedade} other {Existem # propriedades}}",
 		"backToProperties": "Voltar às Propriedades",
 		"save": "Guardar Propriedade",
-		"saving": "A guardar...",
+		"saving": "A guardar…",
 		"cancel": "Cancelar",
 		"edit": "Editar",
 		"views": "visualizações",
@@ -289,6 +278,22 @@
 			"remove": "Remover",
 			"imageNumber": "Imagem {number}",
 			"reorderHint": "A primeira imagem será usada como foto principal da propriedade. Arraste as imagens para reordenar."
+		},
+		"short": {
+			"typology": "T{count}",
+			"bathrooms": "{count} WC",
+			"parking": "{count} lug.",
+			"garage": "Garagem",
+			"garden": "Jardim",
+			"pool": "Piscina",
+			"elevator": "Elevador",
+			"land": "terreno {value}"
+		},
+		"gallery": {
+			"prevImage": "Imagem anterior",
+			"nextImage": "Imagem seguinte",
+			"fullscreen": "Ver em ecrã inteiro",
+			"imageAlt": "{title} — imagem {index}"
 		}
 	},
 	"contacts": {
@@ -299,9 +304,9 @@
 		"phone": "Telefone",
 		"notes": "Notas (opcional)",
 		"create": "Adicionar Contacto",
-		"creating": "Adicionando...",
+		"creating": "Adicionando…",
 		"update": "Atualizar Contacto",
-		"updating": "Atualizando...",
+		"updating": "Atualizando…",
 		"cancel": "Cancelar",
 		"edit": "Editar",
 		"nameMinLength": "O nome deve ter pelo menos 3 caracteres",

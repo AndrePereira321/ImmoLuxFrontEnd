@@ -1,11 +1,15 @@
 <script lang="ts">
+	/**
+	 * The footer closes on the same cobalt ground the page opened with.
+	 *
+	 * Every column starts its heading on one baseline; the brand column carries
+	 * no heading at all, so the mark can sit where the labels do rather than
+	 * pushing its own column out of alignment.
+	 */
 	import { resolve } from '$app/paths';
 	import { _, locale } from 'svelte-i18n';
-	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faEnvelope, faHome, faMapMarkerAlt, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons';
 	import { LANGUAGES } from '$lib/constants/languages';
 	import { changeLanguage } from '$lib/utils/language';
-	import AppTooltip from '$lib/components/AppTooltip.svelte';
 	import pacaGroupLogo from '$lib/assets/images/paca_group.jpg';
 	import immoLuxLogo from '$lib/assets/images/logo_transparent_white.png';
 
@@ -13,142 +17,97 @@
 	const contactEmail = 'info@immolux.pt';
 	const contactPhone = '+351 913 160 232';
 	const contactAddress = 'Lousada, Portugal';
+
+	const linkClass =
+		'text-sm text-light-400/80 transition-colors hover:text-secondary-300 focus-visible:text-secondary-300';
 </script>
 
-<footer class="border-t border-dark-700/30 bg-dark-900 text-light-400 dark:border-dark-800 dark:bg-dark-950">
-	<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-		<div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-			<!-- Company Info -->
-			<div class="space-y-4">
-				<a href={resolve('/')} class="mb-2 inline-block transition-opacity hover:opacity-80">
-					<img src={immoLuxLogo} alt="ImmoLux" class="h-10 w-auto" />
+<footer class="bg-primary-950 text-light-400">
+	<div class="mx-auto max-w-[84rem] px-5 sm:px-8 lg:px-12">
+		<!-- Columns. items-start keeps every heading on the same baseline. -->
+		<div class="grid items-start gap-x-10 gap-y-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:py-20">
+			<div class="lg:col-span-4">
+				<a href={resolve('/')} class="inline-block transition-opacity hover:opacity-80">
+					<img src={immoLuxLogo} alt="ImmoLux" width="200" height="210" class="h-16 w-auto" />
 				</a>
-				<h3
-					class="text-sm font-semibold tracking-wider text-light-200 uppercase"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					{$_('footer.about')}
-				</h3>
-				<p class="text-sm leading-relaxed text-light-600">
+				<p class="mt-6 max-w-[34ch] text-sm leading-relaxed text-light-500/70">
 					{$_('footer.aboutDescription')}
 				</p>
 			</div>
 
-			<!-- Partners -->
-			<div class="space-y-4">
-				<h3
-					class="text-sm font-semibold tracking-wider text-light-200 uppercase"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					{$_('footer.partners')}
-				</h3>
-				<div class="flex items-start">
-					<a
-						href="http://www.pacaconstruct.be"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="group block transition-all hover:scale-105"
-						aria-label="Paca Group - Partner"
-					>
-						<img
-							src={pacaGroupLogo}
-							alt="Paca Group"
-							class="h-14 w-auto rounded-lg bg-white p-1.5 shadow-md transition-shadow group-hover:shadow-lg"
-						/>
-					</a>
-				</div>
+			<nav class="lg:col-span-2 lg:col-start-6" aria-label={$_('footer.quickLinks')}>
+				<h2 class="type-label text-secondary-400">{$_('footer.browse')}</h2>
+				<ul class="mt-5 flex flex-col gap-3">
+					<li><a href={resolve('/')} class={linkClass}>{$_('home')}</a></li>
+					<li><a href={resolve('/houses')} class={linkClass}>{$_('houses.title')}</a></li>
+				</ul>
+			</nav>
+
+			<div class="lg:col-span-3">
+				<h2 class="type-label text-secondary-400">{$_('footer.contact')}</h2>
+				<ul class="mt-5 flex flex-col gap-3">
+					<li>
+						<a href="mailto:{contactEmail}" translate="no" class={linkClass}>{contactEmail}</a>
+					</li>
+					<li>
+						<a href="tel:{contactPhone.replace(/\s/g, '')}" translate="no" class={linkClass}>{contactPhone}</a>
+					</li>
+					<li><span translate="no" class="text-sm text-light-500/70">{contactAddress}</span></li>
+				</ul>
 			</div>
 
-			<!-- Quick Links -->
-			<div class="space-y-4">
-				<h3
-					class="text-sm font-semibold tracking-wider text-light-200 uppercase"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					{$_('footer.quickLinks')}
-				</h3>
-				<nav class="flex flex-col gap-2.5">
-					<a
-						href={resolve('/')}
-						class="flex items-center gap-2.5 text-sm text-light-600 transition-colors hover:text-secondary-400"
-					>
-						<FontAwesomeIcon icon={faHome} class="w-3 text-xs text-light-800" />
-						<span>{$_('home')}</span>
-					</a>
-					<a
-						href={resolve('/houses')}
-						class="flex items-center gap-2.5 text-sm text-light-600 transition-colors hover:text-secondary-400"
-					>
-						<FontAwesomeIcon icon={faSearch} class="w-3 text-xs text-light-800" />
-						<span>{$_('houses.title')}</span>
-					</a>
-				</nav>
-			</div>
-
-			<!-- Contact Info -->
-			<div class="space-y-4">
-				<h3
-					class="text-sm font-semibold tracking-wider text-light-200 uppercase"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					{$_('footer.contact')}
-				</h3>
-				<div class="flex flex-col gap-2.5">
-					<a
-						href="mailto:{contactEmail}"
-						class="flex items-center gap-2.5 text-sm text-light-600 transition-colors hover:text-secondary-400"
-						aria-label="Email contact"
-					>
-						<FontAwesomeIcon icon={faEnvelope} class="w-3 text-xs text-light-800" />
-						<span>{contactEmail}</span>
-					</a>
-					<a
-						href="tel:{contactPhone.replace(/\s/g, '')}"
-						class="flex items-center gap-2.5 text-sm text-light-600 transition-colors hover:text-secondary-400"
-						aria-label="Phone contact"
-					>
-						<FontAwesomeIcon icon={faPhone} class="w-3 text-xs text-light-800" />
-						<span>{contactPhone}</span>
-					</a>
-					<div class="flex items-center gap-2.5 text-sm text-light-600">
-						<FontAwesomeIcon icon={faMapMarkerAlt} class="w-3 text-xs text-light-800" />
-						<span>{contactAddress}</span>
-					</div>
-				</div>
+			<div class="lg:col-span-2">
+				<h2 class="type-label text-secondary-400">{$_('footer.language')}</h2>
+				<ul class="mt-5 flex flex-wrap gap-2">
+					{#each LANGUAGES as lang (lang.code)}
+						<li>
+							<button
+								type="button"
+								onclick={() => changeLanguage(lang.code)}
+								aria-current={$locale === lang.code ? 'true' : undefined}
+								class="type-record border px-3 py-1.5 text-xs uppercase transition-colors {$locale === lang.code
+									? 'border-secondary-400 text-secondary-300'
+									: 'border-light-50/20 text-light-500/70 hover:border-light-50/50 hover:text-light-200'}"
+							>
+								<span class="sr-only">{lang.name}</span>
+								<span aria-hidden="true">{lang.code}</span>
+							</button>
+						</li>
+					{/each}
+				</ul>
 			</div>
 		</div>
 
-		<!-- Bottom Section -->
-		<div class="mt-10 border-t border-dark-700/40 pt-8 dark:border-dark-800/60">
-			<div class="flex flex-col items-center justify-between gap-4 md:flex-row">
-				<!-- Copyright -->
-				<div class="text-center text-xs text-light-700 md:text-left">
-					<p>&copy; {currentYear} {$_('footer.author')}. {$_('footer.allRightsReserved')}</p>
-				</div>
-
-				<!-- Language Selector -->
-				<div class="flex items-center gap-3">
-					<span class="text-xs text-light-700">{$_('footer.language')}:</span>
-					<div class="flex gap-1.5">
-						{#each LANGUAGES as lang (lang.code)}
-							<button
-								id="footer-lang-{lang.code}"
-								onclick={() => changeLanguage(lang.code)}
-								class="group relative overflow-hidden rounded-sm transition-all hover:ring-2 hover:ring-secondary-500/60 {$locale ===
-								lang.code
-									? 'ring-2 ring-secondary-400'
-									: 'opacity-60 hover:opacity-100'}"
-								aria-label={lang.name}
-							>
-								<img src={lang.flag} alt={lang.name} class="h-5 w-7 object-cover" />
-							</button>
-							<AppTooltip triggeredBy="#footer-lang-{lang.code}" placement="top">
-								{lang.name}
-							</AppTooltip>
-						{/each}
-					</div>
-				</div>
+		<!-- The partner, credited at a size its mark can be read at -->
+		<div class="flex flex-col gap-5 border-t border-light-50/12 py-8 sm:flex-row sm:items-center sm:gap-8">
+			<a
+				href="https://www.pacaconstruct.be"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="w-fit shrink-0 border border-light-50/20 bg-white p-2.5 transition-colors hover:border-secondary-400"
+				aria-label="PacaGroup"
+			>
+				<img src={pacaGroupLogo} alt="PacaGroup" width="120" height="52" loading="lazy" class="h-11 w-auto" />
+			</a>
+			<div class="min-w-0">
+				<p class="type-label text-secondary-400">{$_('footer.partnerRole')}</p>
+				<a
+					href="https://www.pacaconstruct.be"
+					target="_blank"
+					rel="noopener noreferrer"
+					translate="no"
+					class="type-record mt-2 inline-block text-sm text-light-300 underline decoration-light-50/25 underline-offset-4 transition-colors hover:text-secondary-300 hover:decoration-secondary-400"
+				>
+					pacaconstruct.be
+				</a>
 			</div>
+		</div>
+
+		<div class="border-t border-light-50/12 py-7">
+			<p class="type-record text-xs text-light-600/60">
+				&copy; {currentYear}
+				{$_('footer.author')}. {$_('footer.allRightsReserved')}
+			</p>
 		</div>
 	</div>
 </footer>

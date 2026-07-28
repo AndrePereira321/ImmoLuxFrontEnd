@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _, locale } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {
 		faBath,
@@ -27,6 +27,7 @@
 	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 	import { inview } from '$lib/actions/inview';
+	import { formatPrice as formatPriceIntl } from '$lib/utils/format';
 
 	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -52,7 +53,7 @@
 		}
 	});
 
-	// Close lightbox on Escape key
+	// Close lightbox on Escape key; keep the page from scrolling underneath it
 	$effect(() => {
 		if (!browser || !lightboxOpen) return;
 		const handleKey = (e: KeyboardEvent) => {
@@ -61,13 +62,15 @@
 			if (e.key === 'ArrowLeft') prevImage();
 		};
 		window.addEventListener('keydown', handleKey);
-		return () => window.removeEventListener('keydown', handleKey);
+		const previousOverflow = document.documentElement.style.overflow;
+		document.documentElement.style.overflow = 'hidden';
+		return () => {
+			window.removeEventListener('keydown', handleKey);
+			document.documentElement.style.overflow = previousOverflow;
+		};
 	});
 
-	const formatPrice = (price?: number): string => {
-		if (!price) return '—';
-		return price.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-	};
+	const formatPrice = (price?: number): string => formatPriceIntl(price, $locale);
 
 	const getPropertyTypeLabel = (type?: string): string => {
 		if (!type) return '—';
@@ -79,16 +82,18 @@
 		return $_(`properties.statuses.${status}`);
 	};
 
+	/* The 900 text steps are deliberate: these ramps run light, and the 800s
+	   fall under 4.5:1 against their own 100-tint plates. */
 	const getStatusColor = (status?: string): string => {
 		switch (status) {
 			case 'available':
-				return 'bg-success-100/90 text-success-800 dark:bg-success-900/80 dark:text-success-200';
+				return 'bg-success-100/90 text-success-900 dark:bg-success-900/80 dark:text-success-200';
 			case 'pending':
-				return 'bg-warning-100/90 text-warning-800 dark:bg-warning-900/80 dark:text-warning-200';
+				return 'bg-warning-100/90 text-warning-900 dark:bg-warning-900/80 dark:text-warning-200';
 			case 'sold':
 				return 'bg-error-100/90 text-error-800 dark:bg-error-900/80 dark:text-error-200';
 			case 'rented':
-				return 'bg-info-100/90 text-info-800 dark:bg-info-900/80 dark:text-info-200';
+				return 'bg-info-100/90 text-info-900 dark:bg-info-900/80 dark:text-info-200';
 			default:
 				return 'bg-light-200/90 text-dark-800 dark:bg-dark-700/80 dark:text-light-200';
 		}
@@ -119,58 +124,25 @@
 	const jsonLd = $derived(
 		property
 			? `<script type="application/ld+json">
-{
-	"@context": "https://schema.org",
-	"@type": "RealEstateListing",
-	"@id": "https://immolux.pt/houses/${property.id}#listing",
-	"name": "${(property.title || 'Propriedade ImmoLux').replace(/"/g, '\\"')}",
-	"description": "${(property.description || '').replace(/"/g, '\\"').replace(/\n/g, ' ')}",
-	"url": "https://immolux.pt/houses/${property.id}",
-	${imageIds.length > 0 ? `"image": "https://immolux.pt/v1/api/images/${imageIds[0]}",` : ''}
-	"offers": {
-		"@type": "Offer",
-		"price": ${property.price || 0},
-		"priceCurrency": "EUR",
-		"availability": "${property.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
-	},
-	"address": {
-		"@type": "PostalAddress",
-		"streetAddress": "${(property.address || '').replace(/"/g, '\\"')}",
-		"addressLocality": "${property.municipality || ''}",
-		"addressRegion": "${property.district || ''}",
-		"postalCode": "${property.postalCode || ''}",
-		"addressCountry": "PT"
+{"@context":"https://schema.org","@type":"RealEstateListing","@id":"https://immolux.pt/houses/${property.id}#listing","name":"${(property.title || 'Propriedade ImmoLux').replace(/"/g, '\\"')}","description":"${(property.description || '').replace(/"/g, '\\"').replace(/\n/g, ' ')}","url":"https://immolux.pt/houses/${property.id}",
+	${imageIds.length > 0 ? `"image":"https://immolux.pt/v1/api/images/${imageIds[0]}",` : ''}"offers": {"@type":"Offer","price": ${property.price || 0},"priceCurrency":"EUR","availability":"${property.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
+	},"address": {"@type":"PostalAddress","streetAddress":"${(property.address || '').replace(/"/g, '\\"')}","addressLocality":"${property.municipality || ''}","addressRegion":"${property.district || ''}","postalCode":"${property.postalCode || ''}","addressCountry":"PT"
 	}${
 		property.areaSqm
-			? `,
-	"floorSize": {
-		"@type": "QuantitativeValue",
-		"value": ${property.areaSqm},
-		"unitCode": "MTK"
+			? `,"floorSize": {"@type":"QuantitativeValue","value": ${property.areaSqm},"unitCode":"MTK"
 	}`
 			: ''
-	}${
-		property.bedrooms
-			? `,
-	"numberOfBedrooms": ${property.bedrooms}`
-			: ''
-	}${
-		property.bathrooms
-			? `,
-	"numberOfBathroomsTotal": ${property.bathrooms}`
-			: ''
+	}${property.bedrooms ? `,"numberOfBedrooms": ${property.bedrooms}` : ''}${
+		property.bathrooms ? `,"numberOfBathroomsTotal": ${property.bathrooms}` : ''
 	}
 }
 </` +
 					`script>` +
 					`<script type="application/ld+json">
-{
-	"@context": "https://schema.org",
-	"@type": "BreadcrumbList",
-	"itemListElement": [
-		{ "@type": "ListItem", "position": 1, "name": "ImmoLux", "item": "https://immolux.pt/" },
-		{ "@type": "ListItem", "position": 2, "name": "Properties", "item": "https://immolux.pt/houses" },
-		{ "@type": "ListItem", "position": 3, "name": "${(property.title || 'Property').replace(/"/g, '\\"')}", "item": "https://immolux.pt/houses/${property.id}" }
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement": [
+		{"@type":"ListItem","position": 1,"name":"ImmoLux","item":"https://immolux.pt/" },
+		{"@type":"ListItem","position": 2,"name":"Properties","item":"https://immolux.pt/houses" },
+		{"@type":"ListItem","position": 3,"name":"${(property.title || 'Property').replace(/"/g, '\\"')}","item":"https://immolux.pt/houses/${property.id}" }
 	]
 }
 </` +
@@ -222,14 +194,14 @@
 
 <svelte:head>
 	{#if property}
-		<title>{property.title || 'Propriedade'} - ImmoLux</title>
+		<title>{property.title || $_('properties.untitled')} - ImmoLux</title>
 		<meta
 			name="description"
 			content={property.description
 				? property.description.substring(0, 160)
 				: `${getPropertyTypeLabel(property.propertyType)} em ${property.municipality}, ${property.district}. ${formatPrice(property.price)}`}
 		/>
-		<meta property="og:title" content="{property.title || 'Propriedade'} - ImmoLux" />
+		<meta property="og:title" content="{property.title || $_('properties.untitled')} - ImmoLux" />
 		<meta
 			property="og:description"
 			content={property.description
@@ -240,10 +212,10 @@
 		<meta property="og:url" content="https://immolux.pt/houses/{property.id}" />
 		{#if imageIds.length > 0}
 			<meta property="og:image" content="https://immolux.pt/v1/api/images/{imageIds[0]}" />
-			<meta property="og:image:alt" content={property.title || 'Property'} />
+			<meta property="og:image:alt" content={property.title || $_('properties.untitled')} />
 			<meta name="twitter:image" content="https://immolux.pt/v1/api/images/{imageIds[0]}" />
 		{/if}
-		<meta name="twitter:title" content="{property.title || 'Property'} - ImmoLux" />
+		<meta name="twitter:title" content="{property.title || $_('properties.untitled')} - ImmoLux" />
 		<meta
 			name="twitter:description"
 			content={property.description
@@ -277,10 +249,10 @@
 		<!-- Breadcrumb -->
 		<nav
 			class="border-b border-light-300/70 bg-white/80 backdrop-blur-sm dark:border-dark-700/60 dark:bg-dark-800/80"
-			aria-label="Breadcrumb"
+			aria-label={$_('common.breadcrumb')}
 		>
 			<div class="mx-auto max-w-7xl px-4 py-3.5 sm:px-6 lg:px-8">
-				<ol class="flex items-center gap-1.5 text-[0.8rem]" style="font-family: 'Plus Jakarta Sans', sans-serif">
+				<ol class="flex items-center gap-1.5 text-[0.8rem]">
 					<li>
 						<a
 							href={resolve('/')}
@@ -312,12 +284,12 @@
 				<!-- Left Column — Property Info -->
 				<div class="lg:col-span-2">
 					<!-- Image Carousel -->
-					<div class="mb-8 overflow-hidden rounded-2xl shadow-lg" style="animation: fadeIn 0.5s ease-out">
+					<div class="anim-fade-in mb-8 overflow-hidden shadow-lg">
 						{#if imageIds.length > 0}
 							<div class="relative aspect-video bg-light-200 dark:bg-dark-800">
 								<img
 									src="{serverUrl}/v1/api/images/{imageIds[currentImageIndex]}"
-									alt={property.title || 'Property'}
+									alt={property.title || $_('properties.untitled')}
 									class="h-full w-full object-cover"
 								/>
 
@@ -326,7 +298,7 @@
 										type="button"
 										onclick={prevImage}
 										class="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/85 p-3 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-white dark:bg-dark-800/85 dark:hover:bg-dark-700"
-										aria-label="Previous image"
+										aria-label={$_('properties.gallery.prevImage')}
 									>
 										<FontAwesomeIcon icon={faChevronLeft} class="h-5 w-5 text-dark-800 dark:text-light-100" />
 									</button>
@@ -334,7 +306,7 @@
 										type="button"
 										onclick={nextImage}
 										class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/85 p-3 shadow-md backdrop-blur-sm transition-all hover:scale-105 hover:bg-white dark:bg-dark-800/85 dark:hover:bg-dark-700"
-										aria-label="Next image"
+										aria-label={$_('properties.gallery.nextImage')}
 									>
 										<FontAwesomeIcon icon={faChevronRight} class="h-5 w-5 text-dark-800 dark:text-light-100" />
 									</button>
@@ -345,7 +317,7 @@
 									type="button"
 									onclick={() => (lightboxOpen = true)}
 									class="absolute right-4 bottom-4 rounded-full bg-dark-900/50 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-dark-900/70"
-									aria-label="View fullscreen"
+									aria-label={$_('properties.gallery.fullscreen')}
 								>
 									<FontAwesomeIcon icon={faExpand} class="h-3.5 w-3.5" />
 								</button>
@@ -381,14 +353,17 @@
 										<button
 											type="button"
 											onclick={() => goToImage(index)}
-											class="flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all {index ===
-											currentImageIndex
+											class="flex-shrink-0 overflow-hidden border-2 transition-all {index === currentImageIndex
 												? 'border-primary-500 ring-1 ring-primary-500/30'
 												: 'border-transparent opacity-70 hover:border-light-400 hover:opacity-100 dark:hover:border-dark-500'}"
 										>
 											<img
 												src="{serverUrl}/v1/api/images/{imageId}"
-												alt="{property.title || 'Property'} - image {index + 1}"
+												alt={$_('properties.gallery.imageAlt', {
+													values: { title: property.title ?? $_('properties.untitled'), index: index + 1 }
+												})}
+												width="96"
+												height="64"
 												class="h-16 w-24 object-cover"
 												loading="lazy"
 											/>
@@ -404,16 +379,16 @@
 					</div>
 
 					<!-- Title Block -->
-					<div class="mb-8" style="animation: fadeInUp 0.5s ease-out 0.1s both">
+					<div class="anim-fade-in-up mb-8" style="animation-delay: 0.1s">
 						<div class="mb-4 flex flex-wrap items-center gap-2">
 							<span
-								class="rounded-md bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300"
+								class="bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300"
 							>
 								{getPropertyTypeLabel(property.propertyType)}
 							</span>
 							{#if property.energyRating}
 								<span
-									class="inline-flex items-center gap-1.5 rounded-md bg-success-50 px-3 py-1 text-xs font-semibold text-success-800 dark:bg-success-950/50 dark:text-success-300"
+									class="inline-flex items-center gap-1.5 bg-success-50 px-3 py-1 text-xs font-semibold text-success-900 dark:bg-success-950/50 dark:text-success-300"
 								>
 									<FontAwesomeIcon icon={faBolt} class="text-[0.6rem]" />
 									<span>{getEnergyRatingLabel(property.energyRating)}</span>
@@ -423,7 +398,6 @@
 
 						<h1
 							class="mb-3 text-3xl leading-tight font-normal text-dark-900 sm:text-4xl lg:text-[2.75rem] dark:text-light-50"
-							style="font-family: 'Playfair Display', Georgia, serif"
 						>
 							{property.title || $_('properties.untitled')}
 						</h1>
@@ -453,20 +427,15 @@
 
 					<!-- Price bar -->
 					<div
-						class="mb-8 flex items-center justify-between rounded-2xl border border-light-300/70 bg-white p-6 shadow-sm sm:p-7 dark:border-dark-700/60 dark:bg-dark-800"
-						style="animation: fadeInUp 0.5s ease-out 0.2s both"
+						class="anim-fade-in-up mb-8 flex items-center justify-between border border-light-300/70 bg-white p-6 shadow-sm sm:p-7 dark:border-dark-700/60 dark:bg-dark-800"
+						style="animation-delay: 0.2s"
 					>
 						<div>
-							<p
-								class="mb-1 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-600"
-								style="font-family: 'Plus Jakarta Sans', sans-serif"
-							>
+							<p class="type-label mb-1 text-dark-400 dark:text-light-600">
 								{$_('properties.price')}
 							</p>
-							<p
-								class="text-3xl font-bold text-primary-700 sm:text-4xl dark:text-primary-400"
-								style="font-family: 'Plus Jakarta Sans', sans-serif"
-							>
+							<!-- Same display voice the homepage record and the cards set the price in -->
+							<p class="type-display text-3xl text-primary-700 tabular-nums sm:text-4xl dark:text-primary-400">
 								{formatPrice(property.price)}
 							</p>
 						</div>
@@ -504,13 +473,10 @@
 					<!-- Description -->
 					{#if property.description}
 						<div
-							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							class="mb-8 border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
 							use:inview
 						>
-							<h2
-								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
-								style="font-family: 'Playfair Display', Georgia, serif"
-							>
+							<h2 class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50">
 								{$_('properties.description')}
 							</h2>
 							<div
@@ -526,13 +492,10 @@
 
 					<!-- Property Details Grid -->
 					<div
-						class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+						class="mb-8 border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
 						use:inview
 					>
-						<h2
-							class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
-							style="font-family: 'Playfair Display', Georgia, serif"
-						>
+						<h2 class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50">
 							{$_('properties.sections.propertyDetails')}
 						</h2>
 						<div
@@ -541,11 +504,9 @@
 						<div class="reveal reveal-up reveal-d2 grid grid-cols-2 gap-3 sm:grid-cols-3">
 							{#if property.bedrooms}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faBed} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -557,11 +518,9 @@
 
 							{#if property.bathrooms}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faBath} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -573,11 +532,9 @@
 
 							{#if property.areaSqm}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faRulerCombined} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -589,11 +546,9 @@
 
 							{#if property.parkingSpaces}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faCar} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -605,11 +560,9 @@
 
 							{#if property.landAreaSqm}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faRulerCombined} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -623,11 +576,9 @@
 
 							{#if property.yearBuilt}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faCalendar} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -639,11 +590,9 @@
 
 							{#if property.floor !== null && property.floor !== undefined}
 								<div
-									class="flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+									class="flex items-center gap-3 border border-light-200/80 bg-light-50 p-4 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 								>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-950/50"
-									>
+									<div class="flex h-10 w-10 items-center justify-center bg-primary-50 dark:bg-primary-950/50">
 										<FontAwesomeIcon icon={faLayerGroup} class="text-sm text-primary-600 dark:text-primary-400" />
 									</div>
 									<div>
@@ -660,13 +609,10 @@
 					<!-- Amenities -->
 					{#if property.hasGarage || property.hasGarden || property.hasPool || property.hasElevator}
 						<div
-							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							class="mb-8 border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
 							use:inview
 						>
-							<h2
-								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
-								style="font-family: 'Playfair Display', Georgia, serif"
-							>
+							<h2 class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50">
 								{$_('properties.sections.features')}
 							</h2>
 							<div
@@ -675,7 +621,7 @@
 							<div class="reveal reveal-up reveal-d2 flex flex-wrap gap-3">
 								{#if property.hasGarage}
 									<div
-										class="flex items-center gap-2.5 rounded-xl border border-primary-200/60 bg-primary-50/60 px-4 py-2.5 dark:border-primary-900/40 dark:bg-primary-950/30"
+										class="flex items-center gap-2.5 border border-primary-200/60 bg-primary-50/60 px-4 py-2.5 dark:border-primary-900/40 dark:bg-primary-950/30"
 									>
 										<FontAwesomeIcon icon={faWarehouse} class="text-sm text-primary-600 dark:text-primary-400" />
 										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
@@ -685,7 +631,7 @@
 								{/if}
 								{#if property.hasGarden}
 									<div
-										class="flex items-center gap-2.5 rounded-xl border border-success-200/60 bg-success-50/60 px-4 py-2.5 dark:border-success-900/40 dark:bg-success-950/30"
+										class="flex items-center gap-2.5 border border-success-200/60 bg-success-50/60 px-4 py-2.5 dark:border-success-900/40 dark:bg-success-950/30"
 									>
 										<FontAwesomeIcon icon={faTree} class="text-sm text-success-600 dark:text-success-400" />
 										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
@@ -695,7 +641,7 @@
 								{/if}
 								{#if property.hasPool}
 									<div
-										class="flex items-center gap-2.5 rounded-xl border border-info-200/60 bg-info-50/60 px-4 py-2.5 dark:border-info-900/40 dark:bg-info-950/30"
+										class="flex items-center gap-2.5 border border-info-200/60 bg-info-50/60 px-4 py-2.5 dark:border-info-900/40 dark:bg-info-950/30"
 									>
 										<FontAwesomeIcon icon={faSwimmingPool} class="text-sm text-info-600 dark:text-info-400" />
 										<span class="text-sm font-medium text-dark-800 dark:text-light-200">{$_('properties.hasPool')}</span
@@ -704,7 +650,7 @@
 								{/if}
 								{#if property.hasElevator}
 									<div
-										class="flex items-center gap-2.5 rounded-xl border border-secondary-200/60 bg-secondary-50/60 px-4 py-2.5 dark:border-secondary-900/40 dark:bg-secondary-950/30"
+										class="flex items-center gap-2.5 border border-secondary-200/60 bg-secondary-50/60 px-4 py-2.5 dark:border-secondary-900/40 dark:bg-secondary-950/30"
 									>
 										<FontAwesomeIcon icon={faElevator} class="text-sm text-secondary-700 dark:text-secondary-400" />
 										<span class="text-sm font-medium text-dark-800 dark:text-light-200"
@@ -719,14 +665,11 @@
 					<!-- Map -->
 					{#if mapCoordinates && mapReady && LeafletMap}
 						<div
-							class="mb-8 overflow-hidden rounded-2xl border border-light-300/70 bg-white shadow-sm dark:border-dark-700/60 dark:bg-dark-800"
+							class="mb-8 overflow-hidden border border-light-300/70 bg-white shadow-sm dark:border-dark-700/60 dark:bg-dark-800"
 							use:inview
 						>
 							<div class="p-7 pb-0 sm:p-8 sm:pb-0">
-								<h2
-									class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
-									style="font-family: 'Playfair Display', Georgia, serif"
-								>
+								<h2 class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50">
 									{$_('properties.sections.location')}
 								</h2>
 								<div
@@ -752,13 +695,10 @@
 					<!-- Virtual Tour -->
 					{#if property.virtualTourUrl}
 						<div
-							class="mb-8 rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
+							class="mb-8 border border-light-300/70 bg-white p-7 shadow-sm sm:p-8 dark:border-dark-700/60 dark:bg-dark-800"
 							use:inview
 						>
-							<h2
-								class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50"
-								style="font-family: 'Playfair Display', Georgia, serif"
-							>
+							<h2 class="reveal reveal-up mb-5 text-lg font-normal text-dark-900 dark:text-light-50">
 								{$_('properties.virtualTourUrl')}
 							</h2>
 							<a
@@ -766,7 +706,7 @@
 								data-sveltekit-reload
 								target="_blank"
 								rel="noopener noreferrer"
-								class="reveal reveal-up reveal-d1 group inline-flex items-center gap-2.5 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-semibold text-light-50 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-primary-700 hover:shadow-md dark:bg-primary-700 dark:hover:bg-primary-600"
+								class="reveal reveal-up reveal-d1 group inline-flex items-center gap-2.5 bg-primary-600 px-6 py-3.5 text-sm font-semibold text-light-50 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-primary-700 hover:shadow-md dark:bg-primary-700 dark:hover:bg-primary-600"
 							>
 								<span>{$_('properties.virtualTourUrl')}</span>
 								<span class="text-xs transition-transform group-hover:translate-x-0.5">&#8594;</span>
@@ -777,16 +717,11 @@
 
 				<!-- Right Column — Contact Sidebar -->
 				<div class="lg:col-span-1">
-					<div class="sticky top-24" style="animation: fadeInUp 0.5s ease-out 0.3s both">
+					<div class="anim-fade-in-up sticky top-24" style="animation-delay: 0.3s">
 						{#if property.contacts && property.contacts.length > 0}
-							<div
-								class="rounded-2xl border border-light-300/70 bg-white p-7 shadow-sm dark:border-dark-700/60 dark:bg-dark-800"
-							>
+							<div class="border border-light-300/70 bg-white p-7 shadow-sm dark:border-dark-700/60 dark:bg-dark-800">
 								<!-- Header — matches other card sections -->
-								<h2
-									class="mb-2 text-lg font-normal text-dark-900 dark:text-light-50"
-									style="font-family: 'Playfair Display', Georgia, serif"
-								>
+								<h2 class="mb-2 text-lg font-normal text-dark-900 dark:text-light-50">
 									{$_('properties.sections.contact')}
 								</h2>
 								<div
@@ -799,7 +734,7 @@
 											<!-- Contact Name -->
 											<div class="mb-4 flex items-center gap-3">
 												<div
-													class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-950/50"
+													class="flex h-10 w-10 flex-shrink-0 items-center justify-center bg-primary-50 dark:bg-primary-950/50"
 												>
 													<FontAwesomeIcon icon={faUser} class="text-sm text-primary-600 dark:text-primary-400" />
 												</div>
@@ -823,10 +758,10 @@
 												{#if contact.phone}
 													<a
 														href="tel:{contact.phone}"
-														class="group flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+														class="group flex items-center gap-3 border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 													>
 														<div
-															class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-success-50 transition-transform group-hover:scale-105 dark:bg-success-950/40"
+															class="flex h-9 w-9 flex-shrink-0 items-center justify-center bg-success-50 transition-transform group-hover:scale-105 dark:bg-success-950/40"
 														>
 															<FontAwesomeIcon icon={faPhone} class="text-sm text-success-600 dark:text-success-400" />
 														</div>
@@ -846,10 +781,10 @@
 												{#if contact.email}
 													<a
 														href="mailto:{contact.email}"
-														class="group flex items-center gap-3 rounded-xl border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
+														class="group flex items-center gap-3 border border-light-200/80 bg-light-50 p-3.5 transition-all hover:border-light-300 hover:shadow-sm dark:border-dark-700/60 dark:bg-dark-800/50 dark:hover:border-dark-600"
 													>
 														<div
-															class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 transition-transform group-hover:scale-105 dark:bg-primary-950/40"
+															class="flex h-9 w-9 flex-shrink-0 items-center justify-center bg-primary-50 transition-transform group-hover:scale-105 dark:bg-primary-950/40"
 														>
 															<FontAwesomeIcon
 																icon={faEnvelope}
@@ -889,17 +824,17 @@
 	<!-- ━━━ LIGHTBOX ━━━ -->
 	{#if lightboxOpen && imageIds.length > 0}
 		<div
-			class="fixed inset-0 z-[100] flex items-center justify-center bg-dark-950/95 backdrop-blur-sm"
+			class="anim-fade-in fixed inset-0 z-[100] flex items-center justify-center overscroll-contain bg-dark-950/95 backdrop-blur-sm"
 			role="dialog"
 			aria-modal="true"
-			style="animation: fadeIn 0.2s ease-out"
+			style="animation-duration: 0.2s"
 		>
 			<!-- Close -->
 			<button
 				type="button"
 				onclick={() => (lightboxOpen = false)}
 				class="absolute top-4 right-4 z-10 rounded-full bg-white/10 p-3 text-white transition-all hover:bg-white/20"
-				aria-label="Close"
+				aria-label={$_('common.close')}
 			>
 				<FontAwesomeIcon icon={faXmark} class="h-5 w-5" />
 			</button>
@@ -915,7 +850,7 @@
 					type="button"
 					onclick={prevImage}
 					class="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white transition-all hover:bg-white/20"
-					aria-label="Previous"
+					aria-label={$_('properties.gallery.prevImage')}
 				>
 					<FontAwesomeIcon icon={faChevronLeft} class="h-6 w-6" />
 				</button>
@@ -923,7 +858,7 @@
 					type="button"
 					onclick={nextImage}
 					class="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white transition-all hover:bg-white/20"
-					aria-label="Next"
+					aria-label={$_('properties.gallery.nextImage')}
 				>
 					<FontAwesomeIcon icon={faChevronRight} class="h-6 w-6" />
 				</button>
@@ -932,9 +867,11 @@
 			<!-- Image -->
 			<img
 				src="{serverUrl}/v1/api/images/{imageIds[currentImageIndex]}"
-				alt="{property.title || 'Property'} - image {currentImageIndex + 1}"
-				class="max-h-[85vh] max-w-[92vw] rounded-lg object-contain shadow-2xl"
-				style="animation: fadeIn 0.15s ease-out"
+				alt={$_('properties.gallery.imageAlt', {
+					values: { title: property.title ?? $_('properties.untitled'), index: currentImageIndex + 1 }
+				})}
+				class="anim-fade-in max-h-[85vh] max-w-[92vw] object-contain shadow-2xl"
+				style="animation-duration: 0.15s"
 			/>
 		</div>
 	{/if}

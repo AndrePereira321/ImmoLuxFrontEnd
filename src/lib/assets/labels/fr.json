@@ -8,20 +8,25 @@
 		},
 		"hero": {
 			"title": "Maisons et Propriétés à Vendre au Portugal",
-			"subtitle": "Filtrez par localisation, prix et type de bien"
+			"subtitle": "Filtrez par localisation, prix et type de bien",
+			"eyebrow": "Portugal · Nord"
 		},
 		"filters": "Filtres",
 		"allTypes": "Tous les Types",
 		"allStatuses": "Tous les États",
 		"minPrice": "Prix Min (€)",
 		"maxPrice": "Prix Max (€)",
+		"min": "Min",
+		"max": "Max",
 		"clearFilters": "Effacer les Filtres",
-		"loading": "Chargement des propriétés...",
+		"loading": "Chargement des propriétés…",
 		"property": "propriété",
 		"properties": "propriétés",
 		"noProperties": "Aucune propriété trouvée",
-		"noPropertiesDescription": "Essayez d'ajuster vos filtres pour voir plus de résultats",
+		"noPropertiesDescription": "Essayez d’ajuster vos filtres pour voir plus de résultats",
 		"pageInfo": "Page {current} sur {total}",
+		"prevPage": "Page précédente",
+		"nextPage": "Page suivante",
 		"quickFilters": {
 			"under200k": "Moins de 200k",
 			"between200k500k": "200k - 500k",
@@ -39,7 +44,7 @@
 	},
 	"common": {
 		"save": "Enregistrer",
-		"saving": "Enregistrement...",
+		"saving": "Enregistrement…",
 		"cancel": "Annuler",
 		"back": "Retour",
 		"edit": "Modifier",
@@ -47,11 +52,13 @@
 		"close": "Fermer",
 		"confirm": "Confirmer",
 		"yes": "Oui",
-		"no": "Non"
+		"no": "Non",
+		"breadcrumb": "Fil d’Ariane"
 	},
 	"menu": {
 		"toggleTheme": "Basculer le thème",
 		"selectLanguage": "Sélectionner la langue",
+		"mainMenu": "Menu",
 		"login": "Connexion",
 		"logout": "Déconnexion",
 		"userMenu": "Menu utilisateur",
@@ -63,94 +70,76 @@
 		"password": "Mot de passe",
 		"rememberMe": "Se souvenir de moi",
 		"loginButton": "Login",
-		"loggingIn": "Connexion...",
-		"loggingOut": "Déconnexion...",
+		"loggingIn": "Connexion…",
+		"loggingOut": "Déconnexion…",
 		"invalidCredentials": "Email ou mot de passe invalide",
 		"accountLocked": "Compte verrouillé en raison de trop nombreuses tentatives échouées",
-		"loginError": "Une erreur s'est produite lors de la connexion",
+		"loginError": "Une erreur s’est produite lors de la connexion",
 		"loginSuccess": "Connexion réussie",
 		"logoutSuccess": "Déconnexion réussie",
-		"logoutError": "Une erreur s'est produite lors de la déconnexion"
+		"logoutError": "Une erreur s’est produite lors de la déconnexion"
 	},
 	"footer": {
 		"author": "André Pereira",
 		"language": "Langue",
-		"about": "À Propos d'ImmoLux",
-		"aboutDescription": "ImmoLux est spécialisée dans l'immobilier de luxe au Portugal, offrant une sélection soignée de villas, appartements et propriétés exclusives premium.",
+		"about": "À Propos d’ImmoLux",
+		"aboutDescription": "Promoteur immobilier à Lousada. Nous concevons, construisons et vendons des maisons dans le nord du Portugal.",
 		"quickLinks": "Liens Rapides",
 		"contact": "Contact",
 		"partners": "Nos Partenaires",
-		"allRightsReserved": "Tous droits réservés"
+		"allRightsReserved": "Tous droits réservés",
+		"partnerRole": "Partenaire construction",
+		"browse": "Biens"
 	},
 	"homepage": {
 		"meta": {
-			"title": "Propriétés et Immobilier de Luxe au Portugal",
-			"description": "Découvrez des propriétés de rêve au Portugal. Villas, appartements et terrains premium dans les meilleurs emplacements. Immobilier de qualité exceptionnelle."
+			"title": "Maisons neuves à Lousada et dans le nord du Portugal",
+			"description": "ImmoLux conçoit, construit et vend des maisons et des appartements à Lousada et alentours. Voyez ce qui est en vente."
 		},
-		"availableHouses": {
-			"title": "Découvrez Votre Propriété de Rêve",
-			"subtitle": "Immobilier Exclusif au Portugal",
-			"description": "Explorez notre portfolio soigneusement sélectionné de propriétés premium dans les emplacements les plus recherchés du Portugal. Des villas contemporaines aux domaines traditionnels, chaque propriété représente une qualité exceptionnelle et un design intemporel.",
-			"comingSoon": "Propriétés Premium Bientôt Disponibles",
-			"comingSoonDesc": "Notre collection exclusive de propriétés triées sur le volet sera bientôt disponible"
+		"hero": {
+			"eyebrow": "Lousada, Portugal",
+			"headline": "Des maisons neuves dans le nord du Portugal.",
+			"lead": "Nous concevons et construisons à Lousada et dans les paroisses voisines. Voici celles qui sont en vente aujourd’hui.",
+			"leadEmpty": "Nous concevons et construisons à Lousada et dans les paroisses voisines.",
+			"viewAll": "Voir tous les biens",
+			"viewProperty": "Voir la fiche complète",
+			"comingSoonTitle": "Nous construisons.",
+			"comingSoonBody": "Les prochains biens paraissent ici dès l’ouverture du chantier. Écrivez-nous pour savoir ce qui arrive."
 		},
-		"aboutUs": {
-			"title": "La Différence ImmoLux",
-			"subtitle": "Excellence dans le Développement Immobilier",
-			"location": {
-				"title": "Emplacement Stratégique",
-				"description": "Situé à Lousada, Portugal, nous opérons au cœur du marché immobilier le plus dynamique du pays, offrant une expertise locale inégalée et une connaissance approfondie du marché."
-			},
-			"dedication": {
-				"title": "Qualité Sans Compromis",
-				"description": "Notre équipe dédiée d'experts en construction et d'architectes s'engage à livrer des propriétés qui dépassent les normes de l'industrie, combinant design innovant et savoir-faire supérieur."
-			},
-			"experience": {
-				"title": "Expertise Européenne",
-				"description": "Avec une vaste expérience sur plusieurs marchés européens, nous apportons les meilleures pratiques internationales et des techniques de construction sophistiquées à chaque projet que nous entreprenons."
-			},
-			"partner": {
-				"title": "Partenariat de Confiance",
-				"description": "Nous collaborons avec {partner}, leader de la construction reconnu avec des décennies d'excellence prouvée, garantissant que chaque propriété répond aux plus hauts standards de qualité et de durabilité.",
-				"partnerName": "PacaGroup"
-			}
+		"studio": {
+			"eyebrow": "Qui nous sommes",
+			"headline": "Nous construisons les maisons que nous vendons.",
+			"body": "ImmoLux est un promoteur établi à Lousada. Nous suivons chaque maison du terrain à l’acte — et nous suivons l’acheteur, qu’il soit au Portugal, en Belgique ou en France.",
+			"facts": "Lousada, Portugal · 15 ans de chantier · 3 marchés européens",
+			"whereLabel": "Où",
+			"whereValue": "Lousada, district de Porto. Nous travaillons dans les paroisses que nous connaissons, pas sur toute la carte.",
+			"howLabel": "Comment",
+			"howValue": "Architecture et construction en interne. Les finitions se choisissent, elles ne s’héritent pas d’un catalogue.",
+			"whoLabel": "Qui",
+			"whoValue": "Quinze ans entre le Portugal et le Benelux. Nous répondons en portugais, en français et en anglais.",
+			"partnerLabel": "Avec qui",
+			"partnerValue": "PacaGroup, constructeur belge, avec nous depuis le début."
 		},
-		"stats": {
-			"experience": "15",
-			"experienceLabel": "Ans d'Expérience",
-			"properties": "50",
-			"propertiesLabel": "Propriétés Gérées",
-			"markets": "3",
-			"marketsLabel": "Marchés Européens",
-			"satisfaction": "100",
-			"satisfactionLabel": "Dévouement Client"
-		},
-		"whyPortugal": {
-			"title": "Pourquoi le Portugal",
-			"subtitle": "Une Destination de Premier Choix pour l'Immobilier",
-			"description": "Le Portugal allie le charme de l'Ancien Monde à une sophistication moderne, en faisant l'un des marchés immobiliers les plus attractifs d'Europe pour les acheteurs et investisseurs exigeants.",
-			"climate": {
-				"title": "Soleil Toute l'Année",
-				"description": "Plus de 300 jours d'ensoleillement par an, des hivers doux et un climat méditerranéen qui attire des gens du monde entier."
-			},
-			"investment": {
-				"title": "Croissance Solide du Marché",
-				"description": "Le marché immobilier portugais a montré une appréciation constante, soutenu par la stabilité économique et la demande internationale croissante."
-			},
-			"lifestyle": {
-				"title": "Qualité de Vie Exceptionnelle",
-				"description": "Gastronomie de classe mondiale, riche patrimoine culturel, littoraux immaculés et une communauté chaleureuse et accueillante."
-			},
-			"safety": {
-				"title": "Sécurité et Stabilité",
-				"description": "Régulièrement classé parmi les pays les plus sûrs au monde, avec d'excellents soins de santé et des infrastructures modernes."
-			}
+		"portugal": {
+			"eyebrow": "Pourquoi le Portugal",
+			"headline": "Quatre raisons d’acheter ici.",
+			"solLabel": "Soleil",
+			"solBody": "Étés longs et secs, hivers doux et pluvieux. Bien plus de soleil qu’en Europe du Nord.",
+			"mercadoLabel": "Marché",
+			"mercadoBody": "Les prix de l’immobilier montent régulièrement depuis dix ans, avec une demande étrangère toujours en hausse.",
+			"mesaLabel": "Vie",
+			"mesaBody": "Bonne cuisine, un coût de la vie sous la moyenne européenne, et Porto à quarante minutes.",
+			"abrigoLabel": "Abri",
+			"abrigoBody": "L’un des pays les plus sûrs au monde, avec un service national de santé sur tout le territoire."
 		},
 		"contact": {
-			"title": "Commencez Votre Voyage",
-			"subtitle": "Trouvons Votre Propriété Parfaite",
-			"interested": "Que vous cherchiez à acheter la maison de vos rêves ou à investir dans l'immobilier premium, notre équipe d'experts est prête à vous guider à chaque étape du processus.",
-			"publishAnnouncement": "Les propriétaires et promoteurs immobiliers sont invités à présenter leurs annonces exclusives via notre plateforme. Contactez-nous pour discuter des opportunités de partenariat et atteindre des acheteurs exigeants."
+			"eyebrow": "Nous écrire",
+			"body": "Typologie, secteur, budget — ce que vous savez déjà suffit pour commencer. Nous répondons en portugais, en français ou en anglais.",
+			"ownersLabel": "Propriétaires et promoteurs",
+			"ownersBody": "Nous publions des biens de tiers sur la plateforme. Écrivez-nous pour en parler.",
+			"headline": "Dites-nous ce que vous cherchez.",
+			"emailCta": "Nous écrire",
+			"ownersCta": "Proposer un bien"
 		}
 	},
 	"properties": {
@@ -162,17 +151,17 @@
 		"editProperty": "Modifier la Propriété",
 		"noProperties": "Pas encore de propriétés",
 		"noPropertiesDescription": "Commencez par ajouter votre première propriété",
-		"loadingProperties": "Chargement des propriétés...",
+		"loadingProperties": "Chargement des propriétés…",
 		"contactPersons": "Personnes de Contact",
 		"addContact": "Ajouter un Contact",
 		"noContacts": "Pas encore de contacts",
 		"noContactsDescription": "Commencez par ajouter votre première personne de contact",
-		"loadingContacts": "Chargement des contacts...",
+		"loadingContacts": "Chargement des contacts…",
 		"contactCount": "Il y a {count, plural, =1 {1 contact} other {# contacts}}",
 		"propertyCount": "Il y a {count, plural, =1 {1 propriété} other {# propriétés}}",
 		"backToProperties": "Retour aux Propriétés",
 		"save": "Enregistrer la Propriété",
-		"saving": "Enregistrement...",
+		"saving": "Enregistrement…",
 		"cancel": "Annuler",
 		"edit": "Modifier",
 		"views": "vues",
@@ -231,7 +220,7 @@
 		"landAreaSqm": "Surface du Terrain (m²)",
 		"yearBuilt": "Année de Construction",
 		"floor": "Étage",
-		"totalFloors": "Nombre d'Étages",
+		"totalFloors": "Nombre d’Étages",
 		"parkingSpaces": "Places de Parking",
 		"hasGarage": "A un Garage",
 		"hasGarden": "A un Jardin",
@@ -246,7 +235,7 @@
 		"selectMultipleContacts": "Sélectionnez une ou plusieurs personnes de contact pour cette propriété",
 		"contactsSelected": "sélectionnés",
 		"moreContacts": "plus de contacts",
-		"noContactsAvailable": "Aucun contact disponible. Veuillez d'abord créer un contact.",
+		"noContactsAvailable": "Aucun contact disponible. Veuillez d’abord créer un contact.",
 		"selectDistrict": "Sélectionner un District",
 		"selectMunicipality": "Sélectionner une Municipalité",
 		"selectParish": "Sélectionner une Paroisse",
@@ -257,8 +246,8 @@
 		"propertyTypeRequired": "Le type de propriété est obligatoire",
 		"pricePositive": "Le prix doit être positif",
 		"statusRequired": "Le statut est obligatoire",
-		"addressRequired": "L'adresse est obligatoire",
-		"addressMaxLength": "L'adresse doit contenir moins de 255 caractères",
+		"addressRequired": "L’adresse est obligatoire",
+		"addressMaxLength": "L’adresse doit contenir moins de 255 caractères",
 		"districtRequired": "Le district est obligatoire",
 		"municipalityRequired": "La municipalité est obligatoire",
 		"postalCodeInvalid": "Le code postal doit être au format XXXX-XXX",
@@ -276,10 +265,10 @@
 		"unpublishSuccess": "Propriété dépubliée avec succès",
 		"deleteSuccess": "Propriété supprimée avec succès",
 		"deleteError": "Échec de la suppression de la propriété",
-		"deleteConfirm": "Êtes-vous sûr de vouloir supprimer '{title}' ? Cette action ne peut pas être annulée.",
+		"deleteConfirm": "Êtes-vous sûr de vouloir supprimer ’{title}’ ? Cette action ne peut pas être annulée.",
 		"imageUpload": {
 			"clickOrDrag": "Cliquez pour télécharger ou glissez-déposez",
-			"requirements": "PNG, JPG jusqu'à {size}MB (max {max} images)",
+			"requirements": "PNG, JPG jusqu’à {size}MB (max {max} images)",
 			"invalidType": "Veuillez sélectionner uniquement des fichiers image (PNG, JPG)",
 			"fileTooLarge": "La taille du fichier dépasse {size}MB",
 			"maxImagesReached": "Maximum de {max} images autorisées",
@@ -289,6 +278,22 @@
 			"remove": "Supprimer",
 			"imageNumber": "Image {number}",
 			"reorderHint": "La première image sera utilisée comme photo principale de la propriété. Glissez les images pour les réorganiser."
+		},
+		"short": {
+			"typology": "T{count}",
+			"bathrooms": "{count} SDB",
+			"parking": "{count} pl.",
+			"garage": "Garage",
+			"garden": "Jardin",
+			"pool": "Piscine",
+			"elevator": "Ascenseur",
+			"land": "terrain {value}"
+		},
+		"gallery": {
+			"prevImage": "Image précédente",
+			"nextImage": "Image suivante",
+			"fullscreen": "Afficher en plein écran",
+			"imageAlt": "{title} — image {index}"
 		}
 	},
 	"contacts": {
@@ -299,16 +304,16 @@
 		"phone": "Téléphone",
 		"notes": "Notes (optionnel)",
 		"create": "Ajouter le Contact",
-		"creating": "Ajout en cours...",
+		"creating": "Ajout en cours…",
 		"update": "Mettre à jour le Contact",
-		"updating": "Mise à jour...",
+		"updating": "Mise à jour…",
 		"cancel": "Annuler",
 		"edit": "Modifier",
 		"nameMinLength": "Le nom doit contenir au moins 3 caractères",
 		"nameMaxLength": "Le nom doit contenir moins de 150 caractères",
-		"emailRequired": "L'email est obligatoire",
+		"emailRequired": "L’email est obligatoire",
 		"emailInvalid": "Veuillez saisir une adresse email valide",
-		"emailMaxLength": "L'email doit contenir moins de 255 caractères",
+		"emailMaxLength": "L’email doit contenir moins de 255 caractères",
 		"phoneRequired": "Le téléphone est obligatoire",
 		"phoneMaxLength": "Le téléphone doit contenir moins de 20 caractères",
 		"notesMaxLength": "Les notes doivent contenir moins de 1000 caractères",

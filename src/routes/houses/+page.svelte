@@ -174,19 +174,22 @@
 			active: 'bg-dark-900 text-white dark:bg-light-50 dark:text-dark-900',
 			hover: 'hover:bg-light-200 dark:hover:bg-dark-700'
 		},
+		/* Active/hover shades are the darkest step of each ramp that keeps the hue
+		   readable: these ramps run unusually light, so the 500–700 steps fail
+		   WCAG against white text or the 50-tint hover grounds. */
 		{
 			value: 'available',
 			label: $_('properties.statuses.available'),
 			dot: 'bg-success-500',
-			active: 'bg-success-600 text-white ring-2 ring-success-200 dark:ring-success-800',
-			hover: 'hover:bg-success-50 hover:text-success-700 dark:hover:bg-success-950/40 dark:hover:text-success-300'
+			active: 'bg-success-900 text-white ring-2 ring-success-200 dark:ring-success-800',
+			hover: 'hover:bg-success-50 hover:text-success-900 dark:hover:bg-success-950/40 dark:hover:text-success-300'
 		},
 		{
 			value: 'pending',
 			label: $_('properties.statuses.pending'),
 			dot: 'bg-warning-400',
-			active: 'bg-warning-500 text-white ring-2 ring-warning-200 dark:ring-warning-800',
-			hover: 'hover:bg-warning-50 hover:text-warning-700 dark:hover:bg-warning-950/40 dark:hover:text-warning-300'
+			active: 'bg-warning-800 text-white ring-2 ring-warning-200 dark:ring-warning-800',
+			hover: 'hover:bg-warning-50 hover:text-warning-900 dark:hover:bg-warning-950/40 dark:hover:text-warning-300'
 		},
 		{
 			value: 'sold',
@@ -199,8 +202,8 @@
 			value: 'rented',
 			label: $_('properties.statuses.rented'),
 			dot: 'bg-info-500',
-			active: 'bg-info-600 text-white ring-2 ring-info-200 dark:ring-info-800',
-			hover: 'hover:bg-info-50 hover:text-info-700 dark:hover:bg-info-950/40 dark:hover:text-info-300'
+			active: 'bg-info-800 text-white ring-2 ring-info-200 dark:ring-info-800',
+			hover: 'hover:bg-info-50 hover:text-info-900 dark:hover:bg-info-950/40 dark:hover:text-info-300'
 		}
 	]);
 </script>
@@ -233,47 +236,31 @@
 
 <div class="min-h-screen bg-light-50 dark:bg-dark-900">
 	<!-- ─── Hero Strip ─────────────────────────────────────────────── -->
-	<section class="relative overflow-hidden" style="height: 260px">
-		<!-- Background photo -->
+	<section class="relative overflow-hidden bg-dark-950">
 		<div class="absolute inset-0 bg-cover bg-center" style="background-image: url({homeImage})"></div>
-		<!-- Gradient overlay: dark left, lighter right -->
-		<div
-			class="absolute inset-0"
-			style="background: linear-gradient(120deg, rgba(10,20,45,0.92) 0%, rgba(10,20,45,0.72) 55%, rgba(10,20,45,0.45) 100%)"
-		></div>
-		<!-- Diagonal clip at bottom (matches page bg) -->
-		<div
-			class="absolute right-0 bottom-0 left-0 h-14 bg-light-50 dark:bg-dark-900"
-			style="clip-path: polygon(0 100%, 100% 30%, 100% 100%)"
-		></div>
+		<!-- Weighted toward the reading edge so the heading holds over any photo -->
+		<div class="absolute inset-0 bg-gradient-to-r from-dark-950/94 via-dark-950/72 to-dark-950/45"></div>
+		<div class="absolute inset-0 bg-primary-950/30 mix-blend-multiply"></div>
 
-		<div class="relative flex h-full items-center">
-			<div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-				<p
-					class="mb-3 text-[0.688rem] font-semibold tracking-[0.22em] text-secondary-300 uppercase"
-					style="animation: fadeInUp 0.5s ease-out; font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					Portugal · Imobiliário de Luxo
-				</p>
-				<h1
-					class="mb-4 text-4xl font-normal tracking-tight text-white drop-shadow-sm sm:text-5xl"
-					style="animation: fadeInUp 0.5s ease-out 0.1s both"
-				>
-					{$_('houses.hero.title')}
-				</h1>
-				<div
-					class="flex items-center gap-4"
-					style="animation: fadeInUp 0.5s ease-out 0.2s both; font-family: 'Plus Jakarta Sans', sans-serif"
-				>
-					<p class="text-sm text-white/65">{$_('houses.hero.subtitle')}</p>
-					{#if !loading && total > 0}
-						<div class="h-px w-8 flex-shrink-0 bg-secondary-400/50"></div>
-						<p class="text-sm font-semibold text-secondary-200">
-							{total}
-							{total === 1 ? $_('houses.property') : $_('houses.properties')}
-						</p>
-					{/if}
-				</div>
+		<div class="relative mx-auto w-full max-w-[84rem] px-5 py-14 sm:px-8 sm:py-16 lg:px-12">
+			<p class="type-label hero-rise text-secondary-400">
+				{$_('houses.hero.eyebrow')}
+			</p>
+			<h1
+				class="type-display hero-rise mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)] text-light-50"
+				style="animation-delay: 80ms"
+			>
+				{$_('houses.hero.title')}
+			</h1>
+			<div class="hero-rise mt-5 flex flex-wrap items-center gap-x-4 gap-y-2" style="animation-delay: 160ms">
+				<p class="text-sm text-light-200/75">{$_('houses.hero.subtitle')}</p>
+				{#if !loading && total > 0}
+					<span aria-hidden="true" class="h-px w-8 shrink-0 bg-secondary-400/50"></span>
+					<p class="type-record text-sm text-secondary-300">
+						{total}
+						{total === 1 ? $_('houses.property') : $_('houses.properties')}
+					</p>
+				{/if}
 			</div>
 		</div>
 	</section>
@@ -315,8 +302,7 @@
 				<select
 					bind:value={filters.orderBy}
 					onchange={handleFilterChange}
-					class="flex-shrink-0 rounded-lg border border-light-200 bg-transparent py-1.5 pr-7 pl-3 text-xs font-medium text-dark-600 focus:border-primary-400 focus:outline-none dark:border-dark-700 dark:text-light-400"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
+					class="flex-shrink-0 border border-light-800 bg-white py-1.5 pr-7 pl-3 text-xs font-medium text-dark-600 focus:border-primary-400 dark:border-dark-700 dark:bg-dark-800 dark:text-light-300"
 				>
 					<option value="created_desc">{$_('houses.sort.newest')}</option>
 					<option value="popularity">{$_('houses.sort.popular')}</option>
@@ -328,10 +314,7 @@
 				</select>
 
 				<!-- Results count (right-aligned) -->
-				<div
-					class="ml-auto flex-shrink-0 text-xs text-dark-400 dark:text-light-600"
-					style="font-family: 'Plus Jakarta Sans', sans-serif"
-				>
+				<div class="ml-auto flex-shrink-0 text-xs text-dark-400 dark:text-light-600">
 					{#if loading}
 						<span class="animate-pulse">{$_('houses.loading')}</span>
 					{:else}
@@ -361,7 +344,8 @@
 			<button
 				type="button"
 				onclick={toggleFilters}
-				class="inline-flex items-center gap-2 rounded-xl border border-light-300 bg-white px-4 py-2.5 text-sm font-semibold text-dark-700 shadow-sm transition-all hover:border-primary-300 hover:text-primary-700 dark:border-dark-600 dark:bg-dark-800 dark:text-light-200 dark:hover:border-primary-600 dark:hover:text-primary-300"
+				aria-expanded={showFilters}
+				class="inline-flex items-center gap-2 border border-light-300 bg-white px-4 py-2.5 text-sm font-semibold text-dark-700 shadow-sm transition-all hover:border-primary-300 hover:text-primary-700 dark:border-dark-600 dark:bg-dark-800 dark:text-light-200 dark:hover:border-primary-600 dark:hover:text-primary-300"
 			>
 				<FontAwesomeIcon icon={faFilter} class="text-xs text-primary-500" />
 				{$_('houses.filters')}
@@ -382,10 +366,7 @@
 				<div class="sticky top-32 space-y-4">
 					<!-- Sidebar header (desktop) -->
 					<div class="hidden items-center justify-between lg:flex">
-						<h2
-							class="text-xs font-semibold tracking-wider text-dark-500 uppercase dark:text-light-600"
-							style="font-family: 'Plus Jakarta Sans', sans-serif"
-						>
+						<h2 class="type-label text-dark-500 dark:text-light-600">
 							{$_('houses.filters')}
 						</h2>
 						{#if activeFiltersCount > 0}
@@ -400,14 +381,9 @@
 					</div>
 
 					<!-- Location -->
-					<div
-						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
-					>
+					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
 						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3
-								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
-								style="font-family: 'Plus Jakarta Sans', sans-serif"
-							>
+							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
 								<FontAwesomeIcon icon={faMapMarkerAlt} class="text-primary-400" />
 								{$_('properties.district')}
 							</h3>
@@ -425,7 +401,7 @@
 									bind:value={filters.district}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectDistrict')}</option>
 									{#each districts as district (district)}
@@ -445,7 +421,7 @@
 									bind:value={filters.municipality}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectMunicipality')}</option>
 									{#each municipalities as municipality (municipality)}
@@ -462,7 +438,7 @@
 									bind:value={filters.parish}
 									onchange={handleFilterChange}
 									disabled={loadingLocations}
-									class="w-full rounded-lg border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+									class="w-full border border-light-300 bg-light-50 px-3 py-2 text-xs text-dark-800 transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 								>
 									<option value="">{$_('properties.selectParish')}</option>
 									{#each parishes as parish (parish)}
@@ -474,14 +450,9 @@
 					</div>
 
 					<!-- Property Type -->
-					<div
-						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
-					>
+					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
 						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3
-								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
-								style="font-family: 'Plus Jakarta Sans', sans-serif"
-							>
+							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
 								<FontAwesomeIcon icon={faHome} class="text-primary-400" />
 								{$_('properties.propertyType')}
 							</h3>
@@ -494,8 +465,7 @@
 										filters.propertyType = type.value;
 										handleFilterChange();
 									}}
-									class="rounded-lg border px-3 py-1.5 text-xs font-medium transition-all {filters.propertyType ===
-									type.value
+									class="border px-3 py-1.5 text-xs font-medium transition-all {filters.propertyType === type.value
 										? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-600/80 dark:bg-primary-950/60 dark:text-primary-300'
 										: 'border-light-300 bg-light-50 text-dark-500 hover:border-primary-300 hover:bg-primary-50/50 hover:text-primary-600 dark:border-dark-600 dark:bg-dark-700/50 dark:text-light-500 dark:hover:border-primary-700 dark:hover:text-primary-400'}"
 								>
@@ -506,14 +476,9 @@
 					</div>
 
 					<!-- Price Range -->
-					<div
-						class="overflow-hidden rounded-2xl border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800"
-					>
+					<div class="overflow-hidden border border-light-200/80 bg-white dark:border-dark-700/60 dark:bg-dark-800">
 						<div class="border-b border-light-100 px-5 py-3.5 dark:border-dark-700/60">
-							<h3
-								class="flex items-center gap-2 text-[0.688rem] font-semibold tracking-wider text-dark-400 uppercase dark:text-light-700"
-								style="font-family: 'Plus Jakarta Sans', sans-serif"
-							>
+							<h3 class="type-label flex items-center gap-2 text-dark-400 dark:text-light-700">
 								<FontAwesomeIcon icon={faEuroSign} class="text-primary-400" />
 								{$_('houses.minPrice')} – {$_('houses.maxPrice')}
 							</h3>
@@ -529,10 +494,11 @@
 										type="number"
 										bind:value={filters.minPrice}
 										onchange={handleFilterChange}
-										placeholder="Min"
+										placeholder={$_('houses.min')}
+										aria-label={$_('houses.minPrice')}
 										min="0"
 										step="1000"
-										class="w-full rounded-lg border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+										class="w-full border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 									/>
 								</div>
 								<div class="relative">
@@ -544,10 +510,11 @@
 										type="number"
 										bind:value={filters.maxPrice}
 										onchange={handleFilterChange}
-										placeholder="Max"
+										placeholder={$_('houses.max')}
+										aria-label={$_('houses.maxPrice')}
 										min="0"
 										step="1000"
-										class="w-full rounded-lg border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 focus:outline-none dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
+										class="w-full border border-light-300 bg-light-50 py-2 pr-2 pl-6 text-xs text-dark-800 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/15 dark:border-dark-600 dark:bg-dark-700/60 dark:text-light-100"
 									/>
 								</div>
 							</div>
@@ -560,7 +527,7 @@
 										filters.maxPrice = 200000;
 										handleFilterChange();
 									}}
-									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
+									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
 								>
 									{$_('houses.quickFilters.under200k')}
 								</button>
@@ -571,7 +538,7 @@
 										filters.maxPrice = 500000;
 										handleFilterChange();
 									}}
-									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
+									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
 								>
 									{$_('houses.quickFilters.between200k500k')}
 								</button>
@@ -582,7 +549,7 @@
 										filters.maxPrice = null;
 										handleFilterChange();
 									}}
-									class="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
+									class="flex w-full items-center px-2.5 py-2 text-left text-[0.688rem] text-dark-500 transition-colors hover:bg-light-100 hover:text-dark-800 dark:text-light-600 dark:hover:bg-dark-700/60 dark:hover:text-light-300"
 								>
 									{$_('houses.quickFilters.luxury500k')}
 								</button>

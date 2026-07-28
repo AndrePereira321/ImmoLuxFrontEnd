@@ -116,29 +116,26 @@
 				<span>/</span>
 				<span class="text-primary-100">{locationName}</span>
 			</nav>
-			<h1
-				class="mb-3 text-4xl font-normal tracking-tight text-white sm:text-5xl"
-				style="font-family: 'Playfair Display', Georgia, serif"
-			>
+			<h1 class="mb-3 text-4xl font-normal tracking-tight text-white sm:text-5xl">
 				{$_('location.district.heroTitle', { values: { location: locationName } })}
 			</h1>
 			<!-- Stats block -->
 			{#if stats.total > 0}
 				<div class="mt-6 flex flex-wrap gap-4">
-					<div class="rounded-xl bg-white/8 px-4 py-2.5">
-						<p class="text-xs text-primary-300/70" style="font-family: 'Plus Jakarta Sans', sans-serif">
+					<div class="bg-white/8 px-4 py-2.5">
+						<p class="text-xs text-primary-300/70">
 							{$_('location.stats.available', { values: { total: stats.total } })}
 						</p>
 					</div>
-					<div class="rounded-xl bg-white/8 px-4 py-2.5">
-						<p class="text-xs text-primary-300/70" style="font-family: 'Plus Jakarta Sans', sans-serif">
+					<div class="bg-white/8 px-4 py-2.5">
+						<p class="text-xs text-primary-300/70">
 							{$_('location.stats.priceRange', {
 								values: { min: formatPrice(stats.minPrice), max: formatPrice(stats.maxPrice) }
 							})}
 						</p>
 					</div>
-					<div class="rounded-xl bg-white/8 px-4 py-2.5">
-						<p class="text-xs text-primary-300/70" style="font-family: 'Plus Jakarta Sans', sans-serif">
+					<div class="bg-white/8 px-4 py-2.5">
+						<p class="text-xs text-primary-300/70">
 							{$_('location.stats.mostCommon', { values: { type: $_('properties.types.' + stats.mostCommonType) } })}
 						</p>
 					</div>

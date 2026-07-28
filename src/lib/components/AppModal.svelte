@@ -57,19 +57,19 @@
 {#if open}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-dark-900/40 p-4 backdrop-blur-md"
+		class="anim-fade-in fixed inset-0 z-50 flex items-center justify-center bg-dark-900/40 p-4 backdrop-blur-md"
 		onclick={handleBackdropClick}
 		role="presentation"
-		style="animation: fadeIn 0.15s ease-out"
+		style="animation-duration: 0.15s"
 	>
 		<!-- Modal -->
 		<div
 			class="relative w-full {sizeClasses[
 				size
-			]} overflow-hidden rounded-2xl border border-light-300/60 bg-white shadow-2xl dark:border-dark-700/60 dark:bg-dark-800"
+			]} anim-fade-in-up overflow-hidden rounded-2xl border border-light-300/60 bg-white shadow-2xl dark:border-dark-700/60 dark:bg-dark-800"
 			role="dialog"
 			aria-modal="true"
-			style="animation: fadeInUp 0.2s ease-out"
+			style="animation-duration: 0.2s"
 		>
 			<!-- Close Button -->
 			<button

@@ -100,41 +100,35 @@
 			<!-- Logo and Menu Items (Left Side) -->
 			<div class="flex items-center gap-8">
 				<!-- Logo/Brand -->
-				<a href={resolve('/')} class="flex items-center gap-2.5 transition-all hover:opacity-80">
-					<img src={logoTransparentDark} alt="ImmoLux" class="h-10 w-auto dark:hidden" />
-					<img src={logoTransparentWhite} alt="ImmoLux" class="hidden h-10 w-auto dark:block" />
-					<span
-						class="text-2xl font-bold tracking-tight text-primary-900 dark:text-light-50"
-						style="font-family: 'Playfair Display', Georgia, serif"
-					>
-						ImmoLux
-					</span>
+				<a href={resolve('/')} class="flex items-center gap-2.5 transition-opacity hover:opacity-75">
+					<img src={logoTransparentDark} alt="" width="40" height="42" class="h-9 w-auto dark:hidden" />
+					<img src={logoTransparentWhite} alt="" width="40" height="42" class="hidden h-9 w-auto dark:block" />
+					<span class="type-display text-2xl text-primary-900 dark:text-light-50">ImmoLux</span>
 				</a>
 
 				<!-- Subtle Divider -->
-				<div class="hidden h-6 w-px bg-light-400/60 md:block dark:bg-dark-600/60"></div>
+				<div class="hidden h-6 w-px bg-light-800 md:block dark:bg-dark-600"></div>
 
-				<!-- Desktop Menu Items -->
-				<div class="hidden items-center gap-1 md:flex">
+				<!-- Desktop Menu Items. Active state is an underline, not a filled pill:
+				     the bar reads as a rule on the page rather than as stacked chips. -->
+				<div class="hidden items-center gap-7 md:flex">
 					<a
 						href={resolve('/')}
-						class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all {isActive('/')
-							? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
-							: 'text-dark-600 hover:bg-light-200/80 hover:text-dark-900 dark:text-light-400 dark:hover:bg-dark-800/80 dark:hover:text-light-50'}"
+						aria-current={isActive('/') ? 'page' : undefined}
+						class="border-b-2 py-1 text-sm font-medium transition-colors {isActive('/')
+							? 'border-primary-600 text-primary-700 dark:border-primary-400 dark:text-primary-300'
+							: 'border-transparent text-dark-500 hover:border-light-900 hover:text-dark-900 dark:text-light-400 dark:hover:border-dark-500 dark:hover:text-light-50'}"
 					>
-						<FontAwesomeIcon icon={faHome} class="text-xs" />
-						<span>{$_('home')}</span>
+						{$_('home')}
 					</a>
 					<a
 						href={resolve('/houses')}
-						class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all {isActive(
-							'/houses'
-						)
-							? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
-							: 'text-dark-600 hover:bg-light-200/80 hover:text-dark-900 dark:text-light-400 dark:hover:bg-dark-800/80 dark:hover:text-light-50'}"
+						aria-current={isActive('/houses') ? 'page' : undefined}
+						class="border-b-2 py-1 text-sm font-medium transition-colors {isActive('/houses')
+							? 'border-primary-600 text-primary-700 dark:border-primary-400 dark:text-primary-300'
+							: 'border-transparent text-dark-500 hover:border-light-900 hover:text-dark-900 dark:text-light-400 dark:hover:border-dark-500 dark:hover:text-light-50'}"
 					>
-						<FontAwesomeIcon icon={faSearch} class="text-xs" />
-						<span>{$_('houses.title')}</span>
+						{$_('houses.title')}
 					</a>
 				</div>
 			</div>
@@ -146,8 +140,9 @@
 					<button
 						id="language-button"
 						onclick={toggleLanguageDropdown}
-						class="flex h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm text-dark-500 transition-all hover:bg-light-200/80 hover:text-dark-800 dark:text-light-500 dark:hover:bg-dark-800/80 dark:hover:text-light-200"
+						class="flex h-9 items-center gap-2 px-3 py-2 text-sm text-dark-500 transition-all hover:bg-light-200/80 hover:text-dark-800 dark:text-light-500 dark:hover:bg-dark-800/80 dark:hover:text-light-200"
 						aria-label={$_('menu.selectLanguage')}
+						aria-expanded={languageDropdownOpen}
 					>
 						<FontAwesomeIcon icon={faGlobe} />
 					</button>
@@ -158,7 +153,7 @@
 					<!-- Language Dropdown Menu -->
 					{#if languageDropdownOpen}
 						<div
-							class="absolute top-11 right-0 z-50 w-40 overflow-hidden rounded-xl border border-light-300 bg-white py-1.5 shadow-xl dark:border-dark-700 dark:bg-dark-800"
+							class="absolute top-11 right-0 z-50 w-40 overflow-hidden border border-light-300 bg-white py-1.5 shadow-xl dark:border-dark-700 dark:bg-dark-800"
 						>
 							{#each LANGUAGES as lang (lang.code)}
 								<button
@@ -168,7 +163,7 @@
 										? 'bg-primary-50 font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
 										: 'text-dark-700 dark:text-light-200'}"
 								>
-									<img src={lang.flag} alt={lang.name} class="h-4 w-6 rounded-sm object-cover shadow-sm" />
+									<img src={lang.flag} alt="" class="h-4 w-6 rounded-sm object-cover shadow-sm" />
 									<span>{lang.name}</span>
 								</button>
 							{/each}
@@ -194,7 +189,7 @@
 						<button
 							id="login-button"
 							onclick={openLoginModal}
-							class="flex h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm text-dark-500 transition-all hover:bg-light-200/80 hover:text-dark-800 dark:text-light-500 dark:hover:bg-dark-800/80 dark:hover:text-light-200"
+							class="flex h-9 items-center gap-2 px-3 py-2 text-sm text-dark-500 transition-all hover:bg-light-200/80 hover:text-dark-800 dark:text-light-500 dark:hover:bg-dark-800/80 dark:hover:text-light-200"
 							aria-label={$_('menu.login')}
 						>
 							<FontAwesomeIcon icon={faRightToBracket} />
@@ -215,7 +210,7 @@
 					{:else}
 						<button
 							onclick={openLoginModal}
-							class="flex h-9 items-center gap-2 rounded-lg px-2.5 py-2 text-dark-600 transition-all hover:bg-light-200/80 dark:text-light-400 dark:hover:bg-dark-800/80"
+							class="flex h-9 items-center gap-2 px-2.5 py-2 text-dark-600 transition-all hover:bg-light-200/80 dark:text-light-400 dark:hover:bg-dark-800/80"
 							aria-label={$_('menu.login')}
 						>
 							<FontAwesomeIcon icon={faRightToBracket} />
@@ -225,9 +220,10 @@
 
 				<!-- Mobile Menu Button -->
 				<button
-					class="rounded-lg p-2 text-dark-600 transition-all hover:bg-light-200/80 dark:text-light-400 dark:hover:bg-dark-800/80"
+					class="p-2 text-dark-600 transition-all hover:bg-light-200/80 dark:text-light-400 dark:hover:bg-dark-800/80"
 					onclick={toggleMenu}
-					aria-label="Toggle menu"
+					aria-label={$_('menu.mainMenu')}
+					aria-expanded={mobileMenuOpen}
 				>
 					<FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} size="lg" />
 				</button>
@@ -241,7 +237,7 @@
 			>
 				<a
 					href={resolve('/')}
-					class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all {isActive('/')
+					class="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all {isActive('/')
 						? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
 						: 'text-dark-700 hover:bg-light-200/60 dark:text-light-300 dark:hover:bg-dark-800/60'}"
 					onclick={toggleMenu}
@@ -251,7 +247,7 @@
 				</a>
 				<a
 					href={resolve('/houses')}
-					class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all {isActive('/houses')
+					class="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all {isActive('/houses')
 						? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
 						: 'text-dark-700 hover:bg-light-200/60 dark:text-light-300 dark:hover:bg-dark-800/60'}"
 					onclick={toggleMenu}
@@ -279,11 +275,11 @@
 								changeLanguage(lang.code);
 								toggleMenu();
 							}}
-							class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all {$locale === lang.code
+							class="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-all {$locale === lang.code
 								? 'bg-primary-50 font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
 								: 'text-dark-700 hover:bg-light-200/60 dark:text-light-300 dark:hover:bg-dark-800/60'}"
 						>
-							<img src={lang.flag} alt={lang.name} class="h-4 w-6 rounded-sm object-cover shadow-sm" />
+							<img src={lang.flag} alt="" class="h-4 w-6 rounded-sm object-cover shadow-sm" />
 							<span>{lang.name}</span>
 						</button>
 					{/each}

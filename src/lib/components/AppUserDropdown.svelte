@@ -63,8 +63,8 @@
 	<!-- Dropdown Menu -->
 	{#if dropdownOpen}
 		<div
-			class="absolute top-11 right-0 z-50 w-60 overflow-hidden rounded-xl border border-light-300 bg-white py-1.5 shadow-xl dark:border-dark-700 dark:bg-dark-800"
-			style="animation: fadeInUp 0.15s ease-out"
+			class="anim-fade-in-up absolute top-11 right-0 z-50 w-60 overflow-hidden rounded-xl border border-light-300 bg-white py-1.5 shadow-xl dark:border-dark-700 dark:bg-dark-800"
+			style="animation-duration: 0.15s"
 		>
 			<!-- User Info -->
 			<div class="border-b border-light-200 px-4 py-3 dark:border-dark-700">

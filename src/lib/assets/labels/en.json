@@ -8,20 +8,25 @@
 		},
 		"hero": {
 			"title": "Houses and Properties for Sale in Portugal",
-			"subtitle": "Filter by location, price and property type"
+			"subtitle": "Filter by location, price and property type",
+			"eyebrow": "Portugal · North"
 		},
 		"filters": "Filters",
 		"allTypes": "All Types",
 		"allStatuses": "All Statuses",
 		"minPrice": "Min Price (€)",
 		"maxPrice": "Max Price (€)",
+		"min": "Min",
+		"max": "Max",
 		"clearFilters": "Clear Filters",
-		"loading": "Loading properties...",
+		"loading": "Loading properties…",
 		"property": "property",
 		"properties": "properties",
 		"noProperties": "No properties found",
 		"noPropertiesDescription": "Try adjusting your filters to see more results",
 		"pageInfo": "Page {current} of {total}",
+		"prevPage": "Previous page",
+		"nextPage": "Next page",
 		"quickFilters": {
 			"under200k": "Under 200k",
 			"between200k500k": "200k - 500k",
@@ -39,7 +44,7 @@
 	},
 	"common": {
 		"save": "Save",
-		"saving": "Saving...",
+		"saving": "Saving…",
 		"cancel": "Cancel",
 		"back": "Back",
 		"edit": "Edit",
@@ -47,11 +52,13 @@
 		"close": "Close",
 		"confirm": "Confirm",
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"breadcrumb": "Breadcrumb"
 	},
 	"menu": {
 		"toggleTheme": "Toggle theme",
 		"selectLanguage": "Select language",
+		"mainMenu": "Menu",
 		"login": "Login",
 		"logout": "Logout",
 		"userMenu": "User menu",
@@ -63,8 +70,8 @@
 		"password": "Password",
 		"rememberMe": "Remember me",
 		"loginButton": "Login",
-		"loggingIn": "Logging in...",
-		"loggingOut": "Logging out...",
+		"loggingIn": "Logging in…",
+		"loggingOut": "Logging out…",
 		"invalidCredentials": "Invalid email or password",
 		"accountLocked": "Account locked due to too many failed login attempts",
 		"loginError": "An error occurred during login",
@@ -76,81 +83,63 @@
 		"author": "André Pereira",
 		"language": "Language",
 		"about": "About ImmoLux",
-		"aboutDescription": "ImmoLux specializes in luxury real estate in Portugal, offering a curated selection of premium villas, apartments, and exclusive properties.",
+		"aboutDescription": "A property developer in Lousada. We design, build and sell houses in northern Portugal.",
 		"quickLinks": "Quick Links",
 		"contact": "Contact",
 		"partners": "Our Partners",
-		"allRightsReserved": "All rights reserved"
+		"allRightsReserved": "All rights reserved",
+		"partnerRole": "Construction partner",
+		"browse": "Properties"
 	},
 	"homepage": {
 		"meta": {
-			"title": "Luxury Properties and Real Estate in Portugal",
-			"description": "Discover dream properties in Portugal. Premium villas, apartments and land in the best locations. Exceptional quality real estate."
+			"title": "New homes in Lousada and northern Portugal",
+			"description": "ImmoLux designs, builds and sells houses and apartments in Lousada and the surrounding area. See what is for sale now."
 		},
-		"availableHouses": {
-			"title": "Discover Your Dream Property",
-			"subtitle": "Exclusive Real Estate in Portugal",
-			"description": "Explore our carefully curated portfolio of premium properties across Portugal's most sought-after locations. From contemporary villas to traditional estates, each property represents exceptional quality and timeless design.",
-			"comingSoon": "Premium Properties Coming Soon",
-			"comingSoonDesc": "Our exclusive collection of handpicked properties will be available shortly"
+		"hero": {
+			"eyebrow": "Lousada, Portugal",
+			"headline": "New homes in northern Portugal.",
+			"lead": "We design and build in Lousada and the parishes around it. These are the ones for sale right now.",
+			"leadEmpty": "We design and build in Lousada and the parishes around it.",
+			"viewAll": "See every property",
+			"viewProperty": "See the full record",
+			"comingSoonTitle": "We are building.",
+			"comingSoonBody": "New properties appear here as soon as work starts on site. Write to us to hear what is coming."
 		},
-		"aboutUs": {
-			"title": "The ImmoLux Difference",
-			"subtitle": "Excellence in Real Estate Development",
-			"location": {
-				"title": "Strategic Location",
-				"description": "Headquartered in Lousada, Portugal, we operate at the heart of the country's most dynamic real estate market, offering unparalleled local expertise and market knowledge."
-			},
-			"dedication": {
-				"title": "Uncompromising Quality",
-				"description": "Our dedicated team of construction experts and architects is committed to delivering properties that exceed industry standards, combining innovative design with superior craftsmanship."
-			},
-			"experience": {
-				"title": "European Expertise",
-				"description": "With extensive experience across multiple European markets, we bring international best practices and sophisticated construction techniques to every project we undertake."
-			},
-			"partner": {
-				"title": "Trusted Partnership",
-				"description": "We collaborate with {partner}, a renowned construction leader with decades of proven excellence, ensuring every property meets the highest standards of quality and durability.",
-				"partnerName": "PacaGroup"
-			}
+		"studio": {
+			"eyebrow": "Who we are",
+			"headline": "We build the houses we sell.",
+			"body": "ImmoLux is a developer based in Lousada. We follow every house from the plot to the deed — and we follow the buyer, whether they are in Portugal, Belgium or France.",
+			"facts": "Lousada, Portugal · 15 years on site · 3 European markets",
+			"whereLabel": "Where",
+			"whereValue": "Lousada, in the district of Porto. We work in the parishes we know, not across the whole map.",
+			"howLabel": "How",
+			"howValue": "Architecture and construction in-house. Finishes are chosen, not inherited from a catalogue.",
+			"whoLabel": "Who",
+			"whoValue": "Fifteen years between Portugal and the Benelux. We answer in Portuguese, French and English.",
+			"partnerLabel": "With whom",
+			"partnerValue": "PacaGroup, Belgian builders, with us from the start."
 		},
-		"stats": {
-			"experience": "15",
-			"experienceLabel": "Years of Experience",
-			"properties": "50",
-			"propertiesLabel": "Properties Managed",
-			"markets": "3",
-			"marketsLabel": "European Markets",
-			"satisfaction": "100",
-			"satisfactionLabel": "Client Dedication"
-		},
-		"whyPortugal": {
-			"title": "Why Portugal",
-			"subtitle": "A Premier Destination for Real Estate",
-			"description": "Portugal combines Old World charm with modern sophistication, making it one of Europe's most attractive property markets for discerning buyers and investors alike.",
-			"climate": {
-				"title": "Year-Round Sunshine",
-				"description": "Over 300 days of sunshine annually, mild winters, and a Mediterranean climate that draws people from across the globe."
-			},
-			"investment": {
-				"title": "Strong Market Growth",
-				"description": "Portugal's property market has shown consistent appreciation, supported by economic stability and growing international demand."
-			},
-			"lifestyle": {
-				"title": "Exceptional Quality of Life",
-				"description": "World-class gastronomy, rich cultural heritage, pristine coastlines, and a warm, welcoming community."
-			},
-			"safety": {
-				"title": "Safety & Stability",
-				"description": "Consistently ranked among the safest countries in the world, with excellent healthcare and modern infrastructure."
-			}
+		"portugal": {
+			"eyebrow": "Why Portugal",
+			"headline": "Four reasons to buy here.",
+			"solLabel": "Sun",
+			"solBody": "Long dry summers, mild wet winters. Considerably more sun than northern Europe.",
+			"mercadoLabel": "Market",
+			"mercadoBody": "House prices have risen steadily for a decade, with foreign demand still growing.",
+			"mesaLabel": "Life",
+			"mesaBody": "Good food, a cost of living below the European average, and Porto forty minutes away.",
+			"abrigoLabel": "Shelter",
+			"abrigoBody": "One of the safest countries in the world, with a national health service across all of it."
 		},
 		"contact": {
-			"title": "Begin Your Journey",
-			"subtitle": "Let's Find Your Perfect Property",
-			"interested": "Whether you're looking to purchase your dream home or invest in premium real estate, our expert team is ready to guide you through every step of the process.",
-			"publishAnnouncement": "Property owners and developers are invited to showcase their exclusive listings through our platform. Contact us to discuss partnership opportunities and reach discerning buyers."
+			"eyebrow": "Talk to us",
+			"body": "Size, area, budget — whatever you already know is enough to start. We answer in Portuguese, French or English.",
+			"ownersLabel": "Owners and developers",
+			"ownersBody": "We list third-party properties on the platform. Write to us about partnerships.",
+			"headline": "Tell us what you are looking for.",
+			"emailCta": "Write to us",
+			"ownersCta": "Submit a property"
 		}
 	},
 	"properties": {
@@ -162,17 +151,17 @@
 		"editProperty": "Edit Property",
 		"noProperties": "No properties yet",
 		"noPropertiesDescription": "Start by adding your first property",
-		"loadingProperties": "Loading properties...",
+		"loadingProperties": "Loading properties…",
 		"contactPersons": "Contact Persons",
 		"addContact": "Add Contact",
 		"noContacts": "No contacts yet",
 		"noContactsDescription": "Start by adding your first contact person",
-		"loadingContacts": "Loading contacts...",
+		"loadingContacts": "Loading contacts…",
 		"contactCount": "There {count, plural, =1 {is 1 contact} other {are # contacts}}",
 		"propertyCount": "There {count, plural, =1 {is 1 property} other {are # properties}}",
 		"backToProperties": "Back to Properties",
 		"save": "Save Property",
-		"saving": "Saving...",
+		"saving": "Saving…",
 		"cancel": "Cancel",
 		"edit": "Edit",
 		"views": "views",
@@ -289,6 +278,22 @@
 			"remove": "Remove",
 			"imageNumber": "Image {number}",
 			"reorderHint": "First image will be used as the main property photo. Drag images to reorder."
+		},
+		"short": {
+			"typology": "T{count}",
+			"bathrooms": "{count} bath",
+			"parking": "{count} parking",
+			"garage": "Garage",
+			"garden": "Garden",
+			"pool": "Pool",
+			"elevator": "Lift",
+			"land": "{value} plot"
+		},
+		"gallery": {
+			"prevImage": "Previous image",
+			"nextImage": "Next image",
+			"fullscreen": "View fullscreen",
+			"imageAlt": "{title} — image {index}"
 		}
 	},
 	"contacts": {
@@ -299,9 +304,9 @@
 		"phone": "Phone",
 		"notes": "Notes (optional)",
 		"create": "Add Contact",
-		"creating": "Adding...",
+		"creating": "Adding…",
 		"update": "Update Contact",
-		"updating": "Updating...",
+		"updating": "Updating…",
 		"cancel": "Cancel",
 		"edit": "Edit",
 		"nameMinLength": "Name must be at least 3 characters",
