@@ -26,6 +26,10 @@
 		error
 	}: Props = $props();
 
+	/* Same as AppInput: a generated fallback id keeps the floating label attached. */
+	const uid = $props.id();
+	const fieldId = $derived(id ?? `field-${uid}`);
+
 	let searchTerm = $state('');
 	let isOpen = $state(false);
 	let isFocused = $state(false);
@@ -57,7 +61,7 @@
 		const color = error
 			? 'text-error-600 dark:text-error-400'
 			: shouldFloat
-				? 'text-primary-600 dark:text-primary-400'
+				? 'text-primary-700 dark:text-primary-300'
 				: 'text-dark-500 dark:text-light-500';
 		return `${base} ${position} ${color}`;
 	});
@@ -124,7 +128,7 @@
 	<div class="relative">
 		<input
 			bind:this={inputElement}
-			{id}
+			id={fieldId}
 			type="text"
 			bind:value={searchTerm}
 			{placeholder}
@@ -134,10 +138,10 @@
 			onblur={handleBlur}
 			onkeydown={handleKeyDown}
 			autocomplete="off"
-			class="peer block w-full appearance-none rounded-lg border-2 bg-white px-4 pt-6 pr-10 pb-2.5 text-base text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-700 dark:text-light-50"
-			class:border-light-300={!error && !isFocused}
+			class="peer block w-full appearance-none border bg-light-50 px-4 pt-6 pr-10 pb-2.5 text-base text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-50"
+			class:border-light-800={!error && !isFocused}
 			class:dark:border-dark-600={!error && !isFocused}
-			class:border-primary-500={!error && isFocused}
+			class:border-primary-600={!error && isFocused}
 			class:dark:border-primary-400={!error && isFocused}
 			class:border-error-600={error}
 			class:dark:border-error-500={error}
@@ -146,7 +150,7 @@
 		/>
 
 		{#if label}
-			<label for={id} class={labelClasses()}>
+			<label for={fieldId} class={labelClasses()}>
 				{label}
 				{#if required}
 					<span class="text-error-600 dark:text-error-400">*</span>
@@ -172,18 +176,18 @@
 	{#if isOpen && filteredOptions.length > 0}
 		<div
 			bind:this={dropdownElement}
-			class="fixed z-[9999] max-h-60 overflow-auto rounded-lg border border-light-300 bg-white shadow-2xl dark:border-dark-600 dark:bg-dark-700"
+			class="azulejo-rule fixed z-[9999] max-h-60 overflow-auto border bg-light-50 shadow-2xl dark:bg-dark-800"
 			style="top: {dropdownPosition.top}px; left: {dropdownPosition.left}px; width: {dropdownPosition.width}px;"
 		>
 			{#each filteredOptions as option, index (`${option.value}-${index}`)}
 				<button
 					type="button"
 					onclick={() => selectOption(option)}
-					class="block w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary-50 dark:text-light-100 dark:hover:bg-primary-900/20"
-					class:bg-primary-100={value === option.value}
-					class:dark:bg-primary-900={value === option.value}
-					class:text-primary-700={value === option.value}
-					class:dark:text-primary-300={value === option.value}
+					class="block w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-primary-50 dark:text-light-100 dark:hover:bg-primary-950/50"
+					class:bg-primary-50={value === option.value}
+					class:dark:bg-primary-950={value === option.value}
+					class:text-primary-800={value === option.value}
+					class:dark:text-primary-200={value === option.value}
 					class:font-medium={value === option.value}
 				>
 					{option.label}

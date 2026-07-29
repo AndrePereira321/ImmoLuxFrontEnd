@@ -166,6 +166,11 @@
 	"properties": {
 		"myProperties": "Mes Propriétés",
 		"manageDescription": "Gérer vos annonces et personnes de contact",
+		"eyebrow": "Le registre",
+		"registerStrip": "Aperçu du registre",
+		"registerSummary": "{published, plural, =1 {1 publié} other {# publiés}} · {drafts, plural, =1 {1 brouillon} other {# brouillons}}",
+		"viewListing": "Voir l'annonce",
+		"deleteTitle": "Supprimer la propriété",
 		"propertiesList": "Propriétés",
 		"addProperty": "Ajouter une Propriété",
 		"newProperty": "Nouvelle Propriété",
@@ -315,6 +320,26 @@
 			"nextImage": "Image suivante",
 			"fullscreen": "Afficher en plein écran",
 			"imageAlt": "{title} — image {index}"
+		},
+		"detail": {
+			"ficha": "Fiche du bien",
+			"ref": "Réf. {id}",
+			"type": "Type",
+			"typology": "Typologie",
+			"area": "Surface habitable",
+			"plot": "Terrain",
+			"equipment": "Équipements",
+			"who": "Qui vend",
+			"contactHeadline": "Parlez à qui connaît le bien.",
+			"contactLead": "Réservez une visite ou posez vos questions — nous répondons en portugais, en français et en anglais.",
+			"writeCta": "Écrire au sujet de ce bien",
+			"emailSubject": "Au sujet de : {title} (Réf. {id})",
+			"speakTo": "Contacter le vendeur",
+			"virtualTour": "Visite virtuelle",
+			"openMap": "Ouvrir dans Google Maps",
+			"callCta": "Appeler",
+			"messageCta": "Écrire",
+			"floatingContact": "Nous contacter"
 		}
 	},
 	"contacts": {

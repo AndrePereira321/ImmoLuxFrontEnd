@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import compression from 'vite-plugin-compression';
 import { imagetools } from 'vite-imagetools';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
 	server: {
@@ -42,6 +43,12 @@ export default defineConfig({
 			},
 			workbox: {
 				globPatterns: ['client/**/*.{js,css,html,ico,png,svg,woff2,webmanifest}'],
+				// Setting modifyURLPrefix (even empty) opts out of @vite-pwa/sveltekit's
+				// default glob-pattern injection, which otherwise always adds a
+				// 'prerendered/**/*.{html,json}' pattern — irrelevant here since no
+				// routes are prerendered (adapter-node + hybrid SSR) and it only ever
+				// produces a "glob pattern doesn't match any files" warning.
+				modifyURLPrefix: {},
 				navigateFallback: null,
 				runtimeCaching: [
 					{
@@ -78,7 +85,10 @@ export default defineConfig({
 			algorithm: 'brotliCompress',
 			ext: '.br',
 			threshold: 1024
-		})
+		}),
+		...(process.env.ANALYZE
+			? [visualizer({ filename: 'stats.html', gzipSize: true, brotliSize: true, template: 'treemap' })]
+			: [])
 	],
 	build: {
 		minify: 'terser',
@@ -87,6 +97,14 @@ export default defineConfig({
 			output: {
 				// Rolldown (Vite 8) replaces the manualChunks function with
 				// declarative codeSplitting groups — first matching group wins.
+				//
+				// NOTE: currently inert for the client build. SvelteKit's Vite plugin
+				// forces `codeSplitting: false` on the client output in this Rolldown
+				// setup (to avoid circular-dependency issues with its own per-route
+				// chunking), so these groups never get applied and Rolldown falls back
+				// to its own automatic vendor chunking instead. Kept here in case a
+				// future SvelteKit/Rolldown version lifts that restriction — verify
+				// with `npm run build:analyze` before relying on this again.
 				codeSplitting: {
 					groups: [
 						{ name: 'vendor-svelte', test: /node_modules\/.*svelte/ },

@@ -1,9 +1,18 @@
 <script lang="ts">
+	/**
+	 * The workshop side of the register.
+	 *
+	 * The public pages show the catalogue; this page is where its entries are
+	 * kept. It is laid out as a ledger: every property is one tile in a grout
+	 * panel, its acts on the tile's edge, and the strip under the title draws
+	 * the whole collection at a glance — a filled square for each published
+	 * entry, a hollow one for each draft.
+	 */
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import { faBuilding, faPlus, faUserTie } from '@fortawesome/free-solid-svg-icons';
+	import { faPlus } from '@fortawesome/free-solid-svg-icons';
 	import { _ } from 'svelte-i18n';
 	import AppModal from '$lib/components/AppModal.svelte';
 	import AppContactCard from '$lib/components/AppContactCard.svelte';
@@ -25,6 +34,9 @@
 	let editingContact = $state<ContactDTO | undefined>(undefined);
 	let modalTitle = $derived(editingContact ? $_('contacts.editContact') : $_('contacts.addContact'));
 	let loadingContacts = $state(true);
+
+	const publishedCount = $derived(properties.filter((p) => p.isPublished).length);
+	const draftCount = $derived(properties.length - publishedCount);
 
 	// Load properties from API
 	const loadProperties = async () => {
@@ -124,14 +136,6 @@
 		return unsubscribe;
 	});
 
-	const handleAddProperty = () => {
-		goto(resolve('/panel/properties/new'));
-	};
-
-	const handleEditProperty = (property: PropertyDTO) => {
-		goto(resolve(`/panel/properties/${property.id}`));
-	};
-
 	let AppContactForm: typeof import('$lib/components/AppContactForm.svelte').default | null = $state(null);
 
 	const openContactModal = async (contact?: ContactDTO) => {
@@ -196,20 +200,35 @@
 		}
 	};
 
-	const handleDeleteProperty = async (property: PropertyDTO) => {
-		if (!property.id) return;
+	/**
+	 * Deleting asks first, in the page's own voice — a modal naming the entry,
+	 * not the browser's confirm() box.
+	 */
+	let deleteTarget = $state<PropertyDTO | null>(null);
+	let deleting = $state(false);
+	let deleteModalOpen = $state(false);
 
-		// Show confirmation dialog
-		if (!confirm($_('properties.deleteConfirm', { values: { title: property.title || $_('properties.untitled') } }))) {
-			return;
-		}
+	const askDeleteProperty = (property: PropertyDTO) => {
+		deleteTarget = property;
+		deleteModalOpen = true;
+	};
+
+	const closeDeleteModal = () => {
+		deleteModalOpen = false;
+		deleteTarget = null;
+	};
+
+	const confirmDeleteProperty = async () => {
+		if (!deleteTarget?.id) return;
+		deleting = true;
 
 		try {
-			const response = await apiClient.delete(`/properties/${property.id}`);
+			const response = await apiClient.delete(`/properties/${deleteTarget.id}`);
 			const serverResponse: ServerAPIResponse = response.data;
 
 			if (serverResponse.success) {
 				notificationStore.success($_('properties.deleteSuccess'));
+				closeDeleteModal();
 				await loadProperties();
 			} else {
 				notificationStore.error(serverResponse.error?.message || $_('properties.deleteError'));
@@ -217,157 +236,203 @@
 		} catch (error) {
 			console.error('Error deleting property:', error);
 			notificationStore.error($_('properties.deleteError'));
+		} finally {
+			deleting = false;
 		}
 	};
 </script>
 
-<div class="min-h-screen bg-light-300 py-6 sm:py-8 dark:bg-dark-800">
-	<div class="container mx-auto px-4 sm:px-6">
-		<!-- Page Header -->
-		<div class="mb-6 sm:mb-8">
-			<h1 class="mb-2 text-3xl font-semibold tracking-tight text-dark-900 sm:text-4xl dark:text-light-50">
-				{$_('properties.myProperties')}
-			</h1>
-			<p class="text-sm text-dark-600 sm:text-base dark:text-light-400">
-				{$_('properties.manageDescription')}
-			</p>
-		</div>
-
-		<div class="grid gap-4 sm:gap-6 lg:grid-cols-3">
-			<!-- Main Properties Section (Takes 2 columns on large screens) -->
-			<div class="lg:col-span-2">
-				<div
-					class="flex h-full flex-col rounded-lg bg-light-50 p-4 shadow-md transition-shadow hover:shadow-lg sm:p-6 dark:bg-dark-700"
-				>
-					<!-- Section Header -->
-					<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div class="flex items-center gap-3">
-							<FontAwesomeIcon icon={faBuilding} class="text-2xl text-primary-600 dark:text-primary-500" />
-							<h2 class="text-xl font-semibold text-dark-900 sm:text-2xl dark:text-light-50">
-								{$_('properties.propertiesList')}
-							</h2>
-						</div>
-						<button
-							onclick={handleAddProperty}
-							class="flex flex-shrink-0 items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-light-50 transition-colors hover:bg-primary-700 sm:text-base dark:bg-primary-700 dark:hover:bg-primary-800"
-						>
-							<FontAwesomeIcon icon={faPlus} class="text-sm" />
-							<span class="whitespace-nowrap">{$_('properties.addProperty')}</span>
-						</button>
-					</div>
-
-					<!-- Property Count -->
-					{#if !loadingProperties && properties.length > 0}
-						<div class="mb-4 rounded-md bg-light-100 px-3 py-2 dark:bg-dark-600">
-							<p class="text-sm font-medium text-dark-700 dark:text-light-300">
-								{$_('properties.propertyCount', { values: { count: properties.length } })}
-							</p>
-						</div>
-					{/if}
-
-					<!-- Properties List -->
-					<div class="flex-1">
-						{#if loadingProperties}
-							<div class="flex h-full items-center justify-center py-12 text-center">
-								<div>
-									<p class="text-dark-600 dark:text-light-400">
-										{$_('properties.loadingProperties')}
-									</p>
-								</div>
-							</div>
-						{:else if properties.length === 0}
-							<div class="flex h-full items-center justify-center py-12 text-center">
-								<div>
-									<FontAwesomeIcon icon={faBuilding} class="mb-4 text-5xl text-dark-300 dark:text-light-300" />
-									<p class="mb-2 text-lg text-dark-900 dark:text-light-50">
-										{$_('properties.noProperties')}
-									</p>
-									<p class="text-sm text-dark-300 dark:text-light-300">
-										{$_('properties.noPropertiesDescription')}
-									</p>
-								</div>
-							</div>
-						{:else}
-							<div class="grid gap-4 sm:grid-cols-2">
-								{#each properties as property (property.id)}
-									<AppPropertyCard
-										{property}
-										imageIds={property.id ? propertyImages.get(property.id) : undefined}
-										onEdit={handleEditProperty}
-										onPublish={handlePublishProperty}
-										onUnpublish={handleUnpublishProperty}
-										onDelete={handleDeleteProperty}
-									/>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				</div>
+<div class="min-h-screen bg-light-200 dark:bg-dark-850">
+	<div class="mx-auto w-full max-w-[84rem] px-5 sm:px-8 lg:px-12">
+		<!-- ── Masthead ──
+		     The same lime-washed ground as the public pages: the workshop is the
+		     other side of the same wall, not a different building. -->
+		<header class="flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pt-10 sm:pt-12">
+			<div class="min-w-0">
+				<p class="type-label text-primary-700 dark:text-primary-300">{$_('properties.eyebrow')}</p>
+				<h1 class="type-display mt-4 text-[clamp(1.9rem,4vw,3rem)] text-dark-900 dark:text-light-50">
+					{$_('properties.myProperties')}
+				</h1>
+				<p class="mt-4 max-w-[54ch] leading-relaxed text-dark-500 dark:text-light-500">
+					{$_('properties.manageDescription')}
+				</p>
 			</div>
 
-			<!-- Contact Persons Section (Takes 1 column) -->
-			<div class="lg:col-span-1">
-				<div
-					class="flex h-full flex-col rounded-lg bg-light-50 p-4 shadow-md transition-shadow hover:shadow-lg sm:p-6 dark:bg-dark-700"
-				>
-					<!-- Section Header -->
-					<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div class="flex items-center gap-3">
-							<FontAwesomeIcon icon={faUserTie} class="text-2xl text-secondary-600 dark:text-secondary-500" />
-							<h2 class="text-xl font-semibold text-dark-900 sm:text-2xl dark:text-light-50">
-								{$_('properties.contactPersons')}
-							</h2>
-						</div>
-						<button
-							onclick={() => openContactModal()}
-							class="flex flex-shrink-0 items-center gap-2 rounded-lg bg-secondary-600 px-4 py-2 text-sm font-medium text-light-50 transition-colors hover:bg-secondary-700 sm:text-base dark:bg-secondary-700 dark:hover:bg-secondary-800"
-						>
-							<FontAwesomeIcon icon={faPlus} class="text-sm" />
-							<span class="whitespace-nowrap">{$_('properties.addContact')}</span>
-						</button>
-					</div>
+			<!-- The one champagne plate on the page: the act the page exists for. -->
+			<a
+				href={resolve('/panel/properties/new')}
+				class="flex shrink-0 items-center gap-2.5 bg-secondary-300 px-5 py-3.5 text-dark-950 transition-colors hover:bg-secondary-200"
+			>
+				<FontAwesomeIcon icon={faPlus} class="text-xs" />
+				<span class="type-label">{$_('properties.addProperty')}</span>
+			</a>
+		</header>
 
-					<!-- Contact Count -->
-					{#if !loadingContacts && contacts.length > 0}
-						<div class="mb-4 rounded-md bg-light-100 px-3 py-2 dark:bg-dark-600">
-							<p class="text-sm font-medium text-dark-700 dark:text-light-300">
-								{$_('properties.contactCount', { values: { count: contacts.length } })}
-							</p>
-						</div>
-					{/if}
+		<!-- ── The register strip ──
+		     The collection drawn in its own material: one small tile per entry,
+		     fired cobalt when published, unglazed while still a draft. Each square
+		     is a link down to its entry in the ledger. -->
+		{#if !loadingProperties && properties.length > 0}
+			<nav aria-label={$_('properties.registerStrip')} class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+				<ul class="flex flex-wrap items-center gap-1.5">
+					{#each properties as property (property.id)}
+						<li class="flex">
+							<a
+								href="#entry-{property.id}"
+								aria-label="{property.title || $_('properties.untitled')} — {property.isPublished
+									? $_('properties.published')
+									: $_('properties.draft')}"
+								title={property.title || $_('properties.untitled')}
+								class="block h-3.5 w-3.5 border transition-colors {property.isPublished
+									? 'border-primary-600 bg-primary-600 hover:border-primary-400 hover:bg-primary-500 dark:border-primary-500 dark:bg-primary-500 dark:hover:bg-primary-400'
+									: 'azulejo-cell azulejo-rule hover:border-primary-600 dark:hover:border-primary-400'}"
+							></a>
+						</li>
+					{/each}
+				</ul>
+				<p class="type-record text-xs text-dark-500 dark:text-light-500">
+					{$_('properties.registerSummary', { values: { published: publishedCount, drafts: draftCount } })}
+				</p>
+			</nav>
+		{/if}
 
-					<!-- Contacts List -->
-					<div class="flex-1 overflow-y-auto">
-						{#if loadingContacts}
-							<div class="flex h-full items-center justify-center py-12 text-center">
-								<div>
-									<p class="text-dark-600 dark:text-light-400">
-										{$_('properties.loadingContacts')}
-									</p>
-								</div>
-							</div>
-						{:else if contacts.length === 0}
-							<div class="flex h-full items-center justify-center py-12 text-center">
-								<div>
-									<FontAwesomeIcon icon={faUserTie} class="mb-4 text-5xl text-dark-300 dark:text-light-300" />
-									<p class="mb-2 text-lg text-dark-900 dark:text-light-50">
-										{$_('properties.noContacts')}
-									</p>
-									<p class="text-sm text-dark-300 dark:text-light-300">
-										{$_('properties.noContactsDescription')}
-									</p>
-								</div>
-							</div>
-						{:else}
-							<div class="space-y-3">
-								{#each contacts as contact (contact.id)}
-									<AppContactCard {contact} onEdit={handleEditContact} />
-								{/each}
-							</div>
+		<!-- ── The ledger and the rail ── -->
+		<div class="grid gap-10 pt-9 pb-16 sm:pb-20 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-12">
+			<!-- Properties -->
+			<section>
+				<div class="mb-3 flex items-baseline justify-between gap-4">
+					<h2 class="type-label text-dark-400 dark:text-light-600">
+						{$_('properties.propertiesList')}
+						{#if !loadingProperties && properties.length > 0}
+							<span aria-hidden="true" class="mx-1 opacity-45">·</span><span class="type-record"
+								>{properties.length}</span
+							>
 						{/if}
-					</div>
+					</h2>
 				</div>
-			</div>
+
+				{#if loadingProperties}
+					<div class="azulejo-panel grid-cols-1" aria-hidden="true">
+						{#each [0, 1, 2] as i (i)}
+							<div
+								class="azulejo-cell grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 p-4 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-x-5 sm:p-5"
+							>
+								<div class="aspect-square animate-pulse bg-light-500 dark:bg-dark-700"></div>
+								<div class="py-1">
+									<div class="h-3 w-1/3 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+									<div class="mt-3 h-5 w-2/3 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+									<div class="mt-3 h-4 w-1/4 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+								</div>
+							</div>
+						{/each}
+					</div>
+					<p class="sr-only" aria-live="polite">{$_('properties.loadingProperties')}</p>
+				{:else if properties.length === 0}
+					<!-- An empty register is an invitation, and it points at the plate above. -->
+					<div class="border border-dashed border-light-900 dark:border-dark-700">
+						<div class="px-8 py-14 text-center">
+							<svg
+								viewBox="0 0 96 96"
+								class="mx-auto h-14 w-14 text-primary-300/60 dark:text-primary-800"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.3"
+								stroke-linecap="round"
+								aria-hidden="true"
+							>
+								<path d="M17 52 L48 25 L79 52" />
+								<path d="M28 52 L48 34 L68 52" />
+								<path d="M36 79 L36 67 A12 12 0 0 1 60 67 L60 79" />
+								<path d="M26 79 L70 79" />
+							</svg>
+							<h3 class="mt-5 font-display text-xl text-dark-900 dark:text-light-50">
+								{$_('properties.noProperties')}
+							</h3>
+							<p class="mt-2 text-sm leading-relaxed text-dark-500 dark:text-light-500">
+								{$_('properties.noPropertiesDescription')}
+							</p>
+							<a
+								href={resolve('/panel/properties/new')}
+								class="mt-6 inline-flex items-center gap-2 border border-primary-700 px-5 py-2.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-700 hover:text-light-50 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-600 dark:hover:text-light-50"
+							>
+								<FontAwesomeIcon icon={faPlus} class="text-xs" />
+								{$_('properties.addProperty')}
+							</a>
+						</div>
+					</div>
+				{:else}
+					<div class="azulejo-panel grid-cols-1">
+						{#each properties as property (property.id)}
+							<AppPropertyCard
+								{property}
+								imageIds={property.id ? propertyImages.get(property.id) : undefined}
+								onPublish={handlePublishProperty}
+								onUnpublish={handleUnpublishProperty}
+								onDelete={askDeleteProperty}
+							/>
+						{/each}
+					</div>
+				{/if}
+			</section>
+
+			<!-- Contact persons -->
+			<section>
+				<div class="mb-3 flex items-baseline justify-between gap-4">
+					<h2 class="type-label text-dark-400 dark:text-light-600">
+						{$_('properties.contactPersons')}
+						{#if !loadingContacts && contacts.length > 0}
+							<span aria-hidden="true" class="mx-1 opacity-45">·</span><span class="type-record">{contacts.length}</span
+							>
+						{/if}
+					</h2>
+					<button
+						type="button"
+						onclick={() => openContactModal()}
+						class="azulejo-rule flex shrink-0 items-center gap-2 border bg-light-50 px-3 py-1.5 text-xs font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
+					>
+						<FontAwesomeIcon icon={faPlus} class="text-[0.7rem]" />
+						{$_('properties.addContact')}
+					</button>
+				</div>
+
+				{#if loadingContacts}
+					<div class="azulejo-panel grid-cols-1" aria-hidden="true">
+						{#each [0, 1] as i (i)}
+							<div class="azulejo-cell p-5">
+								<div class="h-4 w-1/2 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+								<div class="mt-4 h-3 w-2/3 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+								<div class="mt-2 h-3 w-1/3 animate-pulse bg-light-500 dark:bg-dark-700"></div>
+							</div>
+						{/each}
+					</div>
+					<p class="sr-only" aria-live="polite">{$_('properties.loadingContacts')}</p>
+				{:else if contacts.length === 0}
+					<div class="border border-dashed border-light-900 dark:border-dark-700">
+						<div class="px-6 py-10 text-center">
+							<h3 class="font-display text-lg text-dark-900 dark:text-light-50">
+								{$_('properties.noContacts')}
+							</h3>
+							<p class="mt-2 text-sm leading-relaxed text-dark-500 dark:text-light-500">
+								{$_('properties.noContactsDescription')}
+							</p>
+							<button
+								type="button"
+								onclick={() => openContactModal()}
+								class="mt-5 inline-flex items-center gap-2 border border-primary-700 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-700 hover:text-light-50 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-600 dark:hover:text-light-50"
+							>
+								<FontAwesomeIcon icon={faPlus} class="text-xs" />
+								{$_('properties.addContact')}
+							</button>
+						</div>
+					</div>
+				{:else}
+					<div class="azulejo-panel grid-cols-1">
+						{#each contacts as contact (contact.id)}
+							<AppContactCard {contact} onEdit={handleEditContact} />
+						{/each}
+					</div>
+				{/if}
+			</section>
 		</div>
 	</div>
 </div>
@@ -377,4 +442,37 @@
 	{#if AppContactForm}
 		<AppContactForm contact={editingContact} onSuccess={handleContactSuccess} onCancel={closeContactModal} />
 	{/if}
+</AppModal>
+
+<!-- Delete confirmation -->
+<AppModal
+	bind:open={deleteModalOpen}
+	title={$_('properties.deleteTitle')}
+	size="md"
+	closeOnBackdrop={false}
+	onClose={closeDeleteModal}
+>
+	<p class="text-sm leading-relaxed text-dark-600 dark:text-light-400">
+		{$_('properties.deleteConfirm', {
+			values: { title: deleteTarget?.title || $_('properties.untitled') }
+		})}
+	</p>
+	<div class="flex justify-end gap-3 pt-1">
+		<button
+			type="button"
+			onclick={closeDeleteModal}
+			disabled={deleting}
+			class="azulejo-rule border bg-light-50 px-5 py-2.5 text-sm font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
+		>
+			{$_('common.cancel')}
+		</button>
+		<button
+			type="button"
+			onclick={confirmDeleteProperty}
+			disabled={deleting}
+			class="border border-error-600 px-5 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-600 hover:text-light-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-error-500 dark:text-error-400 dark:hover:bg-error-600 dark:hover:text-light-50"
+		>
+			{$_('properties.delete')}
+		</button>
+	</div>
 </AppModal>

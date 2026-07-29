@@ -140,14 +140,14 @@
 			type="button"
 			onclick={handleCancel}
 			disabled={$submitting}
-			class="flex-1 rounded-lg border-2 border-light-600 bg-light-50 px-4 py-2 font-medium text-dark-900 transition-colors hover:bg-light-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-50 dark:hover:bg-dark-600"
+			class="azulejo-rule flex-1 border bg-light-50 px-4 py-2.5 text-sm font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
 		>
 			{$_('contacts.cancel')}
 		</button>
 		<button
 			type="submit"
 			disabled={$submitting || $allErrors.length > 0}
-			class="flex-1 rounded-lg bg-primary-600 px-4 py-2 font-medium text-light-50 transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-700 dark:hover:bg-primary-800"
+			class="flex-1 bg-primary-700 px-4 py-2.5 text-sm font-medium text-light-50 transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-600 dark:hover:bg-primary-500"
 		>
 			{#if $submitting}
 				{$_(isEditMode ? 'contacts.updating' : 'contacts.creating')}

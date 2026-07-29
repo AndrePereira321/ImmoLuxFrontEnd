@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { resolve } from '$app/paths';
 	import { apiClient } from '$lib/api/api-client';
@@ -8,12 +9,19 @@
 
 	let { data } = $props();
 
-	let properties = $state<PropertyDTO[]>(data.properties);
-	let total = $state<number>(data.total);
-	let propertyImageMap = $state<Record<number, number[]>>(data.propertyImageMap);
+	let properties = $state<PropertyDTO[]>(untrack(() => data.properties));
+	let total = $state<number>(untrack(() => data.total));
+	let propertyImageMap = $state<Record<number, number[]>>(untrack(() => data.propertyImageMap));
 	let loading = $state(false);
 	let offset = $state(0);
 	const limit = 12;
+
+	$effect(() => {
+		properties = data.properties;
+		total = data.total;
+		propertyImageMap = data.propertyImageMap;
+		offset = 0;
+	});
 
 	const stats = $derived(data.stats);
 	const locationName = $derived(data.locationName);

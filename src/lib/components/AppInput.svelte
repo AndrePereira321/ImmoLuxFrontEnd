@@ -31,6 +31,11 @@
 		max
 	}: Props = $props();
 
+	/* Callers rarely pass an id, and a floating label pointed at nothing is not a
+	   label. The generated id keeps every field's label clickable and announced. */
+	const uid = $props.id();
+	const fieldId = $derived(id ?? `field-${uid}`);
+
 	let isFocused = $state(false);
 	let hasValue = $derived(value !== '' && value !== null && value !== undefined);
 	let shouldFloat = $derived(isFocused || hasValue);
@@ -41,7 +46,7 @@
 		const color = error
 			? 'text-error-600 dark:text-error-400'
 			: shouldFloat
-				? 'text-primary-600 dark:text-primary-400'
+				? 'text-primary-700 dark:text-primary-300'
 				: 'text-dark-400 dark:text-light-600';
 		return `${base} ${position} ${color}`;
 	});
@@ -57,7 +62,7 @@
 
 <div class="relative">
 	<input
-		{id}
+		id={fieldId}
 		{type}
 		bind:value
 		{placeholder}
@@ -69,11 +74,11 @@
 		{max}
 		onfocus={handleFocus}
 		onblur={handleBlur}
-		class="peer block w-full appearance-none rounded-xl border bg-white px-4 pt-6 pb-2.5 text-sm text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-50"
-		class:border-light-300={!error && !isFocused}
+		class="peer block w-full appearance-none border bg-light-50 px-4 pt-6 pb-2.5 text-sm text-dark-900 transition-all duration-200 placeholder:text-transparent focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-50"
+		class:border-light-800={!error && !isFocused}
 		class:dark:border-dark-600={!error && !isFocused}
-		class:border-primary-500={!error && isFocused}
-		class:dark:border-primary-500={!error && isFocused}
+		class:border-primary-600={!error && isFocused}
+		class:dark:border-primary-400={!error && isFocused}
 		class:border-error-500={error}
 		class:dark:border-error-500={error}
 		class:focus:border-error-500={error}
@@ -81,7 +86,7 @@
 	/>
 
 	{#if label}
-		<label for={id} class={labelClasses()}>
+		<label for={fieldId} class={labelClasses()}>
 			{label}
 			{#if required}
 				<span class="text-error-500">*</span>

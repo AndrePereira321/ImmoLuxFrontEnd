@@ -2,6 +2,7 @@
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faArrowDown, faArrowUp, faCloudUploadAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import { _ } from 'svelte-i18n';
+	import { notificationStore } from '$lib/stores/notification';
 
 	interface ImagePreview {
 		file: File;
@@ -42,12 +43,12 @@
 	const processFiles = (files: File[]) => {
 		const validFiles = files.filter((file) => {
 			if (!file.type.startsWith('image/')) {
-				alert($_('properties.imageUpload.invalidType'));
+				notificationStore.error($_('properties.imageUpload.invalidType'));
 				return false;
 			}
 
 			if (file.size > maxSizeMB * 1024 * 1024) {
-				alert($_('properties.imageUpload.fileTooLarge', { values: { size: maxSizeMB } }));
+				notificationStore.error($_('properties.imageUpload.fileTooLarge', { values: { size: maxSizeMB } }));
 				return false;
 			}
 
@@ -55,7 +56,7 @@
 		});
 
 		if (images.length + validFiles.length > maxImages) {
-			alert($_('properties.imageUpload.maxImagesReached', { values: { max: maxImages } }));
+			notificationStore.error($_('properties.imageUpload.maxImagesReached', { values: { max: maxImages } }));
 			return;
 		}
 
@@ -124,43 +125,38 @@
 </script>
 
 <div class="space-y-4">
-	<!-- Upload area -->
+	<!-- Upload area. The drop zone is a plain region and the button inside it is
+	     the one interactive element, so keyboards meet a single control instead
+	     of a button nested in a button. -->
 	<div
-		role="button"
-		tabindex="0"
-		class="relative overflow-hidden rounded-lg border-2 border-dashed transition-colors {dragOver
+		role="region"
+		class="relative overflow-hidden border border-dashed transition-colors {dragOver
 			? 'border-primary-600 bg-primary-50 dark:border-primary-400 dark:bg-primary-950'
-			: 'border-light-600 bg-light-50 dark:border-dark-600 dark:bg-dark-700'}"
+			: 'border-light-900 bg-light-50 dark:border-dark-600 dark:bg-dark-800'}"
 		ondragover={(e) => {
 			e.preventDefault();
 			dragOver = true;
 		}}
 		ondragleave={() => (dragOver = false)}
 		ondrop={handleDrop}
-		onkeydown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault();
-				openFilePicker();
-			}
-		}}
 	>
 		<input bind:this={fileInput} type="file" accept="image/*" multiple onchange={handleFileSelect} class="hidden" />
 
 		<button
 			type="button"
 			onclick={openFilePicker}
-			class="w-full p-8 text-center transition-colors hover:bg-light-100 dark:hover:bg-dark-600"
+			class="w-full p-8 text-center transition-colors hover:bg-light-100 dark:hover:bg-dark-700"
 		>
 			<FontAwesomeIcon
 				icon={faCloudUploadAlt}
-				class="mb-3 text-5xl {dragOver
+				class="mb-3 text-4xl {dragOver
 					? 'text-primary-600 dark:text-primary-400'
-					: 'text-dark-300 dark:text-light-400'}"
+					: 'text-primary-300/70 dark:text-primary-800'}"
 			/>
 			<p class="mb-1 text-sm font-medium text-dark-900 dark:text-light-50">
 				{$_('properties.imageUpload.clickOrDrag')}
 			</p>
-			<p class="text-xs text-dark-400 dark:text-light-500">
+			<p class="type-record text-xs text-dark-400 dark:text-light-600">
 				{$_('properties.imageUpload.requirements', { values: { size: maxSizeMB, max: maxImages } })}
 			</p>
 		</button>
@@ -176,7 +172,7 @@
 					ondragstart={() => handleImageDragStart(index)}
 					ondragover={(e) => handleImageDragOver(e, index)}
 					ondragend={handleImageDragEnd}
-					class="group relative overflow-hidden rounded-lg border border-light-600 bg-light-50 transition-all dark:border-dark-600 dark:bg-dark-700 {draggedIndex ===
+					class="azulejo-rule group relative overflow-hidden border bg-light-50 transition-all dark:bg-dark-800 {draggedIndex ===
 					index
 						? 'scale-95 opacity-50'
 						: ''} {dragOverIndex === index && draggedIndex !== index
@@ -186,15 +182,21 @@
 				>
 					<!-- Image -->
 					<div class="relative aspect-square overflow-hidden bg-light-200 dark:bg-dark-600">
-						<img src={image.url} alt="Preview {index + 1}" class="h-full w-full object-cover" />
+						<img
+							src={image.url}
+							alt={$_('properties.imageUpload.imageNumber', { values: { number: index + 1 } })}
+							width="240"
+							height="240"
+							class="h-full w-full object-cover"
+						/>
 
 						<!-- Primary badge -->
 						{#if index === 0}
-							<div class="absolute top-2 left-2">
-								<span class="rounded bg-primary-600 px-2 py-1 text-xs font-semibold text-light-50">
-									{$_('properties.imageUpload.primary')}
-								</span>
-							</div>
+							<span
+								class="type-label absolute top-0 left-0 bg-dark-950/90 px-2.5 py-1.5 text-light-50 backdrop-blur-sm"
+							>
+								{$_('properties.imageUpload.primary')}
+							</span>
 						{/if}
 
 						<!-- Action buttons -->
@@ -205,9 +207,10 @@
 								<button
 									type="button"
 									onclick={() => moveImage(index, 'up')}
-									class="rounded-lg bg-light-50 p-2 transition-colors hover:bg-light-100"
+									class="bg-light-50 p-2 transition-colors hover:bg-light-200"
 									title={$_('properties.imageUpload.moveUp')}
 								>
+									<span class="sr-only">{$_('properties.imageUpload.moveUp')}</span>
 									<FontAwesomeIcon icon={faArrowUp} class="h-4 w-4 text-dark-900" />
 								</button>
 							{/if}
@@ -216,9 +219,10 @@
 								<button
 									type="button"
 									onclick={() => moveImage(index, 'down')}
-									class="rounded-lg bg-light-50 p-2 transition-colors hover:bg-light-100"
+									class="bg-light-50 p-2 transition-colors hover:bg-light-200"
 									title={$_('properties.imageUpload.moveDown')}
 								>
+									<span class="sr-only">{$_('properties.imageUpload.moveDown')}</span>
 									<FontAwesomeIcon icon={faArrowDown} class="h-4 w-4 text-dark-900" />
 								</button>
 							{/if}
@@ -226,9 +230,10 @@
 							<button
 								type="button"
 								onclick={() => removeImage(index)}
-								class="rounded-lg bg-error-600 p-2 transition-colors hover:bg-error-700"
+								class="bg-error-600 p-2 transition-colors hover:bg-error-700"
 								title={$_('properties.imageUpload.remove')}
 							>
+								<span class="sr-only">{$_('properties.imageUpload.remove')}</span>
 								<FontAwesomeIcon icon={faTrash} class="h-4 w-4 text-light-50" />
 							</button>
 						</div>
@@ -236,7 +241,7 @@
 
 					<!-- Order number -->
 					<div class="p-2 text-center">
-						<p class="text-xs text-dark-600 dark:text-light-400">
+						<p class="type-record text-xs text-dark-600 dark:text-light-400">
 							{$_('properties.imageUpload.imageNumber', { values: { number: index + 1 } })}
 						</p>
 					</div>

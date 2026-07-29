@@ -18,51 +18,49 @@
 	};
 </script>
 
-<div
-	class="group relative rounded-lg border-2 border-light-600 bg-light-50 p-4 transition-all hover:border-primary-500 hover:shadow-md dark:border-dark-600 dark:bg-dark-700 dark:hover:border-primary-500"
->
-	<div class="flex items-start gap-3">
-		<div class="flex-1 space-y-2">
-			<div class="flex items-start justify-between gap-2">
-				<h4 class="text-lg font-semibold text-dark-900 dark:text-light-50">
-					{contact.name}
-				</h4>
-				{#if onEdit}
-					<button
-						onclick={handleEdit}
-						class="flex-shrink-0 rounded-lg bg-primary-600 p-2 text-light-50 transition-all hover:scale-105 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800"
-						aria-label={$_('contacts.edit')}
-						title={$_('contacts.edit')}
-					>
-						<FontAwesomeIcon icon={faPencil} class="h-3.5 w-3.5" />
-					</button>
-				{/if}
-			</div>
+<!-- One tile of the contacts panel: name, then the two records a caller needs,
+     set in mono like every other figure on the site. -->
+<div class="azulejo-cell p-5">
+	<div class="flex items-start justify-between gap-3">
+		<h3 class="min-w-0 font-medium break-words text-dark-900 dark:text-light-50">
+			{contact.name}
+		</h3>
+		{#if onEdit}
+			<button
+				onclick={handleEdit}
+				class="azulejo-rule flex shrink-0 items-center gap-1.5 border bg-light-50 px-2.5 py-1 text-xs font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
+			>
+				<FontAwesomeIcon icon={faPencil} class="text-[0.6rem] opacity-70" />
+				{$_('contacts.edit')}
+			</button>
+		{/if}
+	</div>
 
-			<div class="space-y-1.5">
-				<div class="flex items-center gap-2 text-sm text-dark-600 dark:text-light-400">
-					<FontAwesomeIcon icon={faEnvelope} class="h-4 w-4 flex-shrink-0 text-primary-600 dark:text-primary-400" />
-					<a
-						href="mailto:{contact.email}"
-						class="break-all hover:text-primary-600 hover:underline dark:hover:text-primary-400"
-					>
-						{contact.email}
-					</a>
-				</div>
+	<div class="mt-3 space-y-1.5">
+		<div class="flex items-baseline gap-2.5 text-sm">
+			<FontAwesomeIcon icon={faEnvelope} class="h-3 w-3 flex-shrink-0 text-dark-300 dark:text-light-700" />
+			<a
+				href="mailto:{contact.email}"
+				class="type-record min-w-0 [overflow-wrap:anywhere] text-dark-600 underline decoration-transparent underline-offset-4 transition-colors hover:text-primary-700 hover:decoration-primary-400 dark:text-light-400 dark:hover:text-primary-300 dark:hover:decoration-primary-600"
+			>
+				{contact.email}
+			</a>
+		</div>
 
-				<div class="flex items-center gap-2 text-sm text-dark-600 dark:text-light-400">
-					<FontAwesomeIcon icon={faPhone} class="h-4 w-4 flex-shrink-0 text-primary-600 dark:text-primary-400" />
-					<a href="tel:{contact.phone}" class="hover:text-primary-600 hover:underline dark:hover:text-primary-400">
-						{contact.phone}
-					</a>
-				</div>
-			</div>
-
-			{#if contact.notes}
-				<p class="mt-3 text-sm text-dark-500 italic dark:text-light-500">
-					"{contact.notes}"
-				</p>
-			{/if}
+		<div class="flex items-baseline gap-2.5 text-sm">
+			<FontAwesomeIcon icon={faPhone} class="h-3 w-3 flex-shrink-0 text-dark-300 dark:text-light-700" />
+			<a
+				href="tel:{contact.phone}"
+				class="type-record text-dark-600 underline decoration-transparent underline-offset-4 transition-colors hover:text-primary-700 hover:decoration-primary-400 dark:text-light-400 dark:hover:text-primary-300 dark:hover:decoration-primary-600"
+			>
+				{contact.phone}
+			</a>
 		</div>
 	</div>
+
+	{#if contact.notes}
+		<p class="azulejo-rule mt-4 border-t pt-3 text-sm leading-relaxed text-dark-500 italic dark:text-light-500">
+			{contact.notes}
+		</p>
+	{/if}
 </div>

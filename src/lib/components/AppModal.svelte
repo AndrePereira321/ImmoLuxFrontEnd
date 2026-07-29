@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faTimes } from '@fortawesome/free-solid-svg-icons';
 	import type { Snippet } from 'svelte';
@@ -66,7 +67,7 @@
 		<div
 			class="relative w-full {sizeClasses[
 				size
-			]} anim-fade-in-up overflow-hidden rounded-2xl border border-light-300/60 bg-white shadow-2xl dark:border-dark-700/60 dark:bg-dark-800"
+			]} anim-fade-in-up azulejo-cell azulejo-rule max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain border shadow-2xl"
 			role="dialog"
 			aria-modal="true"
 			style="animation-duration: 0.2s"
@@ -74,8 +75,8 @@
 			<!-- Close Button -->
 			<button
 				onclick={handleClose}
-				class="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg text-dark-400 transition-all hover:bg-light-100 hover:text-dark-700 dark:text-light-500 dark:hover:bg-dark-700 dark:hover:text-light-200"
-				aria-label="Close"
+				class="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center text-dark-400 transition-colors hover:bg-light-300 hover:text-dark-700 dark:text-light-500 dark:hover:bg-dark-700 dark:hover:text-light-200"
+				aria-label={$_('common.close')}
 			>
 				<FontAwesomeIcon icon={faTimes} class="text-sm" />
 			</button>
@@ -83,10 +84,7 @@
 			<!-- Content -->
 			<div class="space-y-5 p-6">
 				{#if title}
-					<h3
-						class="pr-10 text-xl font-normal text-dark-900 dark:text-light-50"
-						style="font-family: 'Playfair Display', Georgia, serif"
-					>
+					<h3 class="pr-10 font-display text-xl font-normal text-dark-900 dark:text-light-50">
 						{title}
 					</h3>
 				{/if}

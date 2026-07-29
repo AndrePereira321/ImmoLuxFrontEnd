@@ -6,16 +6,9 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
-	import {
-		faAddressCard,
-		faArrowLeft,
-		faHome,
-		faImage,
-		faInfoCircle,
-		faMapMarkerAlt,
-		faStar
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 	import AppCollapsibleSection from '$lib/components/AppCollapsibleSection.svelte';
+	import AppModal from '$lib/components/AppModal.svelte';
 	import AppInput from '$lib/components/AppInput.svelte';
 	import AppTextarea from '$lib/components/AppTextarea.svelte';
 	import AppImageUpload from '$lib/components/AppImageUpload.svelte';
@@ -416,13 +409,13 @@
 		}
 	};
 
+	/** Deleting asks first — a modal in the page's own voice, not confirm(). */
+	let deleteModalOpen = $state(false);
+	let deleting = $state(false);
+
 	const handleDelete = async () => {
 		if (!propertyId || !isEditMode) return;
-
-		// Show confirmation dialog
-		if (!confirm($_('properties.deleteConfirm', { values: { title: property?.title || $_('properties.untitled') } }))) {
-			return;
-		}
+		deleting = true;
 
 		try {
 			const response = await apiClient.delete<null>(`/properties/${propertyId}`);
@@ -430,6 +423,7 @@
 
 			if (serverResponse.success) {
 				notificationStore.success($_('properties.deleteSuccess'));
+				deleteModalOpen = false;
 				goto(resolve('/panel/properties'));
 			} else {
 				notificationStore.error(serverResponse.error?.message || $_('properties.deleteError'));
@@ -437,6 +431,8 @@
 		} catch (error) {
 			console.error('Error deleting property:', error);
 			notificationStore.error($_('properties.deleteError'));
+		} finally {
+			deleting = false;
 		}
 	};
 
@@ -539,424 +535,489 @@
 	const isFormValid = $derived($allErrors.length === 0);
 </script>
 
-<div class="mx-auto max-w-5xl p-6">
-	<div class="mb-6 flex items-center gap-4">
-		<button
-			type="button"
-			onclick={handleCancel}
-			class="flex h-10 w-10 items-center justify-center rounded-lg border border-light-300 bg-light-50 text-dark-700 transition-colors hover:bg-light-100 dark:border-dark-600 dark:bg-dark-700 dark:text-light-200 dark:hover:bg-dark-600"
-			aria-label={$_('common.back')}
+<div class="min-h-screen bg-light-200 dark:bg-dark-850">
+	<div class="mx-auto w-full max-w-5xl px-5 pt-8 pb-16 sm:px-8 sm:pt-10">
+		<!-- ── Masthead ──
+		     The way back, then the entry named in the register's own voice. -->
+		<a
+			href={resolve('/panel/properties')}
+			class="inline-flex items-center gap-2 text-sm font-medium text-dark-500 transition-colors hover:text-primary-700 dark:text-light-500 dark:hover:text-primary-300"
 		>
-			<FontAwesomeIcon icon={faArrowLeft} class="h-5 w-5" />
-		</button>
-		<h1 class="text-3xl font-bold text-dark-900 dark:text-light-50">
-			{isEditMode ? $_('properties.editProperty') : $_('properties.newProperty')}
-		</h1>
-	</div>
+			<FontAwesomeIcon icon={faArrowLeft} class="text-xs" />
+			{$_('properties.backToProperties')}
+		</a>
 
-	{#if loadingProperty}
-		<div class="flex items-center justify-center py-20">
-			<AppLoadingSpinner />
-		</div>
-	{:else}
-		<form method="POST" use:enhance class="space-y-6">
-			<!-- Images Section -->
-			<div class="rounded-lg border border-light-300 bg-light-50 p-6 dark:border-dark-600 dark:bg-dark-800">
-				<div class="mb-4 flex items-center gap-3">
-					<FontAwesomeIcon icon={faImage} class="h-5 w-5 text-primary-600 dark:text-primary-400" />
-					<h2 class="text-xl font-semibold text-dark-900 dark:text-light-50">
+		<header class="mt-7 mb-8">
+			<p class="type-label text-primary-700 dark:text-primary-300">{$_('properties.eyebrow')}</p>
+			<h1 class="type-display mt-3 text-[clamp(1.75rem,3.2vw,2.6rem)] text-dark-900 dark:text-light-50">
+				{isEditMode ? $_('properties.editProperty') : $_('properties.newProperty')}
+			</h1>
+			{#if isEditMode && property}
+				<!-- Fired or unfired: the entry's standing, before any button for changing it. -->
+				<div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+					{#if property.isPublished}
+						<span class="type-label flex items-center gap-1.5 text-primary-700 dark:text-primary-300">
+							<span aria-hidden="true" class="h-1.5 w-1.5 bg-primary-600 dark:bg-primary-400"></span>
+							{$_('properties.published')}
+						</span>
+					{:else}
+						<span class="type-label flex items-center gap-1.5 text-dark-400 dark:text-light-600">
+							<span aria-hidden="true" class="h-1.5 w-1.5 border border-dark-400 dark:border-light-600"></span>
+							{$_('properties.draft')}
+						</span>
+					{/if}
+					{#if property.viewCount !== undefined}
+						<span class="type-record text-xs text-dark-400 dark:text-light-600">
+							{property.viewCount}
+							{$_('properties.views')}
+						</span>
+					{/if}
+				</div>
+			{/if}
+		</header>
+
+		{#if loadingProperty}
+			<div class="flex items-center justify-center py-20">
+				<AppLoadingSpinner />
+			</div>
+		{:else}
+			<form method="POST" use:enhance class="space-y-6">
+				<!-- Images Section — the same tile as the sections below, minus the hinge:
+			     the photographs are never worth folding away. -->
+				<div class="azulejo-cell azulejo-rule border">
+					<h2 class="type-label px-5 py-4 text-primary-700 sm:px-6 dark:text-primary-300">
 						{$_('properties.sections.images')}
 					</h2>
-				</div>
-				<AppImageUpload images={displayImages} onImagesChange={handleImagesChange} />
-			</div>
-
-			<!-- Basic Information -->
-			<AppCollapsibleSection title={$_('properties.sections.basicInfo')} icon={faInfoCircle}>
-				<div class="grid gap-6 md:grid-cols-2">
-					<div class="md:col-span-2">
-						<AppInput
-							label={$_('properties.title')}
-							bind:value={$form.title}
-							error={translateError($errors.title?.[0])}
-							required
-						/>
-					</div>
-
-					<div class="md:col-span-2">
-						<AppTextarea
-							label={$_('properties.description')}
-							bind:value={$form.description}
-							error={translateError($errors.description?.[0])}
-							rows={5}
-							required
-						/>
-					</div>
-
-					<div>
-						<AppAutocomplete
-							id="propertyType"
-							label={$_('properties.propertyType')}
-							bind:value={$form.propertyType}
-							options={propertyTypeOptions}
-							error={translateError($errors.propertyType?.[0])}
-							required
-						/>
-					</div>
-
-					<div>
-						<AppAutocomplete
-							id="status"
-							label={$_('properties.status')}
-							bind:value={$form.status}
-							options={statusOptions}
-							error={translateError($errors.status?.[0])}
-							required
-						/>
-					</div>
-
-					<div class="md:col-span-2">
-						<AppInput
-							label={$_('properties.price')}
-							type="number"
-							bind:value={$form.price}
-							error={translateError($errors.price?.[0])}
-							required
-						/>
+					<div class="azulejo-rule border-t p-5 sm:p-6">
+						<AppImageUpload images={displayImages} onImagesChange={handleImagesChange} />
 					</div>
 				</div>
-			</AppCollapsibleSection>
 
-			<!-- Location -->
-			<AppCollapsibleSection title={$_('properties.sections.location')} icon={faMapMarkerAlt}>
-				<div class="grid gap-6 md:grid-cols-3">
-					<div>
-						<AppAutocomplete
-							id="district"
-							label={$_('properties.district')}
-							bind:value={$form.district}
-							options={districtOptions}
-							placeholder={$_('properties.selectDistrict')}
-							error={translateError($errors.district?.[0])}
-							required
-						/>
-					</div>
-
-					<div>
-						<AppAutocomplete
-							id="municipality"
-							label={$_('properties.municipality')}
-							bind:value={$form.municipality}
-							options={municipalityOptions}
-							placeholder={$_('properties.selectMunicipality')}
-							error={translateError($errors.municipality?.[0])}
-							required
-						/>
-					</div>
-
-					<div>
-						<AppAutocomplete
-							id="parish"
-							label={$_('properties.parish')}
-							bind:value={$form.parish}
-							options={parishOptions}
-							placeholder={$_('properties.selectParish')}
-						/>
-					</div>
-
-					<div class="md:col-span-2">
-						<AppInput
-							label={$_('properties.address')}
-							bind:value={$form.address}
-							error={translateError($errors.address?.[0])}
-							required
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.postalCode')}
-							bind:value={$form.postalCode}
-							error={translateError($errors.postalCode?.[0])}
-							placeholder="1234-567"
-						/>
-					</div>
-				</div>
-			</AppCollapsibleSection>
-
-			<!-- Property Details -->
-			<AppCollapsibleSection title={$_('properties.sections.propertyDetails')} icon={faHome} defaultOpen={false}>
-				<div class="grid gap-6 md:grid-cols-3">
-					<div>
-						<AppInput
-							label={$_('properties.bedrooms')}
-							type="number"
-							bind:value={$form.bedrooms}
-							error={translateError($errors.bedrooms?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.bathrooms')}
-							type="number"
-							bind:value={$form.bathrooms}
-							error={translateError($errors.bathrooms?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.areaSqm')}
-							type="number"
-							bind:value={$form.areaSqm}
-							error={translateError($errors.areaSqm?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.landAreaSqm')}
-							type="number"
-							bind:value={$form.landAreaSqm}
-							error={translateError($errors.landAreaSqm?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.yearBuilt')}
-							type="number"
-							bind:value={$form.yearBuilt}
-							error={translateError($errors.yearBuilt?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.floor')}
-							type="number"
-							bind:value={$form.floor}
-							error={translateError($errors.floor?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.totalFloors')}
-							type="number"
-							bind:value={$form.totalFloors}
-							error={translateError($errors.totalFloors?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.parkingSpaces')}
-							type="number"
-							bind:value={$form.parkingSpaces}
-							error={translateError($errors.parkingSpaces?.[0])}
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.latitude')}
-							type="number"
-							bind:value={$form.latitude}
-							error={translateError($errors.latitude?.[0])}
-							step="0.000001"
-						/>
-					</div>
-
-					<div>
-						<AppInput
-							label={$_('properties.longitude')}
-							type="number"
-							bind:value={$form.longitude}
-							error={translateError($errors.longitude?.[0])}
-							step="0.000001"
-						/>
-					</div>
-				</div>
-			</AppCollapsibleSection>
-
-			<!-- Features & Amenities -->
-			<AppCollapsibleSection title={$_('properties.sections.features')} icon={faStar} defaultOpen={false}>
-				<div class="space-y-6">
-					<div class="grid gap-4 md:grid-cols-2">
-						<label class="flex items-center gap-3">
-							<input
-								type="checkbox"
-								bind:checked={$form.hasGarage}
-								class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
-							/>
-							<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasGarage')}</span>
-						</label>
-
-						<label class="flex items-center gap-3">
-							<input
-								type="checkbox"
-								bind:checked={$form.hasGarden}
-								class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
-							/>
-							<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasGarden')}</span>
-						</label>
-
-						<label class="flex items-center gap-3">
-							<input
-								type="checkbox"
-								bind:checked={$form.hasPool}
-								class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
-							/>
-							<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasPool')}</span>
-						</label>
-
-						<label class="flex items-center gap-3">
-							<input
-								type="checkbox"
-								bind:checked={$form.hasElevator}
-								class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
-							/>
-							<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasElevator')}</span>
-						</label>
-					</div>
-
+				<!-- Basic Information -->
+				<AppCollapsibleSection title={$_('properties.sections.basicInfo')}>
 					<div class="grid gap-6 md:grid-cols-2">
+						<div class="md:col-span-2">
+							<AppInput
+								label={$_('properties.title')}
+								bind:value={$form.title}
+								error={translateError($errors.title?.[0])}
+								required
+							/>
+						</div>
+
+						<div class="md:col-span-2">
+							<AppTextarea
+								label={$_('properties.description')}
+								bind:value={$form.description}
+								error={translateError($errors.description?.[0])}
+								rows={5}
+								required
+							/>
+						</div>
+
 						<div>
 							<AppAutocomplete
-								id="energyRating"
-								label={$_('properties.energyRating')}
-								bind:value={$form.energyRating}
-								options={energyRatingOptions}
-								placeholder={$_('properties.selectEnergyRating')}
+								id="propertyType"
+								label={$_('properties.propertyType')}
+								bind:value={$form.propertyType}
+								options={propertyTypeOptions}
+								error={translateError($errors.propertyType?.[0])}
+								required
+							/>
+						</div>
+
+						<div>
+							<AppAutocomplete
+								id="status"
+								label={$_('properties.status')}
+								bind:value={$form.status}
+								options={statusOptions}
+								error={translateError($errors.status?.[0])}
+								required
+							/>
+						</div>
+
+						<div class="md:col-span-2">
+							<AppInput
+								label={$_('properties.price')}
+								type="number"
+								bind:value={$form.price}
+								error={translateError($errors.price?.[0])}
+								required
+							/>
+						</div>
+					</div>
+				</AppCollapsibleSection>
+
+				<!-- Location -->
+				<AppCollapsibleSection title={$_('properties.sections.location')}>
+					<div class="grid gap-6 md:grid-cols-3">
+						<div>
+							<AppAutocomplete
+								id="district"
+								label={$_('properties.district')}
+								bind:value={$form.district}
+								options={districtOptions}
+								placeholder={$_('properties.selectDistrict')}
+								error={translateError($errors.district?.[0])}
+								required
+							/>
+						</div>
+
+						<div>
+							<AppAutocomplete
+								id="municipality"
+								label={$_('properties.municipality')}
+								bind:value={$form.municipality}
+								options={municipalityOptions}
+								placeholder={$_('properties.selectMunicipality')}
+								error={translateError($errors.municipality?.[0])}
+								required
+							/>
+						</div>
+
+						<div>
+							<AppAutocomplete
+								id="parish"
+								label={$_('properties.parish')}
+								bind:value={$form.parish}
+								options={parishOptions}
+								placeholder={$_('properties.selectParish')}
+							/>
+						</div>
+
+						<div class="md:col-span-2">
+							<AppInput
+								label={$_('properties.address')}
+								bind:value={$form.address}
+								error={translateError($errors.address?.[0])}
+								required
 							/>
 						</div>
 
 						<div>
 							<AppInput
-								label={$_('properties.virtualTourUrl')}
-								bind:value={$form.virtualTourUrl}
-								error={translateError($errors.virtualTourUrl?.[0])}
+								label={$_('properties.postalCode')}
+								bind:value={$form.postalCode}
+								error={translateError($errors.postalCode?.[0])}
+								placeholder="1234-567"
 							/>
 						</div>
 					</div>
-				</div>
-			</AppCollapsibleSection>
+				</AppCollapsibleSection>
 
-			<!-- Contact Information -->
-			<AppCollapsibleSection title={$_('properties.sections.contact')} icon={faAddressCard}>
-				<div class="space-y-4">
-					<p class="text-sm text-dark-600 dark:text-light-400">
-						{$_('properties.selectMultipleContacts')}
-						{#if $form.contactIds.length > 0}
-							<span class="font-semibold text-primary-600 dark:text-primary-400">
-								({$form.contactIds.length}
-								{$_('properties.contactsSelected')})
-							</span>
-						{/if}
-					</p>
-
-					{#if contactOptions.length === 0}
-						<p class="text-sm text-warning-600 dark:text-warning-400">
-							{$_('properties.noContactsAvailable')}
-						</p>
-					{:else}
-						<div class="grid gap-3 sm:grid-cols-2">
-							{#each contactOptions as option (option.value)}
-								<label
-									class="flex cursor-pointer items-center gap-3 rounded-lg border-2 p-4 transition-all {$form.contactIds.includes(
-										option.value
-									)
-										? 'border-primary-600 bg-primary-50 dark:border-primary-500 dark:bg-primary-900/20'
-										: 'border-light-300 bg-white hover:border-primary-300 dark:border-dark-600 dark:bg-dark-700 dark:hover:border-primary-700'}"
-								>
-									<input
-										type="checkbox"
-										checked={$form.contactIds.includes(option.value)}
-										onchange={() => toggleContact(option.value)}
-										class="h-5 w-5 rounded border-light-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
-									/>
-									<span class="flex-1 text-sm font-medium text-dark-900 dark:text-light-50">
-										{option.label}
-									</span>
-								</label>
-							{/each}
+				<!-- Property Details -->
+				<AppCollapsibleSection title={$_('properties.sections.propertyDetails')} defaultOpen={false}>
+					<div class="grid gap-6 md:grid-cols-3">
+						<div>
+							<AppInput
+								label={$_('properties.bedrooms')}
+								type="number"
+								bind:value={$form.bedrooms}
+								error={translateError($errors.bedrooms?.[0])}
+							/>
 						</div>
-					{/if}
 
-					{#if $errors.contactIds?.[0]}
-						<p class="text-sm text-error-600 dark:text-error-400">
-							{translateError(
-								Array.isArray($errors.contactIds[0]) ? $errors.contactIds[0].join(', ') : $errors.contactIds[0]
-							)}
+						<div>
+							<AppInput
+								label={$_('properties.bathrooms')}
+								type="number"
+								bind:value={$form.bathrooms}
+								error={translateError($errors.bathrooms?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.areaSqm')}
+								type="number"
+								bind:value={$form.areaSqm}
+								error={translateError($errors.areaSqm?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.landAreaSqm')}
+								type="number"
+								bind:value={$form.landAreaSqm}
+								error={translateError($errors.landAreaSqm?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.yearBuilt')}
+								type="number"
+								bind:value={$form.yearBuilt}
+								error={translateError($errors.yearBuilt?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.floor')}
+								type="number"
+								bind:value={$form.floor}
+								error={translateError($errors.floor?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.totalFloors')}
+								type="number"
+								bind:value={$form.totalFloors}
+								error={translateError($errors.totalFloors?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.parkingSpaces')}
+								type="number"
+								bind:value={$form.parkingSpaces}
+								error={translateError($errors.parkingSpaces?.[0])}
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.latitude')}
+								type="number"
+								bind:value={$form.latitude}
+								error={translateError($errors.latitude?.[0])}
+								step="0.000001"
+							/>
+						</div>
+
+						<div>
+							<AppInput
+								label={$_('properties.longitude')}
+								type="number"
+								bind:value={$form.longitude}
+								error={translateError($errors.longitude?.[0])}
+								step="0.000001"
+							/>
+						</div>
+					</div>
+				</AppCollapsibleSection>
+
+				<!-- Features & Amenities -->
+				<AppCollapsibleSection title={$_('properties.sections.features')} defaultOpen={false}>
+					<div class="space-y-6">
+						<div class="grid gap-4 md:grid-cols-2">
+							<label class="flex items-center gap-3">
+								<input
+									type="checkbox"
+									bind:checked={$form.hasGarage}
+									class="h-4 w-4 rounded-none border-light-900 bg-light-50 text-primary-600 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-800"
+								/>
+								<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasGarage')}</span>
+							</label>
+
+							<label class="flex items-center gap-3">
+								<input
+									type="checkbox"
+									bind:checked={$form.hasGarden}
+									class="h-4 w-4 rounded-none border-light-900 bg-light-50 text-primary-600 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-800"
+								/>
+								<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasGarden')}</span>
+							</label>
+
+							<label class="flex items-center gap-3">
+								<input
+									type="checkbox"
+									bind:checked={$form.hasPool}
+									class="h-4 w-4 rounded-none border-light-900 bg-light-50 text-primary-600 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-800"
+								/>
+								<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasPool')}</span>
+							</label>
+
+							<label class="flex items-center gap-3">
+								<input
+									type="checkbox"
+									bind:checked={$form.hasElevator}
+									class="h-4 w-4 rounded-none border-light-900 bg-light-50 text-primary-600 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-800"
+								/>
+								<span class="text-sm font-medium text-dark-700 dark:text-light-300">{$_('properties.hasElevator')}</span
+								>
+							</label>
+						</div>
+
+						<div class="grid gap-6 md:grid-cols-2">
+							<div>
+								<AppAutocomplete
+									id="energyRating"
+									label={$_('properties.energyRating')}
+									bind:value={$form.energyRating}
+									options={energyRatingOptions}
+									placeholder={$_('properties.selectEnergyRating')}
+								/>
+							</div>
+
+							<div>
+								<AppInput
+									label={$_('properties.virtualTourUrl')}
+									bind:value={$form.virtualTourUrl}
+									error={translateError($errors.virtualTourUrl?.[0])}
+								/>
+							</div>
+						</div>
+					</div>
+				</AppCollapsibleSection>
+
+				<!-- Contact Information -->
+				<AppCollapsibleSection title={$_('properties.sections.contact')}>
+					<div class="space-y-4">
+						<p class="text-sm text-dark-600 dark:text-light-400">
+							{$_('properties.selectMultipleContacts')}
+							{#if $form.contactIds.length > 0}
+								<span class="font-semibold text-primary-600 dark:text-primary-400">
+									({$form.contactIds.length}
+									{$_('properties.contactsSelected')})
+								</span>
+							{/if}
 						</p>
-					{/if}
-				</div>
-			</AppCollapsibleSection>
 
-			<!-- Action Buttons -->
-			<div class="flex flex-wrap items-center justify-between gap-4">
-				<!-- Delete button - Left side (only in edit mode) -->
-				{#if isEditMode}
-					<button
-						type="button"
-						onclick={handleDelete}
-						class="rounded-lg border border-error-300 bg-white px-6 py-2.5 font-medium text-error-600 transition-colors hover:bg-error-50 dark:border-error-600 dark:bg-dark-700 dark:text-error-400 dark:hover:bg-error-900/20"
-					>
-						{$_('properties.delete')}
-					</button>
-				{:else}
-					<div></div>
-				{/if}
+						{#if contactOptions.length === 0}
+							<p class="text-sm text-warning-600 dark:text-warning-400">
+								{$_('properties.noContactsAvailable')}
+							</p>
+						{:else}
+							<div class="grid gap-3 sm:grid-cols-2">
+								{#each contactOptions as option (option.value)}
+									<label
+										class="flex cursor-pointer items-center gap-3 border p-4 transition-colors {$form.contactIds.includes(
+											option.value
+										)
+											? 'border-primary-600 bg-primary-50 dark:border-primary-500 dark:bg-primary-950/40'
+											: 'azulejo-rule bg-light-50 hover:border-primary-400 dark:bg-dark-800 dark:hover:border-primary-600'}"
+									>
+										<input
+											type="checkbox"
+											checked={$form.contactIds.includes(option.value)}
+											onchange={() => toggleContact(option.value)}
+											class="h-4 w-4 rounded-none border-light-900 bg-light-50 text-primary-600 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-800"
+										/>
+										<span class="flex-1 text-sm font-medium text-dark-900 dark:text-light-50">
+											{option.label}
+										</span>
+									</label>
+								{/each}
+							</div>
+						{/if}
 
-				<!-- Right side buttons -->
-				<div class="flex gap-4">
-					<!-- Publish/Unpublish button (only in edit mode) -->
-					{#if isEditMode}
-						{#if property?.isPublished}
+						{#if $errors.contactIds?.[0]}
+							<p class="text-sm text-error-600 dark:text-error-400">
+								{translateError(
+									Array.isArray($errors.contactIds[0]) ? $errors.contactIds[0].join(', ') : $errors.contactIds[0]
+								)}
+							</p>
+						{/if}
+					</div>
+				</AppCollapsibleSection>
+
+				<!-- ── The acts ──
+			     Kept at the page's foot behind the grout line, so Save never
+			     scrolls out of reach on a long record. -->
+				<div
+					class="azulejo-rule sticky bottom-0 z-20 -mx-5 border-t bg-light-200/95 px-5 py-4 backdrop-blur-md sm:-mx-8 sm:px-8 dark:bg-dark-850/95"
+				>
+					<!-- A two-column grid on a phone — Save ends bottom-right, under the
+					     thumb — and a ruled row with Delete apart from sm up. -->
+					<div class="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+						<!-- Delete stands alone on the left, in its own colour and no other. -->
+						{#if isEditMode}
 							<button
 								type="button"
-								onclick={handleUnpublish}
-								class="rounded-lg border border-warning-300 bg-white px-6 py-2.5 font-medium text-warning-700 transition-colors hover:bg-warning-50 dark:border-warning-600 dark:bg-dark-700 dark:text-warning-400 dark:hover:bg-warning-900/20"
+								onclick={() => (deleteModalOpen = true)}
+								class="border border-error-600 px-5 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-600 hover:text-light-50 dark:border-error-500 dark:text-error-400 dark:hover:bg-error-600 dark:hover:text-light-50"
 							>
-								{$_('properties.unpublish')}
+								{$_('properties.delete')}
 							</button>
 						{:else}
+							<div class="hidden sm:block"></div>
+						{/if}
+
+						<div class="contents sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+							{#if isEditMode}
+								{#if property?.isPublished}
+									<button
+										type="button"
+										onclick={handleUnpublish}
+										class="border border-warning-700 px-5 py-2.5 text-sm font-medium text-warning-700 transition-colors hover:bg-warning-700 hover:text-light-50 dark:border-warning-500 dark:text-warning-400 dark:hover:bg-warning-600 dark:hover:text-light-50"
+									>
+										{$_('properties.unpublish')}
+									</button>
+								{:else}
+									<button
+										type="button"
+										onclick={handlePublish}
+										class="border border-success-700 px-5 py-2.5 text-sm font-medium text-success-700 transition-colors hover:bg-success-700 hover:text-light-50 dark:border-success-500 dark:text-success-400 dark:hover:bg-success-600 dark:hover:text-light-50"
+									>
+										{$_('properties.publish')}
+									</button>
+								{/if}
+							{/if}
+
 							<button
 								type="button"
-								onclick={handlePublish}
-								class="rounded-lg border border-success-300 bg-white px-6 py-2.5 font-medium text-success-700 transition-colors hover:bg-success-50 dark:border-success-600 dark:bg-dark-700 dark:text-success-400 dark:hover:bg-success-900/20"
+								onclick={handleCancel}
+								class="azulejo-rule border bg-light-50 px-5 py-2.5 text-sm font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
 							>
-								{$_('properties.publish')}
+								{$_('common.cancel')}
 							</button>
-						{/if}
-					{/if}
 
-					<button
-						type="button"
-						onclick={handleCancel}
-						class="rounded-lg border border-light-300 bg-white px-6 py-2.5 font-medium text-dark-700 transition-colors hover:bg-light-50 dark:border-dark-600 dark:bg-dark-700 dark:text-light-200 dark:hover:bg-dark-600"
-					>
-						{$_('common.cancel')}
-					</button>
-
-					<button
-						type="submit"
-						disabled={$submitting || !isFormValid}
-						class="rounded-lg bg-primary-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-500 dark:hover:bg-primary-600"
-					>
-						{#if $submitting}
-							{$_('common.saving')}
-						{:else}
-							{$_('common.save')}
-						{/if}
-					</button>
+							<button
+								type="submit"
+								disabled={$submitting || !isFormValid}
+								class="bg-primary-700 px-6 py-2.5 text-sm font-medium text-light-50 transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-600 dark:hover:bg-primary-500"
+							>
+								{#if $submitting}
+									{$_('common.saving')}
+								{:else}
+									{$_('common.save')}
+								{/if}
+							</button>
+						</div>
+					</div>
 				</div>
-			</div>
-		</form>
-	{/if}
+			</form>
+		{/if}
+	</div>
 </div>
+
+<!-- Delete confirmation -->
+<AppModal
+	bind:open={deleteModalOpen}
+	title={$_('properties.deleteTitle')}
+	size="md"
+	closeOnBackdrop={false}
+	onClose={() => (deleteModalOpen = false)}
+>
+	<p class="text-sm leading-relaxed text-dark-600 dark:text-light-400">
+		{$_('properties.deleteConfirm', { values: { title: property?.title || $_('properties.untitled') } })}
+	</p>
+	<div class="flex justify-end gap-3 pt-1">
+		<button
+			type="button"
+			onclick={() => (deleteModalOpen = false)}
+			disabled={deleting}
+			class="azulejo-rule border bg-light-50 px-5 py-2.5 text-sm font-medium text-dark-600 transition-colors hover:border-primary-600 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-dark-800 dark:text-light-300 dark:hover:border-primary-400 dark:hover:text-primary-300"
+		>
+			{$_('common.cancel')}
+		</button>
+		<button
+			type="button"
+			onclick={handleDelete}
+			disabled={deleting}
+			class="border border-error-600 px-5 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-600 hover:text-light-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-error-500 dark:text-error-400 dark:hover:bg-error-600 dark:hover:text-light-50"
+		>
+			{$_('properties.delete')}
+		</button>
+	</div>
+</AppModal>
 
 {#if isSaving}
 	<AppLoadingSpinner message={$_('common.saving')} overlay={true} />

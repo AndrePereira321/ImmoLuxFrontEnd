@@ -166,6 +166,11 @@
 	"properties": {
 		"myProperties": "My Properties",
 		"manageDescription": "Manage your property listings and contact persons",
+		"eyebrow": "The register",
+		"registerStrip": "Register overview",
+		"registerSummary": "{published, plural, =1 {1 published} other {# published}} · {drafts, plural, =1 {1 draft} other {# drafts}}",
+		"viewListing": "View listing",
+		"deleteTitle": "Delete property",
 		"propertiesList": "Properties",
 		"addProperty": "Add Property",
 		"newProperty": "New Property",
@@ -286,7 +291,7 @@
 		"unpublishSuccess": "Property unpublished successfully",
 		"deleteSuccess": "Property deleted successfully",
 		"deleteError": "Failed to delete property",
-		"deleteConfirm": "Are you sure you want to delete '{title}'? This action cannot be undone.",
+		"deleteConfirm": "Are you sure you want to delete “{title}”? This action cannot be undone.",
 		"imageUpload": {
 			"clickOrDrag": "Click to upload or drag and drop",
 			"requirements": "PNG, JPG up to {size}MB (max {max} images)",
@@ -315,6 +320,26 @@
 			"nextImage": "Next image",
 			"fullscreen": "View fullscreen",
 			"imageAlt": "{title} — image {index}"
+		},
+		"detail": {
+			"ficha": "Property record",
+			"ref": "Ref. {id}",
+			"type": "Type",
+			"typology": "Typology",
+			"area": "Floor area",
+			"plot": "Plot",
+			"equipment": "Features",
+			"who": "Who's selling",
+			"contactHeadline": "Talk to someone who knows the property.",
+			"contactLead": "Book a visit or ask anything — we answer in Portuguese, French and English.",
+			"writeCta": "Ask about this property",
+			"emailSubject": "About: {title} (Ref. {id})",
+			"speakTo": "Talk to the seller",
+			"virtualTour": "Virtual tour",
+			"openMap": "Open in Google Maps",
+			"callCta": "Call",
+			"messageCta": "Message",
+			"floatingContact": "Get in touch"
 		}
 	},
 	"contacts": {

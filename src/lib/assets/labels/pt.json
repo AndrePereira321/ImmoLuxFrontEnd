@@ -166,6 +166,11 @@
 	"properties": {
 		"myProperties": "As Minhas Propriedades",
 		"manageDescription": "Gerir os seus anúncios e pessoas de contacto",
+		"eyebrow": "O registo",
+		"registerStrip": "Visão geral do registo",
+		"registerSummary": "{published, plural, =1 {1 publicado} other {# publicados}} · {drafts, plural, =1 {1 rascunho} other {# rascunhos}}",
+		"viewListing": "Ver anúncio",
+		"deleteTitle": "Eliminar propriedade",
 		"propertiesList": "Propriedades",
 		"addProperty": "Adicionar Propriedade",
 		"newProperty": "Nova Propriedade",
@@ -286,7 +291,7 @@
 		"unpublishSuccess": "Propriedade despublicada com sucesso",
 		"deleteSuccess": "Propriedade eliminada com sucesso",
 		"deleteError": "Falha ao eliminar propriedade",
-		"deleteConfirm": "Tem a certeza que deseja eliminar '{title}'? Esta ação não pode ser revertida.",
+		"deleteConfirm": "Tem a certeza que deseja eliminar «{title}»? Esta ação não pode ser revertida.",
 		"imageUpload": {
 			"clickOrDrag": "Clique para carregar ou arraste e solte",
 			"requirements": "PNG, JPG até {size}MB (máx {max} imagens)",
@@ -315,6 +320,26 @@
 			"nextImage": "Imagem seguinte",
 			"fullscreen": "Ver em ecrã inteiro",
 			"imageAlt": "{title} — imagem {index}"
+		},
+		"detail": {
+			"ficha": "Ficha do imóvel",
+			"ref": "Ref. {id}",
+			"type": "Tipo",
+			"typology": "Tipologia",
+			"area": "Área útil",
+			"plot": "Terreno",
+			"equipment": "Equipamento",
+			"who": "Quem vende",
+			"contactHeadline": "Fale com quem conhece o imóvel.",
+			"contactLead": "Marque uma visita ou tire uma dúvida — respondemos em português, francês e inglês.",
+			"writeCta": "Escrever sobre este imóvel",
+			"emailSubject": "Sobre: {title} (Ref. {id})",
+			"speakTo": "Falar com quem vende",
+			"virtualTour": "Visita virtual",
+			"openMap": "Abrir no Google Maps",
+			"callCta": "Ligar",
+			"messageCta": "Escrever",
+			"floatingContact": "Fale connosco"
 		}
 	},
 	"contacts": {

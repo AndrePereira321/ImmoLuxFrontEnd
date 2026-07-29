@@ -275,6 +275,6 @@ Map only renders when `latitude` and `longitude` are present on the property.
 
 - **`console.log` is stripped in production** (`drop_console: true` in terser config) — do not rely on console output for production debugging
 - **Environment files** are in `env/` directory, not the project root — Vite is configured with `envDir: './env'`
-- **Vendor chunks** are split: `vendor-svelte`, `vendor-icons`, `vendor-i18n`, `vendor-leaflet` — avoid importing leaflet or fontawesome in code paths that don't need them
+- **Vendor chunk splitting is configured but currently inert**: `vite.config.ts` declares `vendor-svelte`/`vendor-icons`/`vendor-i18n`/`vendor-leaflet` groups via `build.rolldownOptions.output.codeSplitting`, but SvelteKit's Vite plugin forces `codeSplitting: false` on the client build in this Rolldown/Vite 8 setup (to avoid circular-dependency issues with its own per-route chunking), so the groups never take effect — svelte, svelte-i18n, leaflet, and fontawesome all land in one Rolldown-automatic vendor chunk instead. Still avoid importing leaflet or fontawesome in code paths that don't need them, since that affects whether they're pulled in at all, not just which chunk they'd land in. Run `npm run build:analyze` to inspect actual chunk composition
 - **Tailwind v4** is used via `@tailwindcss/vite` plugin — no `tailwind.config.js`; all theme customization is in `src/lib/styles/app.css` using OKLCH color values
 - **Playfair Display 600 weight is disabled** (corrupted font file) — only weight 400 is available for the serif heading font

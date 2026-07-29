@@ -15,5 +15,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+stats.html
 
 .env.local
