@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 
 const postalCodeRegex = /^\d{4}-\d{3}$/;
 

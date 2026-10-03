@@ -18,7 +18,7 @@
 
 	body {
 		font-family:
-			'Plus Jakarta Sans',
+			'Plus Jakarta Sans Variable',
 			'Inter',
 			-apple-system,
 			BlinkMacSystemFont,
@@ -34,7 +34,7 @@
 	h4,
 	h5,
 	h6 {
-		font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+		font-family: 'Fraunces Variable', 'Playfair Display', Georgia, serif;
 		/* SOFT rounds the terminals, WONK swaps in the flared alternates —
 		   together they read as lettering cut by hand rather than set by machine. */
 		font-variation-settings:
@@ -131,8 +131,8 @@
 @theme {
 	/* ── Type roles ──
 	   display: the voice. body: the reading. mono: measurements and records. */
-	--font-display: 'Fraunces', 'Playfair Display', Georgia, serif;
-	--font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--font-display: 'Fraunces Variable', 'Playfair Display', Georgia, serif;
+	--font-sans: 'Plus Jakarta Sans Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--font-mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
 	/* ── Azulejo ──

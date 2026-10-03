@@ -92,11 +92,11 @@ Location slugs (`/houses/{district}/{municipality}`) are owned by the backend: p
 
 Also: `--color-glaze`/`--color-glaze-dark`, `--color-grout`/`--color-grout-dark`, and status tokens `--color-error-*`, `--color-warning-*`, `--color-success-*`, `--color-info-*`.
 
-**Typography** (Google Fonts loaded in `src/app.html`):
+**Typography** (self-hosted from `@fontsource` packages imported in `src/routes/+layout.svelte` — never link a font CDN: it sends visitors' IPs to a third party and the CSP's `font-src 'self'` blocks it):
 
-- Headings (`--font-display`): **Fraunces** (variable), falling back to locally hosted Playfair Display — Playfair weight 600 is disabled (corrupted file), only 400 exists
-- Body: Plus Jakarta Sans, falling back to local Inter
-- Mono (`--font-mono`): DM Mono, used by `.type-record` / `.type-label`
+- Headings (`--font-display`): **Fraunces** (`'Fraunces Variable'`, the `full.css` build for the SOFT/WONK/opsz axes), falling back to locally hosted Playfair Display — Playfair weight 600 is disabled (corrupted file), only 400 exists
+- Body: Plus Jakarta Sans (`'Plus Jakarta Sans Variable'`, normal + italic), falling back to local Inter
+- Mono (`--font-mono`): DM Mono (300/400/500), used by `.type-record` / `.type-label`
 
 **Defined in `app.css`:**
 
@@ -206,7 +206,7 @@ const { form, errors, enhance, submitting } = superForm(defaults, {
 });
 ```
 
-With Zod 4, `zodClient(...)` needs a type workaround (`schema as any` / `@ts-expect-error`) — follow the existing forms. Enum values and `.max()` lengths in `src/lib/schemas/` mirror the backend's Ent schema; keep them in sync.
+With Zod 4, `zodClient(...)` needs a type workaround (`schema as any` / `@ts-expect-error`) — follow the existing forms. Schemas import `z` from `./zod` (not `'zod'`) so the CSP-friendly `jitless` config applies. Enum values and `.max()` lengths in `src/lib/schemas/` mirror the backend's Ent schema; keep them in sync.
 
 **Validation error messages are i18n keys** (e.g., `'properties.titleRequired'`). Translate before displaying:
 
@@ -272,15 +272,25 @@ To find a property's image IDs, call `/properties/{propertyId}/images`, which re
 
 ## Leaflet Maps
 
-The property detail page is SSR, so Leaflet must never load on the server: `leaflet` and `svelte-leafletjs` are in `ssr.external` (`vite.config.ts`), and the page imports `svelte-leafletjs` dynamically inside `onMount`. Leaflet CSS comes from unpkg.
+The property detail page is SSR, so Leaflet must never load on the server: `leaflet` and `svelte-leafletjs` are in `ssr.external` (`vite.config.ts`), and the page imports `svelte-leafletjs` dynamically inside `onMount`. Leaflet's CSS and marker images are bundled from the `leaflet` package (imported by the page). Always pass `icon` to svelte-leafletjs's `<Marker>`: its default icon loads from cdnjs.
 
-If the property has no `latitude`/`longitude`, the page geocodes its address client-side via `nominatim.openstreetmap.org`.
+If the property has no `latitude`/`longitude`, the page geocodes its address client-side via `nominatim.openstreetmap.org`. Map tiles come from `*.tile.openstreetmap.org`. These two, and the backend, are the only third-party origins the CSP allows.
+
+## Content-Security-Policy
+
+Set in `svelte.config.js` (`kit.csp`, mode `auto`): SvelteKit sends it as a header on SSR pages, with a per-request nonce for its own inline script, so `script-src` is just `'self'` + nonce. Rules that follow from it:
+
+- **No new third-party origins** without adding them to the directives. Browser-side backend calls are allowed via `VITE_SERVER_URL`'s origin, read with Vite's `loadEnv` (mode from `NODE_ENV`, process env overrides). In production that's same-origin.
+- **No inline scripts, `on*=` attributes or `eval`/`new Function`.** `application/ld+json` blocks are data, not scripts, so the JSON-LD is fine. Zod is imported from `$lib/schemas/zod`, which sets `jitless` so Zod's eval probe doesn't log a CSP violation.
+- `style-src` keeps `'unsafe-inline'` (SSR `style=` attributes, Font Awesome's injected `<style>`). `img-src` allows `data:` (inlined small assets, the grain texture) and `blob:` (upload previews).
+- `frame-ancestors 'none'` only works as a header, which `auto` mode sends for SSR pages. A prerendered page would get a `<meta>` CSP instead, and browsers ignore `frame-ancestors` there.
 
 ## Build Notes
 
 - **All `console.*` calls and `debugger` statements are stripped in production** (`drop_console: true` in the terser config) — including `console.error`
 - **Environment files** are in `env/`, not the project root (`envDir` in `vite.config.ts`, `kit.env.dir` in `svelte.config.js`). `.env.development` and `.env.production` are committed; `env/.env.template` lists the required keys (both are needed — the build fails without `PRIVATE_SERVER_URL`), and `.env.local` is gitignored
 - **No service worker or web app manifest (deliberately):** an `@vite-pwa/sveltekit` setup was removed because nothing ever registered its worker, listings are live API data (offline adds little), and its ~2.4 MB precache would have been downloaded by every visitor. For a proper name/icon when someone adds the site to their home screen, a static `static/manifest.webmanifest` plus `<link rel="manifest">` in `app.html` is enough
+- **Fonts are never inlined** (`build.assetsInlineLimit` in `vite.config.ts`): a few fontsource subsets are under 4 kB, and as `data:` URIs they'd bloat the render-blocking CSS and be blocked by `font-src 'self'`
 - **Precompression** (`.br`/`.gz` next to every client asset, served by `node build`) comes from adapter-node's `precompress` (on by default); don't add a Vite compression plugin on top
 - **No manual vendor chunking — keep it that way**: Rolldown `codeSplitting` groups also capture their matches' dependencies (`includeDependenciesRecursively` defaults to `true`), so the old `/node_modules\/.*svelte/` group swallowed svelte-i18n, svelte-leafletjs, svelte-fontawesome and superforms + zod into one ~680 kB chunk loaded on every page. Rolldown's automatic per-route splitting cut public pages from ~866 kB to ~587 kB of JS and keeps form code on `/panel`. Run `npm run build:analyze` before adding groups back
 - **Build noise that is expected**: the `node:dns/promises … externalized for browser compatibility` warning comes from `@vinejs/vine`, which Vite resolves through superforms' all-adapters barrel (`sveltekit-superforms/adapters`) and then tree-shakes away; `[PLUGIN_TIMINGS]` is Rolldown's informational timing report

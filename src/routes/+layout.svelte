@@ -1,4 +1,12 @@
 <script lang="ts">
+	// Webfonts are self-hosted (fontsource), so no visitor IP reaches Google Fonts.
+	// Fraunces needs `full` for the SOFT/WONK/opsz axes the headings use.
+	import '@fontsource-variable/fraunces/full.css';
+	import '@fontsource-variable/plus-jakarta-sans/wght.css';
+	import '@fontsource-variable/plus-jakarta-sans/wght-italic.css';
+	import '@fontsource/dm-mono/300.css';
+	import '@fontsource/dm-mono/400.css';
+	import '@fontsource/dm-mono/500.css';
 	import '$lib/styles/app.css';
 	import '@fortawesome/fontawesome-svg-core/styles.css';
 	import '$lib/i18n';

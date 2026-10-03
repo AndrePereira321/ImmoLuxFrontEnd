@@ -1,6 +1,6 @@
 /* The three webfonts — Fraunces (display), Plus Jakarta Sans (body) and DM Mono
-   (records) — are requested from a <link> in src/app.html, not @imported here,
-   so the browser can start fetching them without waiting for this stylesheet.
+   (records) — come from @fontsource packages imported in src/routes/+layout.svelte.
+   Fontsource names variable fonts '<Family> Variable'.
    The @font-face rules below are the local fallbacks. */
 
 /* Inter Font - Regular (400) — kept as fallback */

@@ -30,6 +30,13 @@
 	import { inview } from '$lib/actions/inview';
 	import { formatArea, formatPrice as formatPriceIntl } from '$lib/utils/format';
 	import AppAzulejo from '$lib/components/AppAzulejo.svelte';
+	// Leaflet's stylesheet and marker images are bundled, not fetched from a CDN:
+	// svelte-leafletjs's default marker points at cdnjs, so the page passes its own.
+	import 'leaflet/dist/leaflet.css';
+	import markerIconUrl from 'leaflet/dist/images/marker-icon.png';
+	import markerIcon2xUrl from 'leaflet/dist/images/marker-icon-2x.png';
+	import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png';
+	import type { Icon } from 'leaflet';
 
 	type LeafletComponent = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -54,6 +61,7 @@
 	let TileLayer = $state<LeafletComponent>(null);
 	let Marker = $state<LeafletComponent>(null);
 	let Popup = $state<LeafletComponent>(null);
+	let markerIcon = $state<Icon>();
 	let mapReady = $state(false);
 
 	// Resolved at init rather than in an effect: this page is server-rendered, and
@@ -323,11 +331,17 @@
 		}
 
 		// Load Leaflet dynamically (must stay client-side — excluded from SSR bundle)
-		const leaflet = await import('svelte-leafletjs');
+		const [leaflet, { Icon }] = await Promise.all([import('svelte-leafletjs'), import('leaflet')]);
 		LeafletMap = leaflet.LeafletMap;
 		TileLayer = leaflet.TileLayer;
 		Marker = leaflet.Marker;
 		Popup = leaflet.Popup;
+		markerIcon = new Icon({
+			...Icon.Default.prototype.options,
+			iconUrl: markerIconUrl,
+			iconRetinaUrl: markerIcon2xUrl,
+			shadowUrl: markerShadowUrl
+		});
 		mapReady = true;
 	});
 </script>
@@ -368,7 +382,6 @@
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html jsonLd}
 	{/if}
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 	<!-- no-JS fallback: the page is server-rendered, so the scroll reveals must
 	     not hide the record from a reader arriving without JavaScript -->
 	<noscript>
@@ -652,7 +665,7 @@
 							<div class="reveal reveal-scale azulejo-cell h-80 lg:h-[24rem]">
 								<LeafletMap options={{ center: mapCoordinates, zoom: 15 }}>
 									<TileLayer url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'} />
-									<Marker latLng={mapCoordinates}>
+									<Marker latLng={mapCoordinates} icon={markerIcon}>
 										<Popup>
 											<div class="p-2">
 												<p class="font-bold">{property.title || $_('properties.untitled')}</p>

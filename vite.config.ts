@@ -30,6 +30,10 @@ export default defineConfig({
 	build: {
 		minify: 'terser',
 		cssMinify: true,
+		// Never inline webfonts: a few tiny fontsource subsets fall under the 4 kB
+		// limit, and as data: URIs they'd sit in the render-blocking CSS and be
+		// blocked by the CSP's font-src 'self'. As files they load only when needed.
+		assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
 		// No manual vendor chunking (build.rolldownOptions.output.codeSplitting):
 		// groups capture their matches' dependencies too, so a broad
 		// /node_modules\/.*svelte/ group pulled svelte-i18n, svelte-leafletjs,
