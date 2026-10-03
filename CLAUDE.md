@@ -15,7 +15,14 @@ npm run lint          # Prettier check + ESLint
 npm run format        # Auto-format with Prettier
 ```
 
-There is no test suite. Requires Node `^20.19 || >=22.12` (`.npmrc` sets `engine-strict`); the production deploy installs with `npm ci`, so keep `package-lock.json` in sync. The backend lives in `../immo-lux-back-end`.
+There is no test suite. Requires Node `^22.13 || >=24` (`.npmrc` sets `engine-strict`; the floor comes from ESLint 10, vite-imagetools and rollup-plugin-visualizer); develop on **Node 26 + npm 12**. The production deploy installs with `npm ci`, so keep `package-lock.json` in sync. The backend lives in `../immo-lux-back-end`.
+
+**Install scripts:** npm 12 skips dependency install scripts unless `package.json` `allowScripts` approves them. `es5-ext` (its script only prints a message) and `esbuild` (pulled in by svelte-i18n, which never calls it) are denied on purpose. When a new dependency needs its script, `npm install` lists it at the end — review it with `npm install-scripts ls`, then `npm install-scripts approve <pkg>` (or `deny`). npm < 12 ignores `allowScripts` and runs every script.
+
+Majors deliberately held back — don't blindly `ncu -u`:
+
+- **SvelteKit 2.x / adapter-node 5.x**: `@vite-pwa/sveltekit` has no Kit 3 release yet (the PWA is currently inactive anyway — see Build Notes) and `sveltekit-superforms` supports Kit 3 only in its `3.x` prerelease. Kit 3 also needs Node ≥ 22.17 and is a large migration (config moves into `vite.config.ts`, `$app/stores` removed, `$app/paths` changes, single `src/params.ts`)
+- **TypeScript 6.x**: `typescript-eslint` (`<6.1`) and `svelte-check` (`^5 || ^6`) don't support TypeScript 7
 
 Formatting: tabs, single quotes, no trailing commas, `printWidth: 120`, with `prettier-plugin-svelte` and `prettier-plugin-tailwindcss`.
 
@@ -40,7 +47,7 @@ Formatting: tabs, single quotes, no trailing commas, `printWidth: 120`, with `pr
 - Each SSR loader makes one extra `/properties/{id}/images` request per property to get image IDs.
 - `src/hooks.server.ts` is a pass-through and `App.Locals` is empty.
 
-**Backend URLs.** Server load functions (`+page.server.ts`) use `PRIVATE_SERVER_URL` from `$env/static/private`; browser code uses `VITE_SERVER_URL` via `apiClient`. Exception: the two child sitemap endpoints use `import.meta.env.VITE_SERVER_URL`. Both come from `env/.env.development` / `env/.env.production` (Vite `envDir` and `kit.env.dir` both point to `./env`) and are **baked in at build time** — changing them needs a rebuild. SSR loads never carry the user's cookie, which is why anything authenticated must stay under `/panel`.
+**Backend URLs.** Server load functions (`+page.server.ts`) use `PRIVATE_SERVER_URL` from `$env/static/private`; browser code uses `VITE_SERVER_URL` via `apiClient`. Exception: the two child sitemap endpoints use `import.meta.env.VITE_SERVER_URL`. Both come from `env/.env.development` / `env/.env.production` (Vite `envDir` and `kit.env.dir` both point to `./env`; process env vars override them, e.g. `VITE_SERVER_URL=… npm run build`) and are **baked in at build time** — changing them needs a rebuild. SSR loads never carry the user's cookie, which is why anything authenticated must stay under `/panel`.
 
 **Key lib layout:**
 
@@ -272,7 +279,9 @@ If the property has no `latitude`/`longitude`, the page geocodes its address cli
 ## Build Notes
 
 - **All `console.*` calls and `debugger` statements are stripped in production** (`drop_console: true` in the terser config) — including `console.error`
-- **Environment files** are in `env/`, not the project root (`envDir` in `vite.config.ts`, `kit.env.dir` in `svelte.config.js`)
-- **PWA:** `@vite-pwa/sveltekit` with `autoUpdate`; its image runtime cache only matches URLs ending in an image extension, so backend `/v1/api/images/{id}` responses aren't cached by the service worker
-- **Vendor chunk splitting is configured but currently inert**: `vite.config.ts` declares `vendor-svelte`/`vendor-icons`/`vendor-i18n`/`vendor-leaflet` groups via `build.rolldownOptions.output.codeSplitting`, but SvelteKit's Vite plugin forces `codeSplitting: false` on the client build in this Rolldown/Vite 8 setup (to avoid circular-dependency issues with its own per-route chunking), so the groups never take effect — svelte, svelte-i18n, leaflet, and fontawesome all land in one Rolldown-automatic vendor chunk instead. Still avoid importing leaflet or fontawesome in code paths that don't need them, since that affects whether they're pulled in at all, not just which chunk they'd land in. Run `npm run build:analyze` to inspect actual chunk composition
+- **Environment files** are in `env/`, not the project root (`envDir` in `vite.config.ts`, `kit.env.dir` in `svelte.config.js`). `.env.development` and `.env.production` are committed; `env/.env.template` lists the required keys (both are needed — the build fails without `PRIVATE_SERVER_URL`), and `.env.local` is gitignored
+- **PWA — built but inactive:** `@vite-pwa/sveltekit` (`autoUpdate`) generates `sw.js`, `registerSW.js` and `manifest.webmanifest`, but nothing registers the service worker or links the manifest (no `virtual:pwa-register` / `pwaInfo` in the layout), so no browser ever installs it. Either wire it up in the root layout or drop the plugin — dropping it also removes the main SvelteKit 3 blocker. Once active, note its image runtime cache only matches URLs ending in an image extension, so backend `/v1/api/images/{id}` responses wouldn't be cached
+- **Precompression** (`.br`/`.gz` next to every client asset, served by `node build`) comes from adapter-node's `precompress` (on by default); don't add a Vite compression plugin on top
+- **No manual vendor chunking — keep it that way**: Rolldown `codeSplitting` groups also capture their matches' dependencies (`includeDependenciesRecursively` defaults to `true`), so the old `/node_modules\/.*svelte/` group swallowed svelte-i18n, svelte-leafletjs, svelte-fontawesome and superforms + zod into one ~680 kB chunk loaded on every page. Rolldown's automatic per-route splitting cut public pages from ~866 kB to ~587 kB of JS and keeps form code on `/panel`. Run `npm run build:analyze` before adding groups back
+- **Build noise that is expected**: the `node:dns/promises … externalized for browser compatibility` warning comes from `@vinejs/vine`, which Vite resolves through superforms' all-adapters barrel (`sveltekit-superforms/adapters`) and then tree-shakes away; `[PLUGIN_TIMINGS]` is Rolldown's informational timing report
 - The `a11y_consider_explicit_label` compiler warning is suppressed in `svelte.config.js`
